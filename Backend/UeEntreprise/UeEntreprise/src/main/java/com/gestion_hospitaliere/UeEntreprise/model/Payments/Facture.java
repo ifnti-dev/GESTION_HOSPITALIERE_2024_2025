@@ -32,6 +32,58 @@ public class Facture {
     @ManyToOne
     @JoinColumn(name = "caissier_id")
     private Caissier caissier;
-    
+
+
     // Getters and setters
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public Double getMontantTotal() {
+		return montantTotal;
+	}
+
+	public void setMontantTotal(Double montantTotal) {
+		this.montantTotal = montantTotal;
+	}
+
+	public String getStatut() {
+		return statut;
+	}
+
+	public void setStatut(String statut) {
+		this.statut = statut;
+	}
+
+	public LocalDate getDate() {
+		return date;
+	}
+
+	public void setDate(LocalDate date) {
+		this.date = date;
+	}
+
+	public List<Paiement> getPaiements() {
+		return paiements;
+	}
+
+	public void setPaiements(List<Paiement> paiements) {
+		this.paiements = paiements;
+	}
+
+	public Caissier getCaissier() {
+		return caissier;
+	}
+
+	public void setCaissier(Caissier caissier) {
+		this.caissier = caissier;
+	}
+    
+    
+    
 }
