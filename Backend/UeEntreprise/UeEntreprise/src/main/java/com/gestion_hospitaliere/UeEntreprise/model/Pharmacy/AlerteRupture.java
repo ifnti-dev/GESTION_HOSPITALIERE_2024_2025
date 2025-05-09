@@ -25,6 +25,45 @@ public class AlerteRupture {
     @ManyToOne
     @JoinColumn(name = "medicament_id")
     private Medicament medicament;
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public LocalDate getDateAlerte() {
+		return dateAlerte;
+	}
+
+	public void setDateAlerte(LocalDate dateAlerte) {
+		this.dateAlerte = dateAlerte;
+	}
+
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
+	}
+
+	public Boolean getEstFrelate() {
+		return estFrelate;
+	}
+
+	public void setEstFrelate(Boolean estFrelate) {
+		this.estFrelate = estFrelate;
+	}
+
+	public Medicament getMedicament() {
+		return medicament;
+	}
+
+	public void setMedicament(Medicament medicament) {
+		this.medicament = medicament;
+	}    
     
-    // Getters and setters
 }

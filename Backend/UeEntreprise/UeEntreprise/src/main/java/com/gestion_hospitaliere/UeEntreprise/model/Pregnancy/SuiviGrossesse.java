@@ -25,6 +25,53 @@ public class SuiviGrossesse {
     @ManyToOne
     @JoinColumn(name = "dossier_grossesse_id")
     private DossierGrossesse dossierGrossesse;
-    
-    // Getters and setters
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getTrimestre() {
+		return trimestre;
+	}
+
+	public void setTrimestre(String trimestre) {
+		this.trimestre = trimestre;
+	}
+
+	public Float getTension() {
+		return tension;
+	}
+
+	public void setTension(Float tension) {
+		this.tension = tension;
+	}
+
+	public Float getPoids() {
+		return poids;
+	}
+
+	public void setPoids(Float poids) {
+		this.poids = poids;
+	}
+
+	public String getRemarque() {
+		return remarque;
+	}
+
+	public void setRemarque(String remarque) {
+		this.remarque = remarque;
+	}
+
+	public DossierGrossesse getDossierGrossesse() {
+		return dossierGrossesse;
+	}
+
+	public void setDossierGrossesse(DossierGrossesse dossierGrossesse) {
+		this.dossierGrossesse = dossierGrossesse;
+	}
+  
 }

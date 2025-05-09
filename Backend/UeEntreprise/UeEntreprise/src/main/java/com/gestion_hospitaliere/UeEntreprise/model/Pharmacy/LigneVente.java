@@ -25,6 +25,39 @@ public class LigneVente {
     @ManyToOne
     @JoinColumn(name = "medicament_id")
     private Medicament medicament;
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public Integer getQuantite() {
+		return quantite;
+	}
+
+	public void setQuantite(Integer quantite) {
+		this.quantite = quantite;
+	}
+
+	public VenteMedicament getVente() {
+		return vente;
+	}
+
+	public void setVente(VenteMedicament vente) {
+		this.vente = vente;
+	}
+
+	public Medicament getMedicament() {
+		return medicament;
+	}
+
+	public void setMedicament(Medicament medicament) {
+		this.medicament = medicament;
+	}
     
-    // Getters and setters
+    
+    
 }

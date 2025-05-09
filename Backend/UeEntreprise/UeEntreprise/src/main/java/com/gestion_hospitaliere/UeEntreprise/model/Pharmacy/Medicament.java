@@ -33,6 +33,77 @@ public class Medicament {
     
     @OneToMany(mappedBy = "medicament", cascade = CascadeType.ALL)
     private List<StockProduit> stocks = new ArrayList<>();
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getNom() {
+		return nom;
+	}
+
+	public void setNom(String nom) {
+		this.nom = nom;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public String getUnite() {
+		return unite;
+	}
+
+	public void setUnite(String unite) {
+		this.unite = unite;
+	}
+
+	public Integer getSeuilAlerte() {
+		return seuilAlerte;
+	}
+
+	public void setSeuilAlerte(Integer seuilAlerte) {
+		this.seuilAlerte = seuilAlerte;
+	}
+
+	public Boolean getEstActif() {
+		return estActif;
+	}
+
+	public void setEstActif(Boolean estActif) {
+		this.estActif = estActif;
+	}
+
+	public CategorieMedicament getCategorie() {
+		return categorie;
+	}
+
+	public void setCategorie(CategorieMedicament categorie) {
+		this.categorie = categorie;
+	}
+
+	public List<Reference> getReferences() {
+		return references;
+	}
+
+	public void setReferences(List<Reference> references) {
+		this.references = references;
+	}
+
+	public List<StockProduit> getStocks() {
+		return stocks;
+	}
+
+	public void setStocks(List<StockProduit> stocks) {
+		this.stocks = stocks;
+	}    
     
-    // Getters and setters
 }
