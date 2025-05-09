@@ -32,6 +32,61 @@ public class Accouchement {
     @ManyToOne
     @JoinColumn(name = "dossier_grossesse_id")
     private DossierGrossesse dossierGrossesse;
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public LocalDate getDate() {
+		return date;
+	}
+
+	public void setDate(LocalDate date) {
+		this.date = date;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public String getComplications() {
+		return complications;
+	}
+
+	public void setComplications(String complications) {
+		this.complications = complications;
+	}
+
+	public Float getBebePoids() {
+		return bebePoids;
+	}
+
+	public void setBebePoids(Float bebePoids) {
+		this.bebePoids = bebePoids;
+	}
+
+	public SageFemme getSageFemme() {
+		return sageFemme;
+	}
+
+	public void setSageFemme(SageFemme sageFemme) {
+		this.sageFemme = sageFemme;
+	}
+
+	public DossierGrossesse getDossierGrossesse() {
+		return dossierGrossesse;
+	}
+
+	public void setDossierGrossesse(DossierGrossesse dossierGrossesse) {
+		this.dossierGrossesse = dossierGrossesse;
+	}
     
-    // Getters and setters
 }
