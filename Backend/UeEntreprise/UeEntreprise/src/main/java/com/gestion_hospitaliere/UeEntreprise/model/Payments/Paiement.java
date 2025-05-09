@@ -22,6 +22,42 @@ public class Paiement {
     @ManyToOne
     @JoinColumn(name = "facture_id")
     private Facture facture;
+
+	public Double getMontant() {
+		return montant;
+	}
+
+	public void setMontant(Double montant) {
+		this.montant = montant;
+	}
+
+	public LocalDate getDate() {
+		return date;
+	}
+
+	public void setDate(LocalDate date) {
+		this.date = date;
+	}
+
+	public String getMoyen() {
+		return moyen;
+	}
+
+	public void setMoyen(String moyen) {
+		this.moyen = moyen;
+	}
+
+	public Facture getFacture() {
+		return facture;
+	}
+
+	public void setFacture(Facture facture) {
+		this.facture = facture;
+	}
     
     // Getters and setters
+    
+    
+    
+    
 }
