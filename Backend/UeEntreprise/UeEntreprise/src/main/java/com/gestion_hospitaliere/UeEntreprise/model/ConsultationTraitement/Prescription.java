@@ -28,6 +28,56 @@ public class Prescription {
     @ManyToOne
     @JoinColumn(name = "medicament_id")
     private Medicament medicament;
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public Integer getQuantite() {
+		return quantite;
+	}
+
+	public void setQuantite(Integer quantite) {
+		this.quantite = quantite;
+	}
+
+	public String getPosologie() {
+		return posologie;
+	}
+
+	public void setPosologie(String posologie) {
+		this.posologie = posologie;
+	}
+
+	public Integer getDuree() {
+		return duree;
+	}
+
+	public void setDuree(Integer duree) {
+		this.duree = duree;
+	}
+
+	public Consultation getConsultation() {
+		return consultation;
+	}
+
+	public void setConsultation(Consultation consultation) {
+		this.consultation = consultation;
+	}
+
+	public Medicament getMedicament() {
+		return medicament;
+	}
+
+	public void setMedicament(Medicament medicament) {
+		this.medicament = medicament;
+	}
     
     // Getters and setters
+    
+    
 }

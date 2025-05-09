@@ -36,6 +36,64 @@ public class Consultation {
     @ManyToOne
     @JoinColumn(name = "patient_id")
     private Patient patient;
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public LocalDate getDate() {
+		return date;
+	}
+
+	public void setDate(LocalDate date) {
+		this.date = date;
+	}
+
+	public String getSymptomes() {
+		return symptomes;
+	}
+
+	public void setSymptomes(String symptomes) {
+		this.symptomes = symptomes;
+	}
+
+	public String getDiagnostic() {
+		return diagnostic;
+	}
+
+	public void setDiagnostic(String diagnostic) {
+		this.diagnostic = diagnostic;
+	}
+
+	public List<Prescription> getPrescriptions() {
+		return prescriptions;
+	}
+
+	public void setPrescriptions(List<Prescription> prescriptions) {
+		this.prescriptions = prescriptions;
+	}
+
+	public Medecin getMedecin() {
+		return medecin;
+	}
+
+	public void setMedecin(Medecin medecin) {
+		this.medecin = medecin;
+	}
+
+	public Patient getPatient() {
+		return patient;
+	}
+
+	public void setPatient(Patient patient) {
+		this.patient = patient;
+	}
     
     // Getters and setters
+    
+    
 }
