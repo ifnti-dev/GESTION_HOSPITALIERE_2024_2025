@@ -28,6 +28,46 @@ public class Approvisionnement {
     
     @OneToMany(mappedBy = "approvisionnement", cascade = CascadeType.ALL)
     private List<LigneApprovisionnement> lignes = new ArrayList<>();
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public LocalDate getDate() {
+		return date;
+	}
+
+	public void setDate(LocalDate date) {
+		this.date = date;
+	}
+
+	public String getFactureNumero() {
+		return factureNumero;
+	}
+
+	public void setFactureNumero(String factureNumero) {
+		this.factureNumero = factureNumero;
+	}
+
+	public Fournisseur getFournisseur() {
+		return fournisseur;
+	}
+
+	public void setFournisseur(Fournisseur fournisseur) {
+		this.fournisseur = fournisseur;
+	}
+
+	public List<LigneApprovisionnement> getLignes() {
+		return lignes;
+	}
+
+	public void setLignes(List<LigneApprovisionnement> lignes) {
+		this.lignes = lignes;
+	}
     
-    // Getters and setters
+    
 }

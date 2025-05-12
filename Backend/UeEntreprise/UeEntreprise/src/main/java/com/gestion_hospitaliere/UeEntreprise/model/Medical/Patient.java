@@ -52,6 +52,121 @@ public class Patient {
     
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
     private List<VenteMedicament> ventesMedicaments = new ArrayList<>();
-    
+
+
     // Getters and setters
+
+
+	public String getNom() {
+		return nom;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public void setNom(String nom) {
+		this.nom = nom;
+	}
+
+	public String getPrenom() {
+		return prenom;
+	}
+
+	public void setPrenom(String prenom) {
+		this.prenom = prenom;
+	}
+
+	public LocalDate getDateNaissance() {
+		return dateNaissance;
+	}
+
+	public void setDateNaissance(LocalDate dateNaissance) {
+		this.dateNaissance = dateNaissance;
+	}
+
+	public String getSexe() {
+		return sexe;
+	}
+
+	public void setSexe(String sexe) {
+		this.sexe = sexe;
+	}
+
+	public String getAdresse() {
+		return adresse;
+	}
+
+	public void setAdresse(String adresse) {
+		this.adresse = adresse;
+	}
+
+	public DossierMedical getDossierMedical() {
+		return dossierMedical;
+	}
+
+	public void setDossierMedical(DossierMedical dossierMedical) {
+		this.dossierMedical = dossierMedical;
+	}
+
+	public DossierGrossesse getDossierGrossesse() {
+		return dossierGrossesse;
+	}
+
+	public void setDossierGrossesse(DossierGrossesse dossierGrossesse) {
+		this.dossierGrossesse = dossierGrossesse;
+	}
+
+	public List<RendezVous> getRendezVous() {
+		return rendezVous;
+	}
+
+	public void setRendezVous(List<RendezVous> rendezVous) {
+		this.rendezVous = rendezVous;
+	}
+
+	public List<Hospitalisation> getHospitalisations() {
+		return hospitalisations;
+	}
+
+	public void setHospitalisations(List<Hospitalisation> hospitalisations) {
+		this.hospitalisations = hospitalisations;
+	}
+
+	public List<Consultation> getConsultations() {
+		return consultations;
+	}
+
+	public void setConsultations(List<Consultation> consultations) {
+		this.consultations = consultations;
+	}
+
+	public List<SuiviEtat> getSuivisEtat() {
+		return suivisEtat;
+	}
+
+	public void setSuivisEtat(List<SuiviEtat> suivisEtat) {
+		this.suivisEtat = suivisEtat;
+	}
+
+	public List<VenteMedicament> getVentesMedicaments() {
+		return ventesMedicaments;
+	}
+
+	public void setVentesMedicaments(List<VenteMedicament> ventesMedicaments) {
+		this.ventesMedicaments = ventesMedicaments;
+	}
+    
+    
+    
+    
+    
+    
+    
+    
+    
 }
