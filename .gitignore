@@ -1,2 +1,55 @@
 ### VS Code ###
 .vscode/
+# Java
+*.class
+*.jar
+*.war
+*.ear
+
+# Logs
+*.log
+
+# Compiled class files
+target/
+bin/
+
+# Maven
+log/
+target/
+dependency-reduced-pom.xml
+release.properties
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+buildNumber.properties
+
+# Eclipse
+.project
+.classpath
+.settings/
+.factorypath
+
+# IntelliJ IDEA
+*.iml
+.idea/
+*.ipr
+*.iws
+out/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Spring Boot devtools
+.spring-boot-devtools.properties
+
+# Test reports
+surefire-reports/
+test-output/
+
+# Local environment configs
+.env
+application-local.properties
+application-dev.properties
+application-test.properties
