@@ -41,6 +41,69 @@ public class VenteMedicament {
     
     @OneToMany(mappedBy = "vente", cascade = CascadeType.ALL)
     private List<LigneVente> lignes = new ArrayList<>();
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public LocalDate getDateVente() {
+		return dateVente;
+	}
+
+	public void setDateVente(LocalDate dateVente) {
+		this.dateVente = dateVente;
+	}
+
+	public Integer getQuantite() {
+		return quantite;
+	}
+
+	public void setQuantite(Integer quantite) {
+		this.quantite = quantite;
+	}
+
+	public Double getMontantTotal() {
+		return montantTotal;
+	}
+
+	public void setMontantTotal(Double montantTotal) {
+		this.montantTotal = montantTotal;
+	}
+
+	public Patient getPatient() {
+		return patient;
+	}
+
+	public void setPatient(Patient patient) {
+		this.patient = patient;
+	}
+
+	public Caissier getCaissier() {
+		return caissier;
+	}
+
+	public void setCaissier(Caissier caissier) {
+		this.caissier = caissier;
+	}
+
+	public Pharmacien getPharmacien() {
+		return pharmacien;
+	}
+
+	public void setPharmacien(Pharmacien pharmacien) {
+		this.pharmacien = pharmacien;
+	}
+
+	public List<LigneVente> getLignes() {
+		return lignes;
+	}
+
+	public void setLignes(List<LigneVente> lignes) {
+		this.lignes = lignes;
+	}    
     
-    // Getters and setters
 }

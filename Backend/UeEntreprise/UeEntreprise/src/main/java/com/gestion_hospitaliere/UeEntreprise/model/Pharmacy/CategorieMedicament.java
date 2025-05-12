@@ -24,6 +24,37 @@ public class CategorieMedicament {
     
     @OneToMany(mappedBy = "categorie")
     private List<Medicament> medicaments = new ArrayList<>();
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getNom() {
+		return nom;
+	}
+
+	public void setNom(String nom) {
+		this.nom = nom;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public List<Medicament> getMedicaments() {
+		return medicaments;
+	}
+
+	public void setMedicaments(List<Medicament> medicaments) {
+		this.medicaments = medicaments;
+	}    
     
-    // Getters and setters
 }

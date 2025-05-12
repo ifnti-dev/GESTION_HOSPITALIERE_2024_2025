@@ -35,6 +35,71 @@ public class RendezVous {
     @ManyToOne
     @JoinColumn(name = "sagefemme_id")
     private SageFemme sageFemme;
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public LocalDateTime getDateHeure() {
+		return dateHeure;
+	}
+
+	public void setDateHeure(LocalDateTime dateHeure) {
+		this.dateHeure = dateHeure;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public String getStatut() {
+		return statut;
+	}
+
+	public void setStatut(String statut) {
+		this.statut = statut;
+	}
+
+	public String getNotes() {
+		return notes;
+	}
+
+	public void setNotes(String notes) {
+		this.notes = notes;
+	}
+
+	public Patient getPatient() {
+		return patient;
+	}
+
+	public void setPatient(Patient patient) {
+		this.patient = patient;
+	}
+
+	public Medecin getMedecin() {
+		return medecin;
+	}
+
+	public void setMedecin(Medecin medecin) {
+		this.medecin = medecin;
+	}
+
+	public SageFemme getSageFemme() {
+		return sageFemme;
+	}
+
+	public void setSageFemme(SageFemme sageFemme) {
+		this.sageFemme = sageFemme;
+	}
     
     // Getters and setters
+    
 }
