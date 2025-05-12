@@ -14,4 +14,13 @@ import jakarta.persistence.OneToMany;
 public class Medecin extends Employe {
     private String specialite;
     // Additional fields and methods
+
+	public String getSpecialite() {
+		return specialite;
+	}
+
+	public void setSpecialite(String specialite) {
+		this.specialite = specialite;
+	}
+    
 }

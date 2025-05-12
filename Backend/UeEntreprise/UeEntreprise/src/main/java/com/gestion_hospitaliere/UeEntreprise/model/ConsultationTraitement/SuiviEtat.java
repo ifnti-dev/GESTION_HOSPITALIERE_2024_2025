@@ -25,6 +25,57 @@ public class SuiviEtat {
     @ManyToOne
     @JoinColumn(name = "patient_id")
     private Patient patient;
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public LocalDate getDate() {
+		return date;
+	}
+
+	public void setDate(LocalDate date) {
+		this.date = date;
+	}
+
+	public Integer getTemperature() {
+		return temperature;
+	}
+
+	public void setTemperature(Integer temperature) {
+		this.temperature = temperature;
+	}
+
+	public Float getTension() {
+		return tension;
+	}
+
+	public void setTension(Float tension) {
+		this.tension = tension;
+	}
+
+	public String getObservations() {
+		return observations;
+	}
+
+	public void setObservations(String observations) {
+		this.observations = observations;
+	}
+
+	public Patient getPatient() {
+		return patient;
+	}
+
+	public void setPatient(Patient patient) {
+		this.patient = patient;
+	}
     
     // Getters and setters
+    
+    
+    
 }
