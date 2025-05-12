@@ -8,19 +8,89 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import java.time.LocalDate;
+import java.util.List;
 
+import com.gestion_hospitaliere.UeEntreprise.model.ConsultationTraitement.Consultation;
+import com.gestion_hospitaliere.UeEntreprise.model.Medical.Patient;
 
 @Entity
 public class Medecin extends Employe {
     private String specialite;
-    // Additional fields and methods
+    private String horairesTravail;
+    private LocalDate dateDebutAffectation;
+    private Boolean actif;
 
-	public String getSpecialite() {
-		return specialite;
-	}
+	// Service :
+	// Une relation avec une entité Service pour indiquer dans quel service hospitalier le médecin travaille.
+    // @ManyToOne
+    // @JoinColumn(name = "service_id")
+    // private Service service;
 
-	public void setSpecialite(String specialite) {
-		this.specialite = specialite;
-	}
-    
+	// 	Liste des patients :
+	// Une relation avec une entité Patient pour suivre les patients pris en charge par le médecin.
+    // @OneToMany(mappedBy = "medecin", cascade = CascadeType.ALL)
+    // private List<Patient> patients;
+
+	// 	Consultations :
+	// Une relation avec une entité Consultation pour suivre les consultations effectuées par le médecin.
+    // @OneToMany(mappedBy = "medecin", cascade = CascadeType.ALL)
+    // private List<Consultation> consultations;
+
+    // Getters et setters
+    public String getSpecialite() {
+        return specialite;
+    }
+
+    public void setSpecialite(String specialite) {
+        this.specialite = specialite;
+    }
+
+    public String getHorairesTravail() {
+        return horairesTravail;
+    }
+
+    public void setHorairesTravail(String horairesTravail) {
+        this.horairesTravail = horairesTravail;
+    }
+
+    public LocalDate getDateDebutAffectation() {
+        return dateDebutAffectation;
+    }
+
+    public void setDateDebutAffectation(LocalDate dateDebutAffectation) {
+        this.dateDebutAffectation = dateDebutAffectation;
+    }
+
+    public Boolean getActif() {
+        return actif;
+    }
+
+    public void setActif(Boolean actif) {
+        this.actif = actif;
+    }
+
+    // public Service getService() {
+    //     return service;
+    // }
+
+    // public void setService(Service service) {
+    //     this.service = service;
+    // }
+
+    // public List<Patient> getPatients() {
+    //     return patients;
+    // }
+
+    // public void setPatients(List<Patient> patients) {
+    //     this.patients = patients;
+    // }
+
+    // public List<Consultation> getConsultations() {
+    //     return consultations;
+    // }
+
+    // public void setConsultations(List<Consultation> consultations) {
+    //     this.consultations = consultations;
+    // }
 }
