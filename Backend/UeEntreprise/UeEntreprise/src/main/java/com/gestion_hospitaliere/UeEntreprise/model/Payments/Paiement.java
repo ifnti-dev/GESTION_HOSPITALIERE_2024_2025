@@ -23,6 +23,8 @@ public class Paiement {
     @JoinColumn(name = "facture_id")
     private Facture facture;
 
+    // Getters and setters
+
 	public Double getMontant() {
 		return montant;
 	}
@@ -55,7 +57,6 @@ public class Paiement {
 		this.facture = facture;
 	}
     
-    // Getters and setters
     
     
     
