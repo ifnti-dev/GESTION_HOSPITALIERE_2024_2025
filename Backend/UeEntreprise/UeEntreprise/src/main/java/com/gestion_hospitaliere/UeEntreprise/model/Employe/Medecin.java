@@ -9,9 +9,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 
-import java.security.Provider.Service;
 import java.time.LocalDate;
 import java.util.List;
+
+import com.gestion_hospitaliere.UeEntreprise.model.HospitalisationService.ServiceHopital;
 
 
 @Entity
@@ -25,7 +26,7 @@ public class Medecin extends Employe {
 	// Une relation avec une entité Service pour indiquer dans quel service hospitalier le médecin travaille.
     @ManyToOne
     @JoinColumn(name = "service_id")
-    private Service service;
+    private ServiceHopital service;
 
 
     // Getters et setters
@@ -61,11 +62,11 @@ public class Medecin extends Employe {
         this.actif = actif;
     }
 
-    public Service getService() {
+    public ServiceHopital getService() {
         return service;
     }
 
-    public void setService(Service service) {
+    public void setService(ServiceHopital service) {
         this.service = service;
     }
 }

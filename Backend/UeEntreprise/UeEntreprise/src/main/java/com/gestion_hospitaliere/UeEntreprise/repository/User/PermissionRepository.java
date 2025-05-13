@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 @Repository
 public interface PermissionRepository extends JpaRepository<Permission, Long> {
     // Méthode pour trouver une permission par son nom
-    Permission findByName(String name);
+    Permission findByNom(String nom);
 }
