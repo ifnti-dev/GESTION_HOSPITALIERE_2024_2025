@@ -8,7 +8,7 @@ import jakarta.persistence.Id;
 
 
 @Entity
-public class Service {
+public class ServiceHopital {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
