@@ -48,6 +48,8 @@ test-output/
 
 # Local environment configs
 .env
+
 application-local.properties
 application-dev.properties
 application-test.properties
+

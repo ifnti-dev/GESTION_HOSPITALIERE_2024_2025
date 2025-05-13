@@ -1,5 +1,6 @@
 ### VS Code ###
 .vscode/
+<<<<<<< HEAD
 # Java
 *.class
 *.jar
@@ -53,3 +54,7 @@ test-output/
 application-local.properties
 application-dev.properties
 application-test.properties
+=======
+*.properties
+
+>>>>>>> cf5e1070d30af16df0c93ab853acd4526d073ca3
