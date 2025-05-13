@@ -25,6 +25,13 @@ public class Paiement {
 
     // Getters and setters
 
+	public Long getId() {
+		return id;
+	}
+	public void setId(Long id) {
+		this.id = id;
+	}
+
 	public Double getMontant() {
 		return montant;
 	}
@@ -56,8 +63,6 @@ public class Paiement {
 	public void setFacture(Facture facture) {
 		this.facture = facture;
 	}
-    
-    
     
     
     

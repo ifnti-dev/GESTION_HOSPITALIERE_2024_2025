@@ -33,7 +33,12 @@ public class Facture {
     @JoinColumn(name = "caissier_id")
     private Caissier caissier;
 
-
+	public Long getId() {
+		return id;
+	}
+	public void setId(Long id) {
+		this.id = id;
+	}
     // Getters and setters
 
 	public String getType() {
