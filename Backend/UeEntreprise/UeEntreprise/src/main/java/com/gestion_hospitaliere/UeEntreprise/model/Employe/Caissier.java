@@ -6,34 +6,18 @@ import jakarta.persistence.CascadeType;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.gestion_hospitaliere.UeEntreprise.model.Payments.Caisse;
+
 @Entity
 public class Caissier extends Employe {
-    private String numeroCaisse;
-    private Double montantTotalEncaisse;
     private LocalDate dateDebutAffectation;
     private String horairesTravail;
     private Boolean actif;
 
-    // @OneToMany(mappedBy = "caissier", cascade = CascadeType.ALL)
-    // private List<RapportCaisse> rapportsCaisse;
+    @OneToMany(mappedBy = "caissier", cascade = CascadeType.ALL)
+    private List<Caisse> caisses;
 
     // Getters et setters
-    public String getNumeroCaisse() {
-        return numeroCaisse;
-    }
-
-    public void setNumeroCaisse(String numeroCaisse) {
-        this.numeroCaisse = numeroCaisse;
-    }
-
-    public Double getMontantTotalEncaisse() {
-        return montantTotalEncaisse;
-    }
-
-    public void setMontantTotalEncaisse(Double montantTotalEncaisse) {
-        this.montantTotalEncaisse = montantTotalEncaisse;
-    }
-
     public LocalDate getDateDebutAffectation() {
         return dateDebutAffectation;
     }
@@ -58,11 +42,11 @@ public class Caissier extends Employe {
         this.actif = actif;
     }
 
-    // public List<RapportCaisse> getRapportsCaisse() {
-    //     return rapportsCaisse;
-    // }
+    public List<Caisse> getCaisses() {
+        return caisses;
+    }
 
-    // public void setRapportsCaisse(List<RapportCaisse> rapportsCaisse) {
-    //     this.rapportsCaisse = rapportsCaisse;
-    // }
+    public void setCaisses(List<Caisse> caisses) {
+        this.caisses = caisses;
+    }
 }

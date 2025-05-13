@@ -8,6 +8,8 @@ import jakarta.persistence.OneToMany;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.gestion_hospitaliere.UeEntreprise.model.Medical.Patient;
+
 @Entity
 public class Infirmier extends Employe {
     private String specialite;

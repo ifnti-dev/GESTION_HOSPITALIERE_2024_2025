@@ -6,7 +6,6 @@ import jakarta.persistence.OneToMany;
 import java.time.LocalDate;
 import java.util.List;
 
-import com.gestion_hospitaliere.UeEntreprise.model.Pharmacy.Medicament;
 
 @Entity
 public class Pharmacien extends Employe {
@@ -14,16 +13,6 @@ public class Pharmacien extends Employe {
     private LocalDate dateDebutAffectation;
     private String horairesTravail;
     private Boolean actif;
-
-    // Liste des médicaments gérés :
-    // Une relation avec une entité Medicament pour suivre les médicaments gérés par le pharmacien.
-    // @OneToMany(mappedBy = "pharmacien", cascade = CascadeType.ALL)
-    // private List<Medicament> medicaments;
-
-    // Commandes de médicaments :
-    // Une relation avec une entité Commande pour suivre les commandes de médicaments effectuées par le pharmacien.
-    // @OneToMany(mappedBy = "pharmacien", cascade = CascadeType.ALL)
-    // private List<Commande> commandes;
 
     // Getters et setters
     public String getNumeroLicence() {
@@ -57,20 +46,4 @@ public class Pharmacien extends Employe {
     public void setActif(Boolean actif) {
         this.actif = actif;
     }
-
-    // public List<Medicament> getMedicaments() {
-    //     return medicaments;
-    // }
-
-    // public void setMedicaments(List<Medicament> medicaments) {
-    //     this.medicaments = medicaments;
-    // }
-
-    // public List<Commande> getCommandes() {
-    //     return commandes;
-    // }
-
-    // public void setCommandes(List<Commande> commandes) {
-    //     this.commandes = commandes;
-    // }
 }
