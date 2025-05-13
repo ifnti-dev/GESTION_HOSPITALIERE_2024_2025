@@ -17,16 +17,7 @@ public class Infirmier extends Employe {
     private LocalDate dateDebutAffectation;
     private Boolean actif;
 
-    // Service :
-    // Une relation avec une entité Service pour indiquer dans quel service hospitalier l'infirmier travaille.
-    // @ManyToOne
-    // @JoinColumn(name = "service_id")
-    // private Service service;
-
-    // Liste des patients :
-    // Une relation avec une entité Patient pour suivre les patients pris en charge par l'infirmier.
-    // @OneToMany(mappedBy = "infirmier", cascade = CascadeType.ALL)
-    // private List<Patient> patients;
+   
 
     // Getters et setters
     public String getSpecialite() {
@@ -61,19 +52,5 @@ public class Infirmier extends Employe {
         this.actif = actif;
     }
 
-    // public Service getService() {
-    //     return service;
-    // }
-
-    // public void setService(Service service) {
-    //     this.service = service;
-    // }
-
-    // public List<Patient> getPatients() {
-    //     return patients;
-    // }
-
-    // public void setPatients(List<Patient> patients) {
-    //     this.patients = patients;
-    // }
+   
 }
