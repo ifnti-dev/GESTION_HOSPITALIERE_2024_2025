@@ -19,9 +19,9 @@ public class SageFemme extends Employe {
 
     // Service :
     // Une relation avec une entité Service pour indiquer dans quel service hospitalier la sage-femme travaille (par exemple, maternité).
-    // @ManyToOne
-    // @JoinColumn(name = "service_id")
-    // private Service service;
+    @ManyToOne
+    @JoinColumn(name = "service_id")
+    private Service service;
 
     // Liste des patientes :
     // Une relation avec une entité Patiente pour suivre les patientes prises en charge par la sage-femme.
