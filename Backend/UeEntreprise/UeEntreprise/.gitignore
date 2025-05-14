@@ -52,4 +52,5 @@ test-output/
 application-local.properties
 application-dev.properties
 application-test.properties
+application.properties
 
