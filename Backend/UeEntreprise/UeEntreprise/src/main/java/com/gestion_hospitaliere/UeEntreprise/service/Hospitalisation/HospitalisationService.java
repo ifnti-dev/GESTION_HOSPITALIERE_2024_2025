@@ -25,7 +25,7 @@ public class HospitalisationService {
         return hospitalisationRepository.findById(id);
     }
 
-    public Hospitalisation save(Hospitalisation hospitalisation) {
+    public Hospitalisation createHospitalisationWithRelations(Hospitalisation hospitalisation) {
         return hospitalisationRepository.save(hospitalisation);
     }
 

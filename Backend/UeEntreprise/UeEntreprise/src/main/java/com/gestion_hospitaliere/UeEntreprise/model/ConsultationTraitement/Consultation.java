@@ -6,6 +6,8 @@ import java.util.List;
 
 import com.gestion_hospitaliere.UeEntreprise.model.Employe.Medecin;
 import com.gestion_hospitaliere.UeEntreprise.model.Medical.Patient;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -21,21 +23,28 @@ public class Consultation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     private LocalDate date;
     private String symptomes;
     private String diagnostic;
-    
+
     @OneToMany(mappedBy = "consultation", cascade = CascadeType.ALL)
+    @JsonManagedReference("consultation-prescription")
     private List<Prescription> prescriptions = new ArrayList<>();
-    
+
     @ManyToOne
     @JoinColumn(name = "medecin_id")
+    @JsonBackReference("medecin-consultation") // c'est Medecin qui détient la liste des consultations
     private Medecin medecin;
-    
+
     @ManyToOne
     @JoinColumn(name = "patient_id")
+    @JsonBackReference("patient-consultation") // idem pour Patient
     private Patient patient;
+
+    // Getters and Setters...
+
+
 
 	public Long getId() {
 		return id;
@@ -92,8 +101,4 @@ public class Consultation {
 	public void setPatient(Patient patient) {
 		this.patient = patient;
 	}
-    
-    // Getters and setters
-    
-    
 }

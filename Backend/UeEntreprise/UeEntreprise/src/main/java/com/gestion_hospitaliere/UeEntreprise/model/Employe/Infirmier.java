@@ -12,4 +12,5 @@ import jakarta.persistence.OneToMany;
 @Entity
 public class Infirmier extends Employe {
     // Additional fields specific to Infirmier
+
 }

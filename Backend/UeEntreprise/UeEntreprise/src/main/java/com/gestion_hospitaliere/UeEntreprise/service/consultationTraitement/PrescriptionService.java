@@ -11,9 +11,9 @@ import java.util.Optional;
 @Service
 public class PrescriptionService {
 
+    @Autowired
     private final PrescriptionRepository prescriptionRepository;
 
-    @Autowired
     public PrescriptionService(PrescriptionRepository prescriptionRepository) {
         this.prescriptionRepository = prescriptionRepository;
     }

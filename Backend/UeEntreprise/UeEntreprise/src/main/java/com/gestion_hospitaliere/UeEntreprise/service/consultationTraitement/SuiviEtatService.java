@@ -12,9 +12,10 @@ import java.util.Optional;
 @Service
 public class SuiviEtatService {
 
+    @Autowired
     private final SuiviEtatRepository suiviEtatRepository;
 
-    @Autowired
+    
     public SuiviEtatService(SuiviEtatRepository suiviEtatRepository) {
         this.suiviEtatRepository = suiviEtatRepository;
     }

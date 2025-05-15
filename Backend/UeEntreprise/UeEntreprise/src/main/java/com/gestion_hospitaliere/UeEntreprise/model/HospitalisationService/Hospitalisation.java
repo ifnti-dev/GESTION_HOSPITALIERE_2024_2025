@@ -2,6 +2,7 @@ package com.gestion_hospitaliere.UeEntreprise.model.HospitalisationService;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.gestion_hospitaliere.UeEntreprise.model.Medical.Patient;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -9,7 +10,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-
 
 @Entity
 public class Hospitalisation {
@@ -23,10 +23,12 @@ public class Hospitalisation {
     
     @ManyToOne
     @JoinColumn(name = "patient_id")
+    @JsonIgnore  // Evite la sérialisation de la relation pour éviter la récursivité
     private Patient patient;
     
     @ManyToOne
     @JoinColumn(name = "service_id")
+    @JsonIgnore  // Evite la sérialisation de la relation pour éviter la récursivité
     private ServiceHopital service;
 
     // Getters and setters

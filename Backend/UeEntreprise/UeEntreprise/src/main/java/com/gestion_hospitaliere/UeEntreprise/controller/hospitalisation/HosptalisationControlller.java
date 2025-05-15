@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,16 +38,17 @@ public class HosptalisationControlller {
     }
 
     //  Créer une hospitalisation
-    @PostMapping
-    public Hospitalisation createHospitalisation(@RequestBody Hospitalisation hospitalisation) {
-        return hospitalisationService.save(hospitalisation);
-    }
+   @PostMapping
+public ResponseEntity<Hospitalisation> createHospitalisation(@RequestBody Hospitalisation hospitalisation) {
+    Hospitalisation savedHospitalisation = hospitalisationService.createHospitalisationWithRelations(hospitalisation);
+    return ResponseEntity.status(HttpStatus.CREATED).body(savedHospitalisation);
+}
 
     // ✏Modifier une hospitalisation
     @PutMapping("/{id}")
     public Hospitalisation updateHospitalisation(@PathVariable Long id, @RequestBody Hospitalisation hospitalisation) {
         hospitalisation.setId(id);
-        return hospitalisationService.save(hospitalisation);
+        return hospitalisationService.createHospitalisationWithRelations(hospitalisation);
     }
 
     //  SHospitalisationupprimer une hospitalisation

@@ -13,12 +13,12 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/v1/suivi-etats")
+@RequestMapping("/api/suiviEtats")
 public class SuiviEtatController {
-
+     @Autowired
     private final SuiviEtatService suiviEtatService;
 
-    @Autowired
+   
     public SuiviEtatController(SuiviEtatService suiviEtatService) {
         this.suiviEtatService = suiviEtatService;
     }

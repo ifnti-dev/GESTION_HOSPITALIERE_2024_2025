@@ -12,6 +12,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;  // Import nécessaire
+
 @Entity
 public class Medicament {
     @Id
@@ -29,81 +31,82 @@ public class Medicament {
     private CategorieMedicament categorie;
     
     @OneToMany(mappedBy = "medicament", cascade = CascadeType.ALL)
+    @JsonIgnore  // Ignorer la sérialisation de la relation pour éviter la récursivité
     private List<Reference> references = new ArrayList<>();
     
     @OneToMany(mappedBy = "medicament", cascade = CascadeType.ALL)
+    @JsonIgnore  // Ignorer la sérialisation de la relation pour éviter la récursivité
     private List<StockProduit> stocks = new ArrayList<>();
 
-	public Long getId() {
-		return id;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public String getNom() {
-		return nom;
-	}
+    public String getNom() {
+        return nom;
+    }
 
-	public void setNom(String nom) {
-		this.nom = nom;
-	}
+    public void setNom(String nom) {
+        this.nom = nom;
+    }
 
-	public String getDescription() {
-		return description;
-	}
+    public String getDescription() {
+        return description;
+    }
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-	public String getUnite() {
-		return unite;
-	}
+    public String getUnite() {
+        return unite;
+    }
 
-	public void setUnite(String unite) {
-		this.unite = unite;
-	}
+    public void setUnite(String unite) {
+        this.unite = unite;
+    }
 
-	public Integer getSeuilAlerte() {
-		return seuilAlerte;
-	}
+    public Integer getSeuilAlerte() {
+        return seuilAlerte;
+    }
 
-	public void setSeuilAlerte(Integer seuilAlerte) {
-		this.seuilAlerte = seuilAlerte;
-	}
+    public void setSeuilAlerte(Integer seuilAlerte) {
+        this.seuilAlerte = seuilAlerte;
+    }
 
-	public Boolean getEstActif() {
-		return estActif;
-	}
+    public Boolean getEstActif() {
+        return estActif;
+    }
 
-	public void setEstActif(Boolean estActif) {
-		this.estActif = estActif;
-	}
+    public void setEstActif(Boolean estActif) {
+        this.estActif = estActif;
+    }
 
-	public CategorieMedicament getCategorie() {
-		return categorie;
-	}
+    public CategorieMedicament getCategorie() {
+        return categorie;
+    }
 
-	public void setCategorie(CategorieMedicament categorie) {
-		this.categorie = categorie;
-	}
+    public void setCategorie(CategorieMedicament categorie) {
+        this.categorie = categorie;
+    }
 
-	public List<Reference> getReferences() {
-		return references;
-	}
+    public List<Reference> getReferences() {
+        return references;
+    }
 
-	public void setReferences(List<Reference> references) {
-		this.references = references;
-	}
+    public void setReferences(List<Reference> references) {
+        this.references = references;
+    }
 
-	public List<StockProduit> getStocks() {
-		return stocks;
-	}
+    public List<StockProduit> getStocks() {
+        return stocks;
+    }
 
-	public void setStocks(List<StockProduit> stocks) {
-		this.stocks = stocks;
-	}    
-    
+    public void setStocks(List<StockProduit> stocks) {
+        this.stocks = stocks;
+    }    
 }

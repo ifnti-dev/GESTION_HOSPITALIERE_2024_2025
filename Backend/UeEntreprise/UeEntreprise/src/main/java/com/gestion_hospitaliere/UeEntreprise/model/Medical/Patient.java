@@ -9,6 +9,8 @@ import com.gestion_hospitaliere.UeEntreprise.model.ConsultationTraitement.Consul
 import com.gestion_hospitaliere.UeEntreprise.model.ConsultationTraitement.SuiviEtat;
 import com.gestion_hospitaliere.UeEntreprise.model.HospitalisationService.Hospitalisation;
 import com.gestion_hospitaliere.UeEntreprise.model.Pharmacy.VenteMedicament;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -45,9 +47,11 @@ public class Patient {
     private List<Hospitalisation> hospitalisations = new ArrayList<>();
     
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
+    @JsonBackReference("patient-consultation")
     private List<Consultation> consultations = new ArrayList<>();
     
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
+	@JsonManagedReference
     private List<SuiviEtat> suivisEtat = new ArrayList<>();
     
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)

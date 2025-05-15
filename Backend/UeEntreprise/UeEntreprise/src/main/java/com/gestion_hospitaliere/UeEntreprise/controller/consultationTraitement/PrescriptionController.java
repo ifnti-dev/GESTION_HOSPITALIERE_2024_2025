@@ -11,12 +11,13 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/v1/prescriptions")
+@RequestMapping("/api/prescriptions")
+   
 public class PrescriptionController {
-
+@Autowired
     private final PrescriptionService prescriptionService;
 
-    @Autowired
+ 
     public PrescriptionController(PrescriptionService prescriptionService) {
         this.prescriptionService = prescriptionService;
     }
