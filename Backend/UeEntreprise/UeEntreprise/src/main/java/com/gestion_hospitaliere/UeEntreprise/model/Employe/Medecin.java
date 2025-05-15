@@ -12,6 +12,7 @@ import jakarta.persistence.OneToMany;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.gestion_hospitaliere.UeEntreprise.model.HospitalisationService.ServiceHopital;
 
 
@@ -26,6 +27,7 @@ public class Medecin extends Employe {
 	// Une relation avec une entité Service pour indiquer dans quel service hospitalier le médecin travaille.
     @ManyToOne
     @JoinColumn(name = "service_id")
+    @JsonIgnore  // Ignore dans le JSON
     private ServiceHopital service;
 
 

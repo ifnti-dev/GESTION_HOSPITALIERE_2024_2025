@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.gestion_hospitaliere.UeEntreprise.model.Employe.Medecin;
 import com.gestion_hospitaliere.UeEntreprise.model.Medical.Patient;
 

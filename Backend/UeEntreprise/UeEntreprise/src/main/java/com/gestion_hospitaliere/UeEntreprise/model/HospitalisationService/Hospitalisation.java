@@ -2,6 +2,7 @@ package com.gestion_hospitaliere.UeEntreprise.model.HospitalisationService;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.gestion_hospitaliere.UeEntreprise.model.Medical.Patient;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -23,6 +24,7 @@ public class Hospitalisation {
     
     @ManyToOne
     @JoinColumn(name = "patient_id")
+	@JsonIgnore
     private Patient patient;
     
     @ManyToOne

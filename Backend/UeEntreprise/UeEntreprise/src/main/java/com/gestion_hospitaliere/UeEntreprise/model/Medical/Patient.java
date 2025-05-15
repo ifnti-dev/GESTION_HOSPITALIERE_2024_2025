@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.gestion_hospitaliere.UeEntreprise.model.Appointments.RendezVous;
 import com.gestion_hospitaliere.UeEntreprise.model.ConsultationTraitement.Consultation;
 import com.gestion_hospitaliere.UeEntreprise.model.ConsultationTraitement.SuiviEtat;
@@ -33,24 +34,31 @@ public class Patient {
     private String adresse;
     
     @OneToOne(mappedBy = "patient", cascade = CascadeType.ALL)
+	@JsonIgnore  // Ignore dans le JSON
     private DossierMedical dossierMedical;
     
     @OneToOne(mappedBy = "patient", cascade = CascadeType.ALL)
+	@JsonIgnore  // Ignore dans le JSON
     private DossierGrossesse dossierGrossesse;
     
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
+	@JsonIgnore  // Ignore dans le JSON
     private List<RendezVous> rendezVous = new ArrayList<>();
     
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
+	@JsonIgnore  // Ignore dans le JSON
     private List<Hospitalisation> hospitalisations = new ArrayList<>();
     
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
+	@JsonIgnore  // Ignore dans le JSON
     private List<Consultation> consultations = new ArrayList<>();
     
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
+	@JsonIgnore  // Ignore dans le JSON
     private List<SuiviEtat> suivisEtat = new ArrayList<>();
     
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
+	@JsonIgnore  // Ignore dans le JSON
     private List<VenteMedicament> ventesMedicaments = new ArrayList<>();
 
 

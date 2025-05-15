@@ -2,6 +2,7 @@ package com.gestion_hospitaliere.UeEntreprise.model.ConsultationTraitement;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.gestion_hospitaliere.UeEntreprise.model.Medical.Patient;
 
 import jakarta.persistence.Entity;
@@ -24,6 +25,7 @@ public class SuiviEtat {
     
     @ManyToOne
     @JoinColumn(name = "patient_id")
+	@JsonIgnore
     private Patient patient;
 
 	public Long getId() {

@@ -1,5 +1,7 @@
 package com.gestion_hospitaliere.UeEntreprise.model.Medical;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -21,6 +23,7 @@ public class DossierMedical {
     
     @OneToOne
     @JoinColumn(name = "patient_id")
+	@JsonIgnore
     private Patient patient;
 
 

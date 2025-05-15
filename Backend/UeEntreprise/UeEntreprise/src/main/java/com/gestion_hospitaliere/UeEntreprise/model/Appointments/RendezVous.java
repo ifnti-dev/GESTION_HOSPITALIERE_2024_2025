@@ -2,6 +2,7 @@ package com.gestion_hospitaliere.UeEntreprise.model.Appointments;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.gestion_hospitaliere.UeEntreprise.model.Employe.Medecin;
 import com.gestion_hospitaliere.UeEntreprise.model.Employe.SageFemme;
 import com.gestion_hospitaliere.UeEntreprise.model.Medical.Patient;
@@ -26,6 +27,7 @@ public class RendezVous {
     
     @ManyToOne
     @JoinColumn(name = "patient_id")
+	@JsonIgnore
     private Patient patient;
     
     @ManyToOne
