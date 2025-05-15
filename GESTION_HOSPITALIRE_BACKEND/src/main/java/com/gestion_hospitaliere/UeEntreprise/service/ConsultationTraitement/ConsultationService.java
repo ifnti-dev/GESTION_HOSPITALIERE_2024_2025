@@ -1,4 +1,3 @@
-
 package com.gestion_hospitaliere.UeEntreprise.service.ConsultationTraitement;
 
 import com.gestion_hospitaliere.UeEntreprise.model.ConsultationTraitement.Consultation;
