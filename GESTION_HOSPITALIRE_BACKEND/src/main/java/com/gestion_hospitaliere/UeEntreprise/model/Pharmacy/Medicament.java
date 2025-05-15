@@ -3,6 +3,10 @@ package com.gestion_hospitaliere.UeEntreprise.model.Pharmacy;
 import java.util.ArrayList;
 import java.util.List;
 
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -26,6 +30,9 @@ public class Medicament {
     
     @ManyToOne
     @JoinColumn(name = "categorie_id")
+
+	@JsonIgnore
+
     private CategorieMedicament categorie;
     
     @OneToMany(mappedBy = "medicament", cascade = CascadeType.ALL)

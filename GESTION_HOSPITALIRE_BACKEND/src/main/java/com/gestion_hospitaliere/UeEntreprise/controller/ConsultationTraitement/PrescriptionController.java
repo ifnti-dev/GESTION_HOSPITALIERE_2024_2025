@@ -1,57 +1,71 @@
-// package com.gestion_hospitaliere.UeEntreprise.controller.ConsultationTraitement;
 
-// import java.util.List;
+package com.gestion_hospitaliere.UeEntreprise.controller.ConsultationTraitement;
 
-// import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.web.bind.annotation.*;
+import com.gestion_hospitaliere.UeEntreprise.model.ConsultationTraitement.Prescription;
+import com.gestion_hospitaliere.UeEntreprise.service.ConsultationTraitement.PrescriptionService;
 
-// import com.gestion_hospitaliere.UeEntreprise.model.ConsultationTraitement.Prescription;
-// import com.gestion_hospitaliere.UeEntreprise.service.ConsultationTraitement.PrescriptionService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-// @RestController
-// @RequestMapping("/api/prescriptions")
-// public class PrescriptionController {
+import java.util.List;
+import java.util.Optional;
 
-//     @Autowired
-//     private PrescriptionService prescriptionService;
+@RestController
+@RequestMapping("/api/prescriptions")
+   
+public class PrescriptionController {
+@Autowired
+    private final PrescriptionService prescriptionService;
 
-//     @GetMapping
-//     public List<Prescription> getAllPrescriptions() {
-//         return prescriptionService.getAllPrescriptions();
-//     }
+ 
+    public PrescriptionController(PrescriptionService prescriptionService) {
+        this.prescriptionService = prescriptionService;
+    }
 
-//     @GetMapping("/{id}")
-//     public Prescription getPrescriptionById(@PathVariable Long id) {
-//         return prescriptionService.getPrescriptionById(id);
-//     }
+    @GetMapping
+    public ResponseEntity<List<Prescription>> getAllPrescriptions() {
+        List<Prescription> prescriptions = prescriptionService.getAllPrescriptions();
+        return ResponseEntity.ok(prescriptions);
+    }
 
-//     @PostMapping
-//     public Prescription createPrescription(@RequestBody Prescription prescription) {
-//         return prescriptionService.createPrescription(prescription);
-//     }
+    @GetMapping("/{id}")
+    public ResponseEntity<Prescription> getPrescriptionById(@PathVariable Long id) {
+        Optional<Prescription> prescription = prescriptionService.getPrescriptionById(id);
+        return prescription.map(ResponseEntity::ok)
+                           .orElseGet(() -> ResponseEntity.notFound().build());
+    }
 
-//     @PutMapping("/{id}")
-//     public Prescription updatePrescription(@PathVariable Long id, @RequestBody Prescription prescription) {
-//         return prescriptionService.updatePrescription(id, prescription);
-//     }
+    @PostMapping
+    public ResponseEntity<Prescription> createPrescription(@RequestBody Prescription prescription) {
+        Prescription savedPrescription = prescriptionService.savePrescription(prescription);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedPrescription);
+    }
 
-//     @DeleteMapping("/{id}")
-//     public void deletePrescription(@PathVariable Long id) {
-//         prescriptionService.deletePrescription(id);
-//     }
+    @PutMapping("/{id}")
+    public ResponseEntity<Prescription> updatePrescription(@PathVariable Long id, @RequestBody Prescription prescriptionDetails) {
+        try {
+            Prescription updatedPrescription = prescriptionService.updatePrescription(id, prescriptionDetails);
+            return ResponseEntity.ok(updatedPrescription);
+        } catch (RuntimeException e) {
+            // Gérer l'exception si la prescription n'est pas trouvée
+            return ResponseEntity.notFound().build();
+        }
+    }
 
-//     @GetMapping("/consultation/{consultationId}")
-//     public List<Prescription> findByConsultationId(@PathVariable Long consultationId) {
-//         return prescriptionService.findByConsultationId(consultationId);
-//     }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletePrescription(@PathVariable Long id) {
+        try {
+            prescriptionService.deletePrescription(id);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            // Gérer l'exception si la prescription n'est pas trouvée
+            return ResponseEntity.notFound().build();
+        }
+    }
 
-//     @GetMapping("/medicament/{medicamentId}")
-//     public List<Prescription> findByMedicamentId(@PathVariable Long medicamentId) {
-//         return prescriptionService.findByMedicamentId(medicamentId);
-//     }
+    // Vous pouvez ajouter ici des endpoints pour des méthodes de service personnalisées
+    // Exemple: @GetMapping("/consultation/{consultationId}")
+}
 
-//     @GetMapping("/posologie")
-//     public List<Prescription> findByPosologieContaining(@RequestParam String posologie) {
-//         return prescriptionService.findByPosologieContaining(posologie);
-//     }
-// }

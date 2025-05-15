@@ -1,79 +1,60 @@
-// package com.gestion_hospitaliere.UeEntreprise.service.ConsultationTraitement;
 
-// import java.time.LocalDate;
-// import java.util.List;
+package com.gestion_hospitaliere.UeEntreprise.service.ConsultationTraitement;
 
-// import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.stereotype.Service;
+import com.gestion_hospitaliere.UeEntreprise.model.ConsultationTraitement.SuiviEtat;
+import com.gestion_hospitaliere.UeEntreprise.repository.ConsultationTraitement.SuiviEtatRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-// import com.gestion_hospitaliere.UeEntreprise.model.ConsultationTraitement.SuiviEtat;
-// import com.gestion_hospitaliere.UeEntreprise.model.Medical.Patient;
-// import com.gestion_hospitaliere.UeEntreprise.repository.ConsultationTraitement.SuiviEtatRepository;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 
-// @Service
-// public class SuiviEtatService {
+@Service
+public class SuiviEtatService {
 
-//     @Autowired
-//     private SuiviEtatRepository suiviEtatRepository;
+    @Autowired
+    private final SuiviEtatRepository suiviEtatRepository;
 
-//     @Autowired
-//     private PatientRepository patientRepository;
+    
+    public SuiviEtatService(SuiviEtatRepository suiviEtatRepository) {
+        this.suiviEtatRepository = suiviEtatRepository;
+    }
 
-//     public List<SuiviEtat> getAllSuiviEtats() {
-//         return suiviEtatRepository.findAll();
-//     }
+    public List<SuiviEtat> getAllSuiviEtats() {
+        return suiviEtatRepository.findAll();
+    }
 
-//     public SuiviEtat getSuiviEtatById(Long id) {
-//         return suiviEtatRepository.findById(id).orElse(null);
-//     }
+    public Optional<SuiviEtat> getSuiviEtatById(Long id) {
+        return suiviEtatRepository.findById(id);
+    }
 
-//     public SuiviEtat createSuiviEtat(SuiviEtat suiviEtat) {
-//         // Récupération et vérification du patient
-//         Long patientId = suiviEtat.getPatient().getId();
-//         Patient patient = patientRepository.findById(patientId)
-//             .orElseThrow(() -> new RuntimeException("Patient non trouvé avec l'id : " + patientId));
-        
-//         // Association explicite du patient récupéré
-//         suiviEtat.setPatient(patient);
+    public SuiviEtat saveSuiviEtat(SuiviEtat suiviEtat) {
+        return suiviEtatRepository.save(suiviEtat);
+    }
 
-//         return suiviEtatRepository.save(suiviEtat);
-//     }
+    public SuiviEtat updateSuiviEtat(Long id, SuiviEtat suiviEtatDetails) {
+        SuiviEtat suiviEtat = suiviEtatRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("SuiviEtat non trouvé avec l'id : " + id));
 
-//     public SuiviEtat updateSuiviEtat(Long id, SuiviEtat updatedSuiviEtat) {
-//         if (suiviEtatRepository.existsById(id)) {
-//             Long patientId = updatedSuiviEtat.getPatient().getId();
-//             Patient patient = patientRepository.findById(patientId)
-//                 .orElseThrow(() -> new RuntimeException("Patient non trouvé avec l'id : " + patientId));
-            
-//             updatedSuiviEtat.setId(id);
-//             updatedSuiviEtat.setPatient(patient);
+        // Mettre à jour les champs de suiviEtat. Exemple :
+        // suiviEtat.setDescription(suiviEtatDetails.getDescription());
+        // suiviEtat.setDateSuivi(suiviEtatDetails.getDateSuivi());
+        // ...
 
-//             return suiviEtatRepository.save(updatedSuiviEtat);
-//         }
-//         return null;
-//     }
+        suiviEtatDetails.setId(id); // Assurez-vous que l'ID est correct
+        return suiviEtatRepository.save(suiviEtatDetails);
+    }
 
-//     public void deleteSuiviEtat(Long id) {
-//         suiviEtatRepository.deleteById(id);
-//     }
+    public void deleteSuiviEtat(Long id) {
+        if (!suiviEtatRepository.existsById(id)) {
+            throw new RuntimeException("SuiviEtat non trouvé avec l'id : " + id + " pour la suppression.");
+        }
+        suiviEtatRepository.deleteById(id);
+    }
 
-//     public List<SuiviEtat> findByPatientId(Long patientId) {
-//         return suiviEtatRepository.findByPatientId(patientId);
-//     }
-
-//     public List<SuiviEtat> findByDate(LocalDate date) {
-//         return suiviEtatRepository.findByDate(date);
-//     }
-
-//     public List<SuiviEtat> findByTemperature(Integer temperature) {
-//         return suiviEtatRepository.findByTemperature(temperature);
-//     }
-
-//     public List<SuiviEtat> findByTension(Float tension) {
-//         return suiviEtatRepository.findByTension(tension);
-//     }
-
-//     public List<SuiviEtat> findByObservationsContaining(String observations) {
-//         return suiviEtatRepository.findByObservationsContaining(observations);
-//     }
-// }
+    // Utilisation de la méthode personnalisée du repository
+   // public List<SuiviEtat> findByConsultationIdAndDateSuiviAfter(Long consultationId, LocalDate date) {
+      //  return suiviEtatRepository.findByConsultationIdAndDateSuiviAfter(consultationId, date);
+    }
+//}
