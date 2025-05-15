@@ -22,7 +22,7 @@ public class PaiementController {
     }
 
     @GetMapping("/{id}")
-    public Paiement getPaiementById(@PathVariable Long id) {
+    public Paiement getPaiementById(@PathVariable("id") Long id) {
         return paiementService.getPaiementById(id);
     }
 
@@ -32,14 +32,15 @@ public class PaiementController {
     }
 
     @PutMapping("/{id}")
-    public Paiement updatePaiement(@PathVariable Long id, @RequestBody Paiement paiement) {
+    public Paiement updatePaiement(@PathVariable("id") Long id, @RequestBody Paiement paiement) {
         return paiementService.updatePaiement(id, paiement);
     }
 
     @DeleteMapping("/{id}")
-    public void deletePaiement(@PathVariable Long id) {
+    public void deletePaiement(@PathVariable("id") Long id) {
         paiementService.deletePaiement(id);
     }
+
 
     @GetMapping("/montant")
     public List<Paiement> findByMontant(@RequestParam Double montant) {

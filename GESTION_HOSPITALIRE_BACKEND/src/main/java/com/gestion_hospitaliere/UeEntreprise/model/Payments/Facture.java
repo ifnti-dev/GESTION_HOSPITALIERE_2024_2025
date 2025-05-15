@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.gestion_hospitaliere.UeEntreprise.model.Employe.Caissier;
 
 import jakarta.persistence.CascadeType;
@@ -27,6 +28,7 @@ public class Facture {
     private LocalDate date;
     
     @OneToMany(mappedBy = "facture", cascade = CascadeType.ALL)
+	@JsonIgnore
     private List<Paiement> paiements = new ArrayList<>();
     
     @ManyToOne
