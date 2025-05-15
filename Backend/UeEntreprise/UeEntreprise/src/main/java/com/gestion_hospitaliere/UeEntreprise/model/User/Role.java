@@ -1,6 +1,5 @@
 package com.gestion_hospitaliere.UeEntreprise.model.User;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.persistence.CascadeType;
@@ -28,7 +27,7 @@ public class Role {
         joinColumns = @JoinColumn(name = "role_id"),
         inverseJoinColumns = @JoinColumn(name = "permission_id")
     )
-    private Set<Permission> permissions = new HashSet<>();
+    private Set<Permission> permissions;
 
 	public Long getId() {
 		return id;

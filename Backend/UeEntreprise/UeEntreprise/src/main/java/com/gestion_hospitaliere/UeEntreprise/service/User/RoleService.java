@@ -3,20 +3,42 @@ package com.gestion_hospitaliere.UeEntreprise.service.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.gestion_hospitaliere.UeEntreprise.model.User.Permission;
 import com.gestion_hospitaliere.UeEntreprise.model.User.Role;
+import com.gestion_hospitaliere.UeEntreprise.model.dto.RoleRequest;
+import com.gestion_hospitaliere.UeEntreprise.repository.User.PermissionRepository;
 import com.gestion_hospitaliere.UeEntreprise.repository.User.RoleRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class RoleService {
 
     @Autowired
     private RoleRepository roleRepository;
+    
+    @Autowired
+    private PermissionRepository permissionRepository;
 
     // Créer un rôle
-    public Role creerRole(Role role) {
+    // public Role creerRole(Role role) {
+    //     return roleRepository.save(role);
+    // }
+
+    public Role creerRole(RoleRequest roleRequest) {
+        Role role = new Role();
+        role.setNom(roleRequest.getNom());
+
+        Set<Permission> permissions = roleRequest.getPermissions().stream()
+            .map(id -> permissionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Permission non trouvée avec id : " + id)))
+            .collect(Collectors.toSet());
+
+        role.setPermissions(permissions);
+
         return roleRepository.save(role);
     }
 
@@ -36,10 +58,25 @@ public class RoleService {
     }
 
     // Mettre à jour un rôle
-    public Role mettreAJourRole(Long id, Role roleDetails) {
+    // public Role mettreAJourRole(Long id, Role roleDetails) {
+    //     return roleRepository.findById(id).map(role -> {
+    //         role.setNom(roleDetails.getNom());
+    //         role.setPermissions(roleDetails.getPermissions());
+    //         return roleRepository.save(role);
+    //     }).orElseThrow(() -> new RuntimeException("Rôle non trouvé avec l'ID : " + id));
+    // }
+
+    public Role mettreAJourRole(Long id, RoleRequest roleRequest) {
         return roleRepository.findById(id).map(role -> {
-            role.setNom(roleDetails.getNom());
-            role.setPermissions(roleDetails.getPermissions());
+            role.setNom(roleRequest.getNom());
+
+            Set<Permission> permissions = roleRequest.getPermissions().stream()
+                .map(permissionId -> permissionRepository.findById(permissionId)
+                    .orElseThrow(() -> new RuntimeException("Permission non trouvée : " + permissionId)))
+                .collect(Collectors.toSet());
+
+            role.setPermissions(permissions);
+
             return roleRepository.save(role);
         }).orElseThrow(() -> new RuntimeException("Rôle non trouvé avec l'ID : " + id));
     }

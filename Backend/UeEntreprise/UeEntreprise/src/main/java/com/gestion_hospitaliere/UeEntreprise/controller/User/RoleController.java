@@ -1,6 +1,7 @@
 package com.gestion_hospitaliere.UeEntreprise.controller.User;
 
 import com.gestion_hospitaliere.UeEntreprise.model.User.Role;
+import com.gestion_hospitaliere.UeEntreprise.model.dto.RoleRequest;
 import com.gestion_hospitaliere.UeEntreprise.service.User.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,11 +18,18 @@ public class RoleController {
     private RoleService roleService;
 
     // Ajouter un rôle
+    // @PostMapping
+    // public ResponseEntity<Role> creerRole(@RequestBody Role role) {
+    //     Role nouveauRole = roleService.creerRole(role);
+    //     return ResponseEntity.ok(nouveauRole);
+    // }
+
     @PostMapping
-    public ResponseEntity<Role> creerRole(@RequestBody Role role) {
-        Role nouveauRole = roleService.creerRole(role);
+    public ResponseEntity<Role> creerRole(@RequestBody RoleRequest roleRequest) {
+        Role nouveauRole = roleService.creerRole(roleRequest);
         return ResponseEntity.ok(nouveauRole);
     }
+
 
     // Récupérer tous les rôles
     @GetMapping
@@ -51,14 +59,23 @@ public class RoleController {
 
     // Mettre à jour un rôle
     @PutMapping("/{id}")
-    public ResponseEntity<Role> mettreAJourRole(@PathVariable Long id, @RequestBody Role roleDetails) {
+    public ResponseEntity<Role> mettreAJourRole(@PathVariable Long id, @RequestBody RoleRequest roleRequest) {
         try {
-            Role roleMisAJour = roleService.mettreAJourRole(id, roleDetails);
+            Role roleMisAJour = roleService.mettreAJourRole(id, roleRequest);
             return ResponseEntity.ok(roleMisAJour);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
     }
+    // public ResponseEntity<Role> mettreAJourRole(@PathVariable Long id, @RequestBody Role roleDetails) {
+    //     try {
+    //         Role roleMisAJour = roleService.mettreAJourRole(id, roleDetails);
+    //         return ResponseEntity.ok(roleMisAJour);
+    //     } catch (RuntimeException e) {
+    //         return ResponseEntity.notFound().build();
+    //     }
+    // }
+
 
     // Supprimer un rôle
     @DeleteMapping("/{id}")
