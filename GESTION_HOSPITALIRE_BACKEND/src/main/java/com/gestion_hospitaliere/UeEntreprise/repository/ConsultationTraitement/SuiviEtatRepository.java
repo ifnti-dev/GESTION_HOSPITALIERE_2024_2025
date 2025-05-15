@@ -1,14 +1,15 @@
 package com.gestion_hospitaliere.UeEntreprise.repository.ConsultationTraitement;
 
 
+
 import com.gestion_hospitaliere.UeEntreprise.model.ConsultationTraitement.SuiviEtat;
+
 
 import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
 
 @Repository
 public interface SuiviEtatRepository extends JpaRepository<SuiviEtat, Long> {

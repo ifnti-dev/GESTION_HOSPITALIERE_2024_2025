@@ -3,6 +3,7 @@ package com.gestion_hospitaliere.UeEntreprise.model.ConsultationTraitement;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import com.gestion_hospitaliere.UeEntreprise.model.Pharmacy.Medicament;
 
 import jakarta.persistence.CascadeType;
@@ -26,12 +27,14 @@ public class Prescription {
     
     @ManyToOne
     @JoinColumn(name = "consultation_id")
+
 	@JsonBackReference
+
     private Consultation consultation;
     
     @ManyToOne
     @JoinColumn(name = "medicament_id")
-	
+
     private Medicament medicament;
 
 	public Long getId() {

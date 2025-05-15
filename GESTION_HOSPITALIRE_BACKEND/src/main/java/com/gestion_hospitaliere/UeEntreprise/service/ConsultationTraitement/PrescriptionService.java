@@ -1,3 +1,4 @@
+
 package com.gestion_hospitaliere.UeEntreprise.service.ConsultationTraitement;
 
 import com.gestion_hospitaliere.UeEntreprise.model.ConsultationTraitement.Prescription;
@@ -53,3 +54,6 @@ public class PrescriptionService {
     // Vous pouvez ajouter ici des méthodes spécifiques basées sur votre repository, par exemple :
     // public List<Prescription> findPrescriptionsByConsultationId(Long consultationId) { ... }
 }
+
+
+

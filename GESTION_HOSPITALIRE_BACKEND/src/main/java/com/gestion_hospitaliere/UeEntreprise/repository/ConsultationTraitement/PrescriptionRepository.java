@@ -1,7 +1,6 @@
 package com.gestion_hospitaliere.UeEntreprise.repository.ConsultationTraitement;
 
-// Assurez-vous que le chemin d'importation vers votre entité Prescription est correct.
-// En se basant sur ConsultationRepository, elle pourrait être dans com.gestion_hospitaliere.UeEntreprise.model.ConsultationTraitement
+
 import com.gestion_hospitaliere.UeEntreprise.model.ConsultationTraitement.Prescription;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -14,3 +13,27 @@ public interface PrescriptionRepository extends JpaRepository<Prescription, Long
     // Par exemple :
     // List<Prescription> findByConsultationId(Long consultationId);
 }
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import com.gestion_hospitaliere.UeEntreprise.model.ConsultationTraitement.Prescription;
+
+@Repository
+public interface PrescriptionRepository extends JpaRepository<Prescription, Long> {
+    
+    // Trouver les prescriptions par consultation ID
+    List<Prescription> findByConsultationId(Long consultationId);
+    
+    // Trouver les prescriptions par médicament ID
+    List<Prescription> findByMedicamentId(Long medicamentId);
+    
+    // Trouver les prescriptions par quantité
+    List<Prescription> findByQuantite(Integer quantite);
+    
+    // Trouver les prescriptions par posologie
+    List<Prescription> findByPosologieContaining(String posologie);
+}
+

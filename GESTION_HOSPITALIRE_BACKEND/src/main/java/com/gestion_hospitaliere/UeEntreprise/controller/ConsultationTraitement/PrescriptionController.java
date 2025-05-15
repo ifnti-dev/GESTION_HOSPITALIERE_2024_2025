@@ -1,3 +1,4 @@
+
 package com.gestion_hospitaliere.UeEntreprise.controller.ConsultationTraitement;
 
 import com.gestion_hospitaliere.UeEntreprise.model.ConsultationTraitement.Prescription;
@@ -67,3 +68,4 @@ public class PrescriptionController {
     // Vous pouvez ajouter ici des endpoints pour des méthodes de service personnalisées
     // Exemple: @GetMapping("/consultation/{consultationId}")
 }
+
