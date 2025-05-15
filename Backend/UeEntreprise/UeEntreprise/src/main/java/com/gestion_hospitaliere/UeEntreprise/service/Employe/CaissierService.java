@@ -18,6 +18,25 @@ public class CaissierService {
     private CaissierRepository caissierRepository;
 
     // Ajouter un nouveau caissier
+    // public Caissier ajouterCaissier(Caissier caissier) {
+    //     if (caissier.getHorairesTravail() == null || caissier.getHorairesTravail().isEmpty()) {
+    //         throw new IllegalArgumentException("Les horaires de travail ne peuvent pas être vides.");
+    //     }
+
+    //     // Remplacer les caisses détachées par les entités gérées
+    //     if (caissier.getCaisses() != null) {
+    //         List<Caisse> caissesManaged = new ArrayList<>();
+    //         for (Caisse caisse : caissier.getCaisses()) {
+    //             Caisse managed = caisseRepository.findById(caisse.getId())
+    //                 .orElseThrow(() -> new IllegalArgumentException("Caisse non trouvée avec l'ID : " + caisse.getId()));
+    //             caissesManaged.add(managed);
+    //         }
+    //         caissier.setCaisses(caissesManaged);
+    //     }
+
+    //     return caissierRepository.save(caissier);
+    // }
+
     public Caissier ajouterCaissier(Caissier caissier) {
         if (caissier.getHorairesTravail() == null || caissier.getHorairesTravail().isEmpty()) {
             throw new IllegalArgumentException("Les horaires de travail ne peuvent pas être vides.");
