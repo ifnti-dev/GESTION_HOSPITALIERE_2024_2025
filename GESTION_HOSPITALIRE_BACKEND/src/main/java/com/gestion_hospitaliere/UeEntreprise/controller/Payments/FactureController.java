@@ -22,7 +22,7 @@ public class FactureController {
     }
 
     @GetMapping("/{id}")
-    public Facture getFactureById(@PathVariable Long id) {
+    public Facture getFactureById(@PathVariable("id") Long id) {
         return factureService.getFactureById(id);
     }
 
@@ -32,12 +32,12 @@ public class FactureController {
     }
 
     @PutMapping("/{id}")
-    public Facture updateFacture(@PathVariable Long id, @RequestBody Facture facture) {
+    public Facture updateFacture(@PathVariable("id") Long id, @RequestBody Facture facture) {
         return factureService.updateFacture(id, facture);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteFacture(@PathVariable Long id) {
+    public void deleteFacture(@PathVariable("id") Long id) {
         factureService.deleteFacture(id);
     }
 

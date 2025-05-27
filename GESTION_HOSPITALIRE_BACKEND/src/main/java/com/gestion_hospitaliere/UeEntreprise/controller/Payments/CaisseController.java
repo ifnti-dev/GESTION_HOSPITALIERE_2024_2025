@@ -21,7 +21,7 @@ public class CaisseController {
     }
 
     @GetMapping("/{id}")
-    public Caisse getCaisseById(@PathVariable Long id) {
+    public Caisse getCaisseById(@PathVariable("id") Long id) {
         return caisseService.getCaisseById(id);
     }
 
@@ -31,17 +31,17 @@ public class CaisseController {
     }
 
     @PutMapping("/{id}")
-    public Caisse updateCaisse(@PathVariable Long id, @RequestBody Caisse caisse) {
+    public Caisse updateCaisse(@PathVariable("id") Long id, @RequestBody Caisse caisse) {
         return caisseService.updateCaisse(id, caisse);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteCaisse(@PathVariable Long id) {
+    public void deleteCaisse(@PathVariable("id") Long id) {
         caisseService.deleteCaisse(id);
     }
 
     @GetMapping("/caissier/{caissierId}")
-    public List<Caisse> findByCaissierId(@PathVariable Long caissierId) {
+    public List<Caisse> findByCaissierId(@PathVariable("id") Long caissierId) {
         return caisseService.findByCaissierId(caissierId);
     }
 
