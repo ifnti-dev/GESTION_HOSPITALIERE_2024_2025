@@ -10,10 +10,12 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+
 @Service
 public class SuiviEtatService {
 
     @Autowired
+
     private final SuiviEtatRepository suiviEtatRepository;
 
     
@@ -21,9 +23,11 @@ public class SuiviEtatService {
         this.suiviEtatRepository = suiviEtatRepository;
     }
 
+
     public List<SuiviEtat> getAllSuiviEtats() {
         return suiviEtatRepository.findAll();
     }
+
 
     public Optional<SuiviEtat> getSuiviEtatById(Long id) {
         return suiviEtatRepository.findById(id);
@@ -58,3 +62,4 @@ public class SuiviEtatService {
       //  return suiviEtatRepository.findByConsultationIdAndDateSuiviAfter(consultationId, date);
     }
 //}
+

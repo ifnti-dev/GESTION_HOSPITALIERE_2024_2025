@@ -1,5 +1,6 @@
 package com.gestion_hospitaliere.UeEntreprise.service.ConsultationTraitement;
 
+
 import com.gestion_hospitaliere.UeEntreprise.model.ConsultationTraitement.Consultation;
 import com.gestion_hospitaliere.UeEntreprise.model.ConsultationTraitement.Prescription;
 import com.gestion_hospitaliere.UeEntreprise.model.Employe.Medecin;
@@ -22,9 +23,11 @@ public class ConsultationService {
         this.consultationRepository = consultationRepository;
     }
 
+
     public List<Consultation> getAllConsultations() {
         return consultationRepository.findAll();
     }
+
 
     public Optional<Consultation> getConsultationById(Long id) {
         return consultationRepository.findById(id);
@@ -96,3 +99,4 @@ public class ConsultationService {
         consultationRepository.deleteById(id);
     }
 }
+
