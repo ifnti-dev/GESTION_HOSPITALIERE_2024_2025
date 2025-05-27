@@ -65,4 +65,5 @@ public class SuiviEtatController {
     public List<SuiviEtat> findByObservationsContaining(@RequestParam String observations) {
         return suiviEtatService.findByObservationsContaining(observations);
     }
+
 }

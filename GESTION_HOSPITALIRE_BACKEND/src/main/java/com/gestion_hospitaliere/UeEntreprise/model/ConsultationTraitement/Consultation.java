@@ -4,7 +4,13 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import com.gestion_hospitaliere.UeEntreprise.model.Employe.Medecin;
 import com.gestion_hospitaliere.UeEntreprise.model.Medical.Patient;
 
@@ -28,6 +34,9 @@ public class Consultation {
     private String diagnostic;
     
     @OneToMany(mappedBy = "consultation", cascade = CascadeType.ALL)
+
+	@JsonIgnore
+
     private List<Prescription> prescriptions = new ArrayList<>();
     
     @ManyToOne
