@@ -1,47 +1,93 @@
 package com.gestion_hospitaliere.UeEntreprise.model.Employe;
 
-import jakarta.persistence.Entity;
 import java.time.LocalDate;
 
+import com.gestion_hospitaliere.UeEntreprise.model.HospitalisationService.ServiceHopital;
+import com.gestion_hospitaliere.UeEntreprise.model.User.Utilisateur;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+
 @Entity
-public class Infirmier extends Employe {
+public class Infirmier {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private String specialite;
     private String horairesTravail;
     private LocalDate dateDebutAffectation;
     private Boolean actif;
 
-    // Getters et setters
+    @OneToOne
+    @JoinColumn(name = "utilisateur_id")
+    private Utilisateur utilisateur;
 
-    public String getSpecialite() {
-        return specialite;
-    }
+    @ManyToOne
+    @JoinColumn(name = "service_id")
+    private ServiceHopital service;
 
-    public void setSpecialite(String specialite) {
-        this.specialite = specialite;
-    }
+	public Long getId() {
+		return id;
+	}
 
-    public String getHorairesTravail() {
-        return horairesTravail;
-    }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-    public void setHorairesTravail(String horairesTravail) {
-        this.horairesTravail = horairesTravail;
-    }
+	public String getSpecialite() {
+		return specialite;
+	}
 
-    public LocalDate getDateDebutAffectation() {
-        return dateDebutAffectation;
-    }
+	public void setSpecialite(String specialite) {
+		this.specialite = specialite;
+	}
 
-    public void setDateDebutAffectation(LocalDate dateDebutAffectation) {
-        this.dateDebutAffectation = dateDebutAffectation;
-    }
+	public String getHorairesTravail() {
+		return horairesTravail;
+	}
 
-    public Boolean getActif() {
-        return actif;
-    }
+	public void setHorairesTravail(String horairesTravail) {
+		this.horairesTravail = horairesTravail;
+	}
 
-    public void setActif(Boolean actif) {
-        this.actif = actif;
-    }
+	public LocalDate getDateDebutAffectation() {
+		return dateDebutAffectation;
+	}
+
+	public void setDateDebutAffectation(LocalDate dateDebutAffectation) {
+		this.dateDebutAffectation = dateDebutAffectation;
+	}
+
+	public Boolean getActif() {
+		return actif;
+	}
+
+	public void setActif(Boolean actif) {
+		this.actif = actif;
+	}
+
+	public Utilisateur getUtilisateur() {
+		return utilisateur;
+	}
+
+	public void setUtilisateur(Utilisateur utilisateur) {
+		this.utilisateur = utilisateur;
+	}
+
+	public ServiceHopital getService() {
+		return service;
+	}
+
+	public void setService(ServiceHopital service) {
+		this.service = service;
+	}
+
+    
 }

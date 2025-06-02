@@ -1,20 +1,23 @@
 package com.gestion_hospitaliere.UeEntreprise.model.Employe;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-
 import java.time.LocalDate;
-import java.util.List;
 
 import com.gestion_hospitaliere.UeEntreprise.model.HospitalisationService.ServiceHopital;
 
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
-@Entity
-public class SageFemme extends Employe {
-    private String specialite;
+public class SageFemme {
+	
+	
+	  @Id
+	  @GeneratedValue(strategy = GenerationType.IDENTITY)
+	  private Long id;
+	 
+	private String specialite;
     private String horairesTravail;
     private LocalDate dateDebutAffectation;
     private Boolean actif;
@@ -27,7 +30,15 @@ public class SageFemme extends Employe {
 
     
 
-    // Getters et setters
+    public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	// Getters et setters
     public String getSpecialite() {
         return specialite;
     }

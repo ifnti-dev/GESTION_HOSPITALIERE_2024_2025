@@ -1,74 +1,93 @@
 package com.gestion_hospitaliere.UeEntreprise.model.Employe;
 
-import jakarta.persistence.CascadeType;
+import java.time.LocalDate;
+
+import com.gestion_hospitaliere.UeEntreprise.model.HospitalisationService.ServiceHopital;
+import com.gestion_hospitaliere.UeEntreprise.model.User.Utilisateur;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-
-import java.time.LocalDate;
-import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.gestion_hospitaliere.UeEntreprise.model.HospitalisationService.ServiceHopital;
-
+import jakarta.persistence.OneToOne;
 
 @Entity
-public class Medecin extends Employe {
+public class Medecin {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private String specialite;
-    private String horairesTravail;
+    private String numeroOrdre;
     private LocalDate dateDebutAffectation;
     private Boolean actif;
 
-	// Service :
-	// Une relation avec une entité Service pour indiquer dans quel service hospitalier le médecin travaille.
+    @OneToOne
+    @JoinColumn(name = "utilisateur_id")
+    private Utilisateur utilisateur;
+
     @ManyToOne
     @JoinColumn(name = "service_id")
-    @JsonIgnore  // Ignore dans le JSON
     private ServiceHopital service;
 
+	public Long getId() {
+		return id;
+	}
 
-    // Getters et setters
-    public String getSpecialite() {
-        return specialite;
-    }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-    public void setSpecialite(String specialite) {
-        this.specialite = specialite;
-    }
+	public String getSpecialite() {
+		return specialite;
+	}
 
-    public String getHorairesTravail() {
-        return horairesTravail;
-    }
+	public void setSpecialite(String specialite) {
+		this.specialite = specialite;
+	}
 
-    public void setHorairesTravail(String horairesTravail) {
-        this.horairesTravail = horairesTravail;
-    }
+	public String getNumeroOrdre() {
+		return numeroOrdre;
+	}
 
-    public LocalDate getDateDebutAffectation() {
-        return dateDebutAffectation;
-    }
+	public void setNumeroOrdre(String numeroOrdre) {
+		this.numeroOrdre = numeroOrdre;
+	}
 
-    public void setDateDebutAffectation(LocalDate dateDebutAffectation) {
-        this.dateDebutAffectation = dateDebutAffectation;
-    }
+	public LocalDate getDateDebutAffectation() {
+		return dateDebutAffectation;
+	}
 
-    public Boolean getActif() {
-        return actif;
-    }
+	public void setDateDebutAffectation(LocalDate dateDebutAffectation) {
+		this.dateDebutAffectation = dateDebutAffectation;
+	}
 
-    public void setActif(Boolean actif) {
-        this.actif = actif;
-    }
+	public Boolean getActif() {
+		return actif;
+	}
 
-    public ServiceHopital getService() {
-        return service;
-    }
+	public void setActif(Boolean actif) {
+		this.actif = actif;
+	}
 
-    public void setService(ServiceHopital service) {
-        this.service = service;
-    }
+	public Utilisateur getUtilisateur() {
+		return utilisateur;
+	}
+
+	public void setUtilisateur(Utilisateur utilisateur) {
+		this.utilisateur = utilisateur;
+	}
+
+	public ServiceHopital getService() {
+		return service;
+	}
+
+	public void setService(ServiceHopital service) {
+		this.service = service;
+	}
+
+    
 }
