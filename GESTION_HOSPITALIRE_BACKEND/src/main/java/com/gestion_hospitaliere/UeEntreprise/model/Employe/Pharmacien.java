@@ -1,49 +1,30 @@
 package com.gestion_hospitaliere.UeEntreprise.model.Employe;
+import com.gestion_hospitaliere.UeEntreprise.model.User.Utilisateur;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
-import java.time.LocalDate;
-import java.util.List;
-
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 
 @Entity
-public class Pharmacien extends Employe {
-    private String numeroLicence;
-    private LocalDate dateDebutAffectation;
-    private String horairesTravail;
-    private Boolean actif;
+public class Pharmacien {
 
-    // Getters et setters
-    public String getNumeroLicence() {
-        return numeroLicence;
-    }
+	 @Id
+	    @GeneratedValue(strategy = GenerationType.IDENTITY)
+	    private Long id;
 
-    public void setNumeroLicence(String numeroLicence) {
-        this.numeroLicence = numeroLicence;
-    }
+	    private String horairesTravail;
+	    private Boolean actif;
 
-    public LocalDate getDateDebutAffectation() {
-        return dateDebutAffectation;
-    }
+	    @OneToOne
+	    @JoinColumn(name = "utilisateur_id")
+	    private Utilisateur utilisateur;
 
-    public void setDateDebutAffectation(LocalDate dateDebutAffectation) {
-        this.dateDebutAffectation = dateDebutAffectation;
-    }
+	  
 
-    public String getHorairesTravail() {
-        return horairesTravail;
-    }
-
-    public void setHorairesTravail(String horairesTravail) {
-        this.horairesTravail = horairesTravail;
-    }
-
-    public Boolean getActif() {
-        return actif;
-    }
-
-    public void setActif(Boolean actif) {
-        this.actif = actif;
-    }
+    
 }
+
