@@ -48,12 +48,7 @@ public class UtilisateurController {
     }
 
     // Récupérer un utilisateur par email
-    @GetMapping("/email")
-    public ResponseEntity<Utilisateur> obtenirUtilisateurParEmail(@RequestParam String email) {
-        Optional<Utilisateur> utilisateur = utilisateurService.obtenirUtilisateurParEmail(email);
-        return utilisateur.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
+    
 
     // Mettre à jour un utilisateur
     @PutMapping("/{id}")

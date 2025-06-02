@@ -18,7 +18,9 @@ import jakarta.persistence.OneToMany;
 
 
 @Entity
-public class DossierGrossesse extends DossierMedical {
+public class DossierGrossesse extends Dossier {
+
+	
     private LocalDate dateOuverture;
     private Integer nombreGrossesses;
     private Integer nombreAccouchements;
@@ -33,12 +35,16 @@ public class DossierGrossesse extends DossierMedical {
     private Boolean presenceDiabeteGestationnel;
     private Boolean presenceHypertensionGestationnelle;
     private String observationsGenerales;
+
+	@ManyToOne
+	@JoinColumn(name = "patient_id", referencedColumnName = "id", nullable = true) // Important: nullable=true
+	private Patient patient;
     
-    @OneToMany(mappedBy = "dossierGrossesse", cascade = CascadeType.ALL)
-    private List<SuiviGrossesse> suivisGrossesse = new ArrayList<>();
-    
-    @OneToMany(mappedBy = "dossierGrossesse", cascade = CascadeType.ALL)
-    private List<Accouchement> accouchements = new ArrayList<>();
+    @OneToMany(mappedBy = "dossierGrossesse", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<SuiviGrossesse> suivisGrossesse = new ArrayList<>();
+
+	@OneToMany(mappedBy = "dossierGrossesse", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Accouchement> accouchements = new ArrayList<>();
 
 	
 
@@ -170,6 +176,14 @@ public class DossierGrossesse extends DossierMedical {
 
 	public void setAccouchements(List<Accouchement> accouchements) {
 		this.accouchements = accouchements;
+	}
+
+	public Patient getPatient() {
+		return patient;
+	}
+
+	public void setPatient(Patient patient) {
+		this.patient = patient;
 	}
     
     
