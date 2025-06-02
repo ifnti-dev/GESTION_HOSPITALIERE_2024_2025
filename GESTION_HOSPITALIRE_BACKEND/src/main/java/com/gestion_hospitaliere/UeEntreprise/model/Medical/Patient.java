@@ -33,14 +33,15 @@ public class Patient {
     private String sexe;
     private String adresse;
     
-    @OneToOne(mappedBy = "patient", cascade = CascadeType.ALL)
+	@OneToOne(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)	
 	@JsonIgnore  // Ignore dans le JSON
     private DossierMedical dossierMedical;
     
-    @OneToOne(mappedBy = "patient", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
 	@JsonIgnore  // Ignore dans le JSON
-    private DossierGrossesse dossierGrossesse;
-    
+	
+	private List<DossierGrossesse> dossierGrossesse; 
+		
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
 	@JsonIgnore  // Ignore dans le JSON
     private List<RendezVous> rendezVous = new ArrayList<>();
@@ -119,13 +120,17 @@ public class Patient {
 
 	public void setDossierMedical(DossierMedical dossierMedical) {
 		this.dossierMedical = dossierMedical;
+		if (dossierMedical != null) {
+			dossierMedical.setPatient(this);
+		}
 	}
+	
 
-	public DossierGrossesse getDossierGrossesse() {
+	public List<DossierGrossesse> getDossierGrossesse() {
 		return dossierGrossesse;
 	}
 
-	public void setDossierGrossesse(DossierGrossesse dossierGrossesse) {
+	public void setDossierGrossesse(List<DossierGrossesse> dossierGrossesse) {
 		this.dossierGrossesse = dossierGrossesse;
 	}
 

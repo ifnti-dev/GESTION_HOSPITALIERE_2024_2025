@@ -11,6 +11,8 @@ import com.gestion_hospitaliere.UeEntreprise.model.Medical.Patient;
 import com.gestion_hospitaliere.UeEntreprise.repository.Medical.DossierMedicalRepository;
 import com.gestion_hospitaliere.UeEntreprise.repository.Medical.PatientRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class DossierMedicalService {
 
@@ -47,9 +49,25 @@ public class DossierMedicalService {
         return dossierMedicalRepository.save(dossierMedical);
     }
 
-    public void deleteDossier(Long id) {
-        dossierMedicalRepository.deleteById(id);
+@Transactional
+public void deleteDossier(Long id) {
+    DossierMedical dossier = dossierMedicalRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("Dossier non trouvé"));
+
+    // Détacher le dossier du Patient (côté propriétaire ET inverse)
+    Patient patient = dossier.getPatient();
+    if (patient != null) {
+        patient.setDossierMedical(null); // Côté inverse (Patient)
+        dossier.setPatient(null); // Côté propriétaire (DossierMedical)
     }
+
+   
+
+    dossierMedicalRepository.delete(dossier); // Suppression unique
+}
+    
+
+
 
     public DossierMedical updateDossier(Long id, DossierMedical updatedDossier) {
         if (!dossierMedicalRepository.existsById(id)) {

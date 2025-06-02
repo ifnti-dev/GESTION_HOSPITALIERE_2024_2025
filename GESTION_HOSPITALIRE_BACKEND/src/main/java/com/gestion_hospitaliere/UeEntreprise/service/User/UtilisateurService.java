@@ -30,10 +30,7 @@ public class UtilisateurService {
         return utilisateurRepository.findById(id);
     }
 
-    // Récupérer un utilisateur par email
-    public Optional<Utilisateur> obtenirUtilisateurParEmail(String email) {
-        return Optional.ofNullable(utilisateurRepository.findByEmail(email));
-    }
+    
 
     // Mettre à jour un utilisateur
     public Utilisateur mettreAJourUtilisateur(Long id, Utilisateur utilisateurDetails) {
@@ -42,10 +39,6 @@ public class UtilisateurService {
             Utilisateur utilisateur = utilisateurOptional.get();
             utilisateur.setNomUtilisateur(utilisateurDetails.getNomUtilisateur());
             utilisateur.setPassword(utilisateurDetails.getPassword());
-            utilisateur.setNom(utilisateurDetails.getNom());
-            utilisateur.setPrenom(utilisateurDetails.getPrenom());
-            utilisateur.setEmail(utilisateurDetails.getEmail());
-            utilisateur.setRoles(utilisateurDetails.getRoles());
             return utilisateurRepository.save(utilisateur);
         } else {
             throw new RuntimeException("Utilisateur non trouvé avec l'ID : " + id);
