@@ -15,34 +15,34 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.gestion_hospitaliere.UeEntreprise.model.User.Utilisateur;
-import com.gestion_hospitaliere.UeEntreprise.service.User.UtilisateurService;
+import com.gestion_hospitaliere.UeEntreprise.model.User.Personne;
+import com.gestion_hospitaliere.UeEntreprise.service.User.PersonneService;
 
 @RestController
-@RequestMapping("/api/utilisateurs")
-public class UtilisateurController {
+@RequestMapping("/api/personne")
+public class PersonneController {
 
     @Autowired
-    private UtilisateurService utilisateurService;
+    private PersonneService personneService;
 
     // Ajouter un utilisateur
     @PostMapping
-    public ResponseEntity<Utilisateur> ajouterUtilisateur(@RequestBody Utilisateur utilisateur) {
-        Utilisateur nouvelUtilisateur = utilisateurService.ajouterUtilisateur(utilisateur);
-        return ResponseEntity.ok(nouvelUtilisateur);
+    public ResponseEntity<Personne> ajouterPersonne(@RequestBody Personne personne) {
+        Personne nouvelPersonne = personneService.ajouterPersonne(personne);
+        return ResponseEntity.ok(nouvelPersonne);
     }
 
     // Récupérer tous les utilisateurs
     @GetMapping
-    public ResponseEntity<List<Utilisateur>> obtenirTousLesUtilisateurs() {
-        List<Utilisateur> utilisateurs = utilisateurService.obtenirTousLesUtilisateurs();
-        return ResponseEntity.ok(utilisateurs);
+    public ResponseEntity<List<Personne>> obtenirTousLesPersonne() {
+        List<Personne> personnes = personneService.obtenirTousLesPersonnes();
+        return ResponseEntity.ok(personnes);
     }
 
     // Récupérer un utilisateur par ID
     @GetMapping("/{id}")
-    public ResponseEntity<Utilisateur> obtenirUtilisateurParId(@PathVariable Long id) {
-        Optional<Utilisateur> utilisateur = utilisateurService.obtenirUtilisateurParId(id);
+    public ResponseEntity<Personne> obtenirUtilisateurParId(@PathVariable Long id) {
+        Optional<Personne> utilisateur = personneService.obtenirPersonneParId(id);
         return utilisateur.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -52,10 +52,10 @@ public class UtilisateurController {
 
     // Mettre à jour un utilisateur
     @PutMapping("/{id}")
-    public ResponseEntity<Utilisateur> mettreAJourUtilisateur(@PathVariable Long id, @RequestBody Utilisateur utilisateurDetails) {
+    public ResponseEntity<Personne> mettreAJourUtilisateur(@PathVariable Long id, @RequestBody Personne personneDetails) {
         try {
-            Utilisateur utilisateurMisAJour = utilisateurService.mettreAJourUtilisateur(id, utilisateurDetails);
-            return ResponseEntity.ok(utilisateurMisAJour);
+            Personne personneMisAJour = personneService.mettreAJourPersonne(id, personneDetails);
+            return ResponseEntity.ok(personneMisAJour);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
@@ -63,8 +63,8 @@ public class UtilisateurController {
 
     // Supprimer un utilisateur
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> supprimerUtilisateur(@PathVariable Long id) {
-        utilisateurService.supprimerUtilisateur(id);
+    public ResponseEntity<Void> supprimerPersonne(@PathVariable Long id) {
+        personneService.supprimerPersonne(id);
         return ResponseEntity.noContent().build();
     }
 }
