@@ -2,11 +2,12 @@ package com.gestion_hospitaliere.UeEntreprise.repository.User;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import com.gestion_hospitaliere.UeEntreprise.model.User.Utilisateur;
+
+import com.gestion_hospitaliere.UeEntreprise.model.User.Personne;
 
 
 @Repository
-public interface UtilisateurRepository extends JpaRepository<Utilisateur, Long> {
+public interface PersonneRepository extends JpaRepository<Personne, Long> {
     // Méthode pour trouver un utilisateur par son adresse e-mail
    
 }

@@ -6,47 +6,47 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.gestion_hospitaliere.UeEntreprise.model.User.Utilisateur;
-import com.gestion_hospitaliere.UeEntreprise.repository.User.UtilisateurRepository;
+import com.gestion_hospitaliere.UeEntreprise.model.User.Personne;
+import com.gestion_hospitaliere.UeEntreprise.repository.User.PersonneRepository;
 
 @Service
-public class UtilisateurService {
+public class PersonneService {
 
     @Autowired
-    private UtilisateurRepository utilisateurRepository;
+    private PersonneRepository personneRepository;
 
     // Ajouter un utilisateur
-    public Utilisateur ajouterUtilisateur(Utilisateur utilisateur) {
-        return utilisateurRepository.save(utilisateur);
+    public Personne ajouterPersonne(Personne utilisateur) {
+        return personneRepository.save(utilisateur);
     }
 
     // Récupérer tous les utilisateurs
-    public List<Utilisateur> obtenirTousLesUtilisateurs() {
-        return utilisateurRepository.findAll();
+    public List<Personne> obtenirTousLesPersonnes() {
+        return personneRepository.findAll();
     }
 
     // Récupérer un utilisateur par ID
-    public Optional<Utilisateur> obtenirUtilisateurParId(Long id) {
-        return utilisateurRepository.findById(id);
+    public Optional<Personne> obtenirPersonneParId(Long id) {
+        return personneRepository.findById(id);
     }
 
     
 
     // Mettre à jour un utilisateur
-    public Utilisateur mettreAJourUtilisateur(Long id, Utilisateur utilisateurDetails) {
-        Optional<Utilisateur> utilisateurOptional = utilisateurRepository.findById(id);
-        if (utilisateurOptional.isPresent()) {
-            Utilisateur utilisateur = utilisateurOptional.get();
-            utilisateur.setNomUtilisateur(utilisateurDetails.getNomUtilisateur());
-            utilisateur.setPassword(utilisateurDetails.getPassword());
-            return utilisateurRepository.save(utilisateur);
+    public Personne mettreAJourPersonne(Long id, Personne personneDetails) {
+        Optional<Personne> personnelOptional = personneRepository.findById(id);
+        if (personnelOptional.isPresent()) {
+            Personne personnel = personnelOptional.get();
+            personnel.setNom(personneDetails.getNom());
+            personnel.setPassword(personneDetails.getPassword());
+            return personneRepository.save(personnel);
         } else {
-            throw new RuntimeException("Utilisateur non trouvé avec l'ID : " + id);
+            throw new RuntimeException("Personnel non trouvé avec l'ID : " + id);
         }
     }
 
     // Supprimer un utilisateur
-    public void supprimerUtilisateur(Long id) {
-        utilisateurRepository.deleteById(id);
+    public void supprimerPersonne(Long id) {
+        personneRepository.deleteById(id);
     }
 }
