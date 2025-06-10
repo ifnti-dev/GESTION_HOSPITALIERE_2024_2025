@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 
 
+
 @Entity
 public class Caisse {
     private String numeroCaisse;
@@ -22,6 +23,7 @@ public class Caisse {
 
     @ManyToOne
     private Employe caissier;
+
 
     // Getters et setters
     public Long getId() {
@@ -63,4 +65,5 @@ public class Caisse {
     public void setCaissier(Employe caissier) {
         this.caissier = caissier;
     }
+
 }

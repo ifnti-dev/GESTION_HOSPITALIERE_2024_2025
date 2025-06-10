@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.gestion_hospitaliere.UeEntreprise.model.Employe.Employe;
 import com.gestion_hospitaliere.UeEntreprise.model.Payments.Caisse;
 import com.gestion_hospitaliere.UeEntreprise.repository.Employe.EmployeRepository;
+
 import com.gestion_hospitaliere.UeEntreprise.repository.Payments.CaisseRepository;
 
 @Service
@@ -18,6 +19,7 @@ public class CaisseService {
 
     @Autowired
     private EmployeRepository caissierRepository;
+
 
     public List<Caisse> getAllCaisses() {
         return caisseRepository.findAll();
@@ -32,7 +34,8 @@ public class CaisseService {
         Employe caissier = caissierRepository.findById(caissierId)
             .orElseThrow(() -> new RuntimeException("Caissier non trouvé avec l'id : " + caissierId));
 
-        caisse.setCaissier(caissier);
+
+//        caisse.setCaissier(caissier);
 
         return caisseRepository.save(caisse);
     }
@@ -49,6 +52,7 @@ public class CaisseService {
         updatedCaisse.setId(id);
         updatedCaisse.setCaissier(caissier);
 
+
         return caisseRepository.save(updatedCaisse);
     }
 
@@ -56,9 +60,9 @@ public class CaisseService {
         caisseRepository.deleteById(id);
     }
 
-    public List<Caisse> findByCaissierId(Long caissierId) {
-        return caisseRepository.findByCaissierId(caissierId);
-    }
+//    public List<Caisse> findByCaissierId(Long caissierId) {
+//        return caisseRepository.findByCaissierId(caissierId);
+//    }
 
     // Méthode ignorée car champ `active` non défini dans le modèle
     // public List<Caisse> findByActive(Boolean active) {

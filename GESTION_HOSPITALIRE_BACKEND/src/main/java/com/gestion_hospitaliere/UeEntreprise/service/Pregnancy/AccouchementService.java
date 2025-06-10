@@ -10,6 +10,7 @@ import com.gestion_hospitaliere.UeEntreprise.model.Pregnancy.Accouchement;
 import com.gestion_hospitaliere.UeEntreprise.model.Employe.Employe;
 import com.gestion_hospitaliere.UeEntreprise.model.Medical.DossierGrossesse;
 import com.gestion_hospitaliere.UeEntreprise.repository.Employe.EmployeRepository;
+
 import com.gestion_hospitaliere.UeEntreprise.repository.Medical.DossierGrossesseRepository;
 import com.gestion_hospitaliere.UeEntreprise.repository.Pregnancy.AccouchementRepository;
 
@@ -25,6 +26,7 @@ public class AccouchementService {
     @Autowired
     private EmployeRepository sageFemmeRepository;
 
+
     public List<Accouchement> getAll() {
         return accouchementRepository.findAll();
     }
@@ -37,9 +39,9 @@ public class AccouchementService {
         return accouchementRepository.findByDossierGrossesseId(dossierId);
     }
 
-    public List<Accouchement> getBySageFemmeId(Long sageFemmeId) {
-        return accouchementRepository.findBySageFemmeId(sageFemmeId);
-    }
+//    public List<Accouchement> getBySageFemmeId(Long sageFemmeId) {
+//        return accouchementRepository.findBySageFemmeId(sageFemmeId);
+//    }
 
     public Accouchement create(Accouchement accouchement) {
         Long dossierId = accouchement.getDossierGrossesse().getId();
@@ -52,6 +54,7 @@ public class AccouchementService {
 
         accouchement.setDossierGrossesse(dossier);
         accouchement.setSageFemme(sageFemme);
+
 
         return accouchementRepository.save(accouchement);
     }
@@ -69,9 +72,10 @@ public class AccouchementService {
         Employe sageFemme = sageFemmeRepository.findById(sageFemmeId)
                 .orElseThrow(() -> new RuntimeException("SageFemme non trouvée avec l'id: " + sageFemmeId));
 
+
         updated.setId(id);
-        updated.setDossierGrossesse(dossier);
-        updated.setSageFemme(sageFemme);
+//        updated.setDossierGrossesse(dossier);
+//        updated.setSageFemme(sageFemme);
 
         return accouchementRepository.save(updated);
     }

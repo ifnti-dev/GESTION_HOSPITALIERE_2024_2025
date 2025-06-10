@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.gestion_hospitaliere.UeEntreprise.model.Employe.Employe;
 import com.gestion_hospitaliere.UeEntreprise.model.Payments.Facture;
 import com.gestion_hospitaliere.UeEntreprise.repository.Employe.EmployeRepository;
+
 import com.gestion_hospitaliere.UeEntreprise.repository.Payments.FactureRepository;
 
 @Service
@@ -19,6 +20,7 @@ public class FactureService {
 
     @Autowired
     private EmployeRepository caissierRepository;
+
 
     public List<Facture> getAllFactures() {
         return factureRepository.findAll();
@@ -35,6 +37,7 @@ public class FactureService {
             .orElseThrow(() -> new RuntimeException("Caissier non trouvé avec l'id : " + caissierId));
 
         facture.setCaissier(caissier);
+
 
         // Si tu veux t'assurer que chaque paiement connaît sa facture (relation bidirectionnelle)
         facture.getPaiements().forEach(paiement -> paiement.setFacture(facture));
@@ -55,6 +58,7 @@ public class FactureService {
             .orElseThrow(() -> new RuntimeException("Caissier non trouvé avec l'id : " + caissierId));
 
         updatedFacture.setCaissier(caissier);
+
 
         // Mettre à jour la relation bidirectionnelle avec les paiements
         updatedFacture.getPaiements().forEach(paiement -> paiement.setFacture(updatedFacture));

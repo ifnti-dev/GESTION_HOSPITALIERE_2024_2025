@@ -12,12 +12,6 @@ import com.gestion_hospitaliere.UeEntreprise.model.Pharmacy.VenteMedicament;
 public interface VenteMedicamentRepository extends JpaRepository<VenteMedicament, Long> {
 	  List<VenteMedicament> findByPatientId(Long patientId);
 	    
-	    // Trouver les ventes par caissier
-	    List<VenteMedicament> findByCaissierId(Long caissierId);
-	    
-	    // Trouver les ventes par pharmacien
-	    List<VenteMedicament> findByPharmacienId(Long pharmacienId);
-	    
 	    // Trouver les ventes entre deux dates
 	    List<VenteMedicament> findByDateVenteBetween(LocalDate startDate, LocalDate endDate);
 	    

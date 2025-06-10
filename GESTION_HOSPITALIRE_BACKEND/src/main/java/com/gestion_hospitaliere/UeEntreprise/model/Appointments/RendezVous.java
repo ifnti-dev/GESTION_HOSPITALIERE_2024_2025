@@ -3,7 +3,7 @@ package com.gestion_hospitaliere.UeEntreprise.model.Appointments;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.gestion_hospitaliere.UeEntreprise.model.Employe.Employe;
+
 import com.gestion_hospitaliere.UeEntreprise.model.Medical.Patient;
 
 import jakarta.persistence.Entity;
@@ -42,6 +42,7 @@ public class RendezVous {
 	public void setEmploye(Employe employe) {
 		this.employe = employe;
 	}
+
 
 	public Long getId() {
 		return id;
@@ -91,9 +92,6 @@ public class RendezVous {
 		this.patient = patient;
 	}
 
-	
-
-	
     // Getters and setters
     
 }

@@ -11,6 +11,7 @@ import com.gestion_hospitaliere.UeEntreprise.model.Employe.Employe;
 import com.gestion_hospitaliere.UeEntreprise.model.Medical.Patient;
 import com.gestion_hospitaliere.UeEntreprise.repository.Appointments.RendezVousRepository;
 import com.gestion_hospitaliere.UeEntreprise.repository.Employe.EmployeRepository;
+
 import com.gestion_hospitaliere.UeEntreprise.repository.Medical.PatientRepository;
 
 @Service
@@ -52,6 +53,7 @@ public class RendezVousService {
 
         
 
+
         return rendezVousRepository.save(rendezVous);
     }
 
@@ -78,6 +80,7 @@ public class RendezVousService {
 
         // Récupérer et valider la sage-femme si elle est fournie
        
+
 
         return rendezVousRepository.save(updatedRendezVous);
     }

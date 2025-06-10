@@ -49,13 +49,13 @@ public class VenteMedicamentService {
         return venteRepository.findByPatientId(patientId);
     }
 
-    public List<VenteMedicament> getVentesByCaissier(Long caissierId) {
-        return venteRepository.findByCaissierId(caissierId);
-    }
+//    public List<VenteMedicament> getVentesByCaissier(Long caissierId) {
+//        return venteRepository.findByCaissierId(caissierId);
+//    }
 
-    public List<VenteMedicament> getVentesByPharmacien(Long pharmacienId) {
-        return venteRepository.findByPharmacienId(pharmacienId);
-    }
+//    public List<VenteMedicament> getVentesByPharmacien(Long pharmacienId) {
+//        return venteRepository.findByPharmacienId(pharmacienId);
+//    }
 
 //  public List<VenteMedicament> getVentesBetweenDates(LocalDate startDate, LocalDate endDate) {
 //        return venteRepository.findByDateVenteBetween(startDate, endDate);

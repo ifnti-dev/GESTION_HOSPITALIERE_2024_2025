@@ -3,7 +3,6 @@ package com.gestion_hospitaliere.UeEntreprise.service.ConsultationTraitement;
 
 import com.gestion_hospitaliere.UeEntreprise.model.ConsultationTraitement.Consultation;
 import com.gestion_hospitaliere.UeEntreprise.model.ConsultationTraitement.Prescription;
-import com.gestion_hospitaliere.UeEntreprise.model.Employe.Medecin;
 import com.gestion_hospitaliere.UeEntreprise.model.Medical.Patient;
 import com.gestion_hospitaliere.UeEntreprise.repository.ConsultationTraitement.ConsultationRepository;
 // import com.gestion_hospitaliere.UeEntreprise.exception.ResourceNotFoundException; // Example custom exception
@@ -58,15 +57,15 @@ public class ConsultationService {
         existingConsultation.setDiagnostic(consultationDetails.getDiagnostic());
 
         // Handle Medecin update (if ID is provided in consultationDetails)
-        if (consultationDetails.getMedecin() != null && consultationDetails.getMedecin().getId() != null) {
+//        if (consultationDetails.getMedecin() != null && consultationDetails.getMedecin().getId() != null) {
             // Here you would typically fetch the Medecin entity from its repository
             // Medecin medecin = medecinRepository.findById(consultationDetails.getMedecin().getId())
             // .orElseThrow(() -> new RuntimeException("Medecin non trouvé"));
             // existingConsultation.setMedecin(medecin);
             // For now, if the Medecin object is passed correctly by the controller, this might work
             // but fetching is safer to ensure it's a managed entity.
-            existingConsultation.setMedecin(consultationDetails.getMedecin());
-        }
+//            existingConsultation.setMedecin(consultationDetails.getMedecin());
+//        }
 
         // Handle Patient update (if ID is provided in consultationDetails)
         if (consultationDetails.getPatient() != null && consultationDetails.getPatient().getId() != null) {
