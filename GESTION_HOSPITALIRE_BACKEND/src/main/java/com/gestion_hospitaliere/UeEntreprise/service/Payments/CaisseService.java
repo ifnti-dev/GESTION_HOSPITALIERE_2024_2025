@@ -5,7 +5,10 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.gestion_hospitaliere.UeEntreprise.model.Employe.Employe;
 import com.gestion_hospitaliere.UeEntreprise.model.Payments.Caisse;
+import com.gestion_hospitaliere.UeEntreprise.repository.Employe.EmployeRepository;
+
 import com.gestion_hospitaliere.UeEntreprise.repository.Payments.CaisseRepository;
 
 @Service
@@ -14,6 +17,8 @@ public class CaisseService {
     @Autowired
     private CaisseRepository caisseRepository;
 
+    @Autowired
+    private EmployeRepository caissierRepository;
 
 
     public List<Caisse> getAllCaisses() {
@@ -25,9 +30,10 @@ public class CaisseService {
     }
 
     public Caisse createCaisse(Caisse caisse) {
-//        Long caissierId = caisse.getCaissier().getId();
-//        Caissier caissier = caissierRepository.findById(caissierId)
-//            .orElseThrow(() -> new RuntimeException("Caissier non trouvé avec l'id : " + caissierId));
+        Long caissierId = caisse.getCaissier().getId();
+        Employe caissier = caissierRepository.findById(caissierId)
+            .orElseThrow(() -> new RuntimeException("Caissier non trouvé avec l'id : " + caissierId));
+
 
 //        caisse.setCaissier(caissier);
 
@@ -39,12 +45,13 @@ public class CaisseService {
             return null;
         }
 
-//        Long caissierId = updatedCaisse.getCaissier().getId();
-//        Caissier caissier = caissierRepository.findById(caissierId)
-//            .orElseThrow(() -> new RuntimeException("Caissier non trouvé avec l'id : " + caissierId));
-//
-//        updatedCaisse.setId(id);
-//        updatedCaisse.setCaissier(caissier);
+        Long caissierId = updatedCaisse.getCaissier().getId();
+        Employe caissier = caissierRepository.findById(caissierId)
+            .orElseThrow(() -> new RuntimeException("Caissier non trouvé avec l'id : " + caissierId));
+
+        updatedCaisse.setId(id);
+        updatedCaisse.setCaissier(caissier);
+
 
         return caisseRepository.save(updatedCaisse);
     }

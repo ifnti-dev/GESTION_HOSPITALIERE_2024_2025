@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.gestion_hospitaliere.UeEntreprise.model.Employe.Employe;
+
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.GenerationType;
@@ -27,6 +29,11 @@ public class Facture {
     @OneToMany(mappedBy = "facture", cascade = CascadeType.ALL)
 	@JsonIgnore
     private List<Paiement> paiements = new ArrayList<>();
+    
+    @ManyToOne
+    @JoinColumn(name = "caissier_id")
+    private Employe caissier;
+
 
 	public Long getId() {
 		return id;
@@ -75,5 +82,15 @@ public class Facture {
 	public void setPaiements(List<Paiement> paiements) {
 		this.paiements = paiements;
 	}
-   
-}
+
+	public Employe getCaissier() {
+		return caissier;
+	}
+
+	public void setCaissier(Employe caissier) {
+		this.caissier = caissier;
+	}
+    
+    
+    
+

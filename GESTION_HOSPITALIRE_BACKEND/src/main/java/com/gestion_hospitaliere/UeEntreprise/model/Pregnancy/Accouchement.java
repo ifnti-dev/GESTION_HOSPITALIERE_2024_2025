@@ -2,6 +2,8 @@ package com.gestion_hospitaliere.UeEntreprise.model.Pregnancy;
 
 import java.time.LocalDate;
 
+import com.gestion_hospitaliere.UeEntreprise.model.Employe.Employe;
+
 import com.gestion_hospitaliere.UeEntreprise.model.Medical.DossierGrossesse;
 
 import jakarta.persistence.Entity;
@@ -23,6 +25,11 @@ public class Accouchement {
     private Float bebePoids;
     
     @ManyToOne
+    @JoinColumn(name = "sagefemme_id")
+    private Employe sageFemme;
+    
+    @ManyToOne
+
     @JoinColumn(name = "dossier_grossesse_id")
     private DossierGrossesse dossierGrossesse;
 
@@ -65,6 +72,15 @@ public class Accouchement {
 	public void setBebePoids(Float bebePoids) {
 		this.bebePoids = bebePoids;
 	}
+
+	public Employe getSageFemme() {
+		return sageFemme;
+	}
+
+	public void setSageFemme(Employe sageFemme) {
+		this.sageFemme = sageFemme;
+	}
+
 
 	public DossierGrossesse getDossierGrossesse() {
 		return dossierGrossesse;

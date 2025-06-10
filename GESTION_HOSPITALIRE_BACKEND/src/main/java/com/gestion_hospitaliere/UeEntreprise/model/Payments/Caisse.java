@@ -1,9 +1,14 @@
 package com.gestion_hospitaliere.UeEntreprise.model.Payments;
 
+import com.gestion_hospitaliere.UeEntreprise.model.Employe.Employe;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+
+
 
 @Entity
 public class Caisse {
@@ -15,6 +20,10 @@ public class Caisse {
     private Long id;
     // @OneToMany(mappedBy = "caisse", cascade = CascadeType.ALL)
     // private List<RapportCaisse> rapportsCaisse;
+
+    @ManyToOne
+    private Employe caissier;
+
 
     // Getters et setters
     public Long getId() {
@@ -48,4 +57,13 @@ public class Caisse {
     // public void setRapportsCaisse(List<RapportCaisse> rapportsCaisse) {
     //     this.rapportsCaisse = rapportsCaisse;
     // }
+
+    public Employe getCaissier() {
+        return caissier;
+    }
+
+    public void setCaissier(Employe caissier) {
+        this.caissier = caissier;
+    }
+
 }
