@@ -55,15 +55,15 @@ public class VenteMedicamentController {
         return venteService.getVentesByPatient(patientId);
     }
 
-    @GetMapping("/caissier/{caissierId}")
-    public List<VenteMedicament> getVentesByCaissier(@PathVariable Long caissierId) {
-        return venteService.getVentesByCaissier(caissierId);
-    }
-
-    @GetMapping("/pharmacien/{pharmacienId}")
-    public List<VenteMedicament> getVentesByPharmacien(@PathVariable Long pharmacienId) {
-        return venteService.getVentesByPharmacien(pharmacienId);
-    }
+//    @GetMapping("/caissier/{caissierId}")
+//    public List<VenteMedicament> getVentesByCaissier(@PathVariable Long caissierId) {
+//        return venteService.getVentesByCaissier(caissierId);
+//    }
+//
+//    @GetMapping("/pharmacien/{pharmacienId}")
+//    public List<VenteMedicament> getVentesByPharmacien(@PathVariable Long pharmacienId) {
+//        return venteService.getVentesByPharmacien(pharmacienId);
+//    }
 
 //    @GetMapping("/periode")
 //    public List<VenteMedicament> getVentesBetweenDates(

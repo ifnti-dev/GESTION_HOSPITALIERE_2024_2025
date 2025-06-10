@@ -7,12 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.gestion_hospitaliere.UeEntreprise.model.Appointments.RendezVous;
-import com.gestion_hospitaliere.UeEntreprise.model.Employe.Medecin;
-import com.gestion_hospitaliere.UeEntreprise.model.Employe.SageFemme;
 import com.gestion_hospitaliere.UeEntreprise.model.Medical.Patient;
 import com.gestion_hospitaliere.UeEntreprise.repository.Appointments.RendezVousRepository;
-import com.gestion_hospitaliere.UeEntreprise.repository.Employe.MedecinRepository;
-import com.gestion_hospitaliere.UeEntreprise.repository.Employe.SageFemmeRepository;
 import com.gestion_hospitaliere.UeEntreprise.repository.Medical.PatientRepository;
 
 @Service
@@ -24,11 +20,6 @@ public class RendezVousService {
     @Autowired
     private PatientRepository patientRepository;
 
-    @Autowired
-    private MedecinRepository medecinRepository;
-
-    @Autowired
-    private SageFemmeRepository sageFemmeRepository;
 
     public List<RendezVous> getAllRendezVous() {
         return rendezVousRepository.findAll();
@@ -46,20 +37,20 @@ public class RendezVousService {
         rendezVous.setPatient(patient);
 
         // Récupérer et valider le médecin s'il est fourni
-        if (rendezVous.getMedecin() != null) {
-            Long medecinId = rendezVous.getMedecin().getId();
-            Medecin medecin = medecinRepository.findById(medecinId)
-                .orElseThrow(() -> new RuntimeException("Médecin non trouvé avec l'id : " + medecinId));
-            rendezVous.setMedecin(medecin);
-        }
+//        if (rendezVous.getMedecin() != null) {
+//            Long medecinId = rendezVous.getMedecin().getId();
+//            Medecin medecin = medecinRepository.findById(medecinId)
+//                .orElseThrow(() -> new RuntimeException("Médecin non trouvé avec l'id : " + medecinId));
+//            rendezVous.setMedecin(medecin);
+//        }
 
         // Récupérer et valider la sage-femme si elle est fournie
-        if (rendezVous.getSageFemme() != null) {
-            Long sageFemmeId = rendezVous.getSageFemme().getId();
-            SageFemme sageFemme = sageFemmeRepository.findById(sageFemmeId)
-                .orElseThrow(() -> new RuntimeException("Sage-femme non trouvée avec l'id : " + sageFemmeId));
-            rendezVous.setSageFemme(sageFemme);
-        }
+//        if (rendezVous.getSageFemme() != null) {
+//            Long sageFemmeId = rendezVous.getSageFemme().getId();
+//            SageFemme sageFemme = sageFemmeRepository.findById(sageFemmeId)
+//                .orElseThrow(() -> new RuntimeException("Sage-femme non trouvée avec l'id : " + sageFemmeId));
+//            rendezVous.setSageFemme(sageFemme);
+//        }
 
         return rendezVousRepository.save(rendezVous);
     }
@@ -78,20 +69,20 @@ public class RendezVousService {
         updatedRendezVous.setPatient(patient);
 
         // Récupérer et valider le médecin s'il est fourni
-        if (updatedRendezVous.getMedecin() != null) {
-            Long medecinId = updatedRendezVous.getMedecin().getId();
-            Medecin medecin = medecinRepository.findById(medecinId)
-                .orElseThrow(() -> new RuntimeException("Médecin non trouvé avec l'id : " + medecinId));
-            updatedRendezVous.setMedecin(medecin);
-        }
+//        if (updatedRendezVous.getMedecin() != null) {
+//            Long medecinId = updatedRendezVous.getMedecin().getId();
+//            Medecin medecin = medecinRepository.findById(medecinId)
+//                .orElseThrow(() -> new RuntimeException("Médecin non trouvé avec l'id : " + medecinId));
+//            updatedRendezVous.setMedecin(medecin);
+//        }
 
         // Récupérer et valider la sage-femme si elle est fournie
-        if (updatedRendezVous.getSageFemme() != null) {
-            Long sageFemmeId = updatedRendezVous.getSageFemme().getId();
-            SageFemme sageFemme = sageFemmeRepository.findById(sageFemmeId)
-                .orElseThrow(() -> new RuntimeException("Sage-femme non trouvée avec l'id : " + sageFemmeId));
-            updatedRendezVous.setSageFemme(sageFemme);
-        }
+//        if (updatedRendezVous.getSageFemme() != null) {
+//            Long sageFemmeId = updatedRendezVous.getSageFemme().getId();
+//            SageFemme sageFemme = sageFemmeRepository.findById(sageFemmeId)
+//                .orElseThrow(() -> new RuntimeException("Sage-femme non trouvée avec l'id : " + sageFemmeId));
+//            updatedRendezVous.setSageFemme(sageFemme);
+//        }
 
         return rendezVousRepository.save(updatedRendezVous);
     }

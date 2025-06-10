@@ -8,13 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.gestion_hospitaliere.UeEntreprise.model.Employe.Caissier;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 @Entity
 public class Facture {
@@ -30,10 +27,6 @@ public class Facture {
     @OneToMany(mappedBy = "facture", cascade = CascadeType.ALL)
 	@JsonIgnore
     private List<Paiement> paiements = new ArrayList<>();
-    
-    @ManyToOne
-    @JoinColumn(name = "caissier_id")
-    private Caissier caissier;
 
 	public Long getId() {
 		return id;
@@ -82,15 +75,5 @@ public class Facture {
 	public void setPaiements(List<Paiement> paiements) {
 		this.paiements = paiements;
 	}
-
-	public Caissier getCaissier() {
-		return caissier;
-	}
-
-	public void setCaissier(Caissier caissier) {
-		this.caissier = caissier;
-	}
-    
-    
-    
+   
 }

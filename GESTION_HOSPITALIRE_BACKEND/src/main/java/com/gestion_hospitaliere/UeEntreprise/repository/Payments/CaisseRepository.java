@@ -9,8 +9,6 @@ import com.gestion_hospitaliere.UeEntreprise.model.Payments.Caisse;
 
 @Repository
 public interface CaisseRepository extends JpaRepository<Caisse, Long> {
-    // Trouver les caisses par caissier ID
-    List<Caisse> findByCaissierId(Long caissierId);
 
     // // Trouver les caisses actives
     // List<Caisse> findByActive(Boolean active);

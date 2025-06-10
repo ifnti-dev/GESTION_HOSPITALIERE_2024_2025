@@ -8,9 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.gestion_hospitaliere.UeEntreprise.model.Pregnancy.Accouchement;
 import com.gestion_hospitaliere.UeEntreprise.model.Medical.DossierGrossesse;
-import com.gestion_hospitaliere.UeEntreprise.model.Employe.SageFemme;
 import com.gestion_hospitaliere.UeEntreprise.repository.Medical.DossierGrossesseRepository;
-import com.gestion_hospitaliere.UeEntreprise.repository.Employe.SageFemmeRepository;
 import com.gestion_hospitaliere.UeEntreprise.repository.Pregnancy.AccouchementRepository;
 
 @Service
@@ -21,9 +19,6 @@ public class AccouchementService {
 
     @Autowired
     private DossierGrossesseRepository dossierGrossesseRepository;
-
-    @Autowired
-    private SageFemmeRepository sageFemmeRepository;
 
     public List<Accouchement> getAll() {
         return accouchementRepository.findAll();
@@ -37,21 +32,21 @@ public class AccouchementService {
         return accouchementRepository.findByDossierGrossesseId(dossierId);
     }
 
-    public List<Accouchement> getBySageFemmeId(Long sageFemmeId) {
-        return accouchementRepository.findBySageFemmeId(sageFemmeId);
-    }
+//    public List<Accouchement> getBySageFemmeId(Long sageFemmeId) {
+//        return accouchementRepository.findBySageFemmeId(sageFemmeId);
+//    }
 
     public Accouchement create(Accouchement accouchement) {
         Long dossierId = accouchement.getDossierGrossesse().getId();
-        Long sageFemmeId = accouchement.getSageFemme().getId();
-
-        DossierGrossesse dossier = dossierGrossesseRepository.findById(dossierId)
-                .orElseThrow(() -> new RuntimeException("DossierGrossesse non trouvé avec l'id: " + dossierId));
-        SageFemme sageFemme = sageFemmeRepository.findById(sageFemmeId)
-                .orElseThrow(() -> new RuntimeException("SageFemme non trouvée avec l'id: " + sageFemmeId));
-
-        accouchement.setDossierGrossesse(dossier);
-        accouchement.setSageFemme(sageFemme);
+//        Long sageFemmeId = accouchement.getSageFemme().getId();
+//
+//        DossierGrossesse dossier = dossierGrossesseRepository.findById(dossierId)
+//                .orElseThrow(() -> new RuntimeException("DossierGrossesse non trouvé avec l'id: " + dossierId));
+//        SageFemme sageFemme = sageFemmeRepository.findById(sageFemmeId)
+//                .orElseThrow(() -> new RuntimeException("SageFemme non trouvée avec l'id: " + sageFemmeId));
+//
+//        accouchement.setDossierGrossesse(dossier);
+//        accouchement.setSageFemme(sageFemme);
 
         return accouchementRepository.save(accouchement);
     }
@@ -62,16 +57,16 @@ public class AccouchementService {
         }
 
         Long dossierId = updated.getDossierGrossesse().getId();
-        Long sageFemmeId = updated.getSageFemme().getId();
-
-        DossierGrossesse dossier = dossierGrossesseRepository.findById(dossierId)
-                .orElseThrow(() -> new RuntimeException("DossierGrossesse non trouvé avec l'id: " + dossierId));
-        SageFemme sageFemme = sageFemmeRepository.findById(sageFemmeId)
-                .orElseThrow(() -> new RuntimeException("SageFemme non trouvée avec l'id: " + sageFemmeId));
+//        Long sageFemmeId = updated.getSageFemme().getId();
+//
+//        DossierGrossesse dossier = dossierGrossesseRepository.findById(dossierId)
+//                .orElseThrow(() -> new RuntimeException("DossierGrossesse non trouvé avec l'id: " + dossierId));
+//        SageFemme sageFemme = sageFemmeRepository.findById(sageFemmeId)
+//                .orElseThrow(() -> new RuntimeException("SageFemme non trouvée avec l'id: " + sageFemmeId));
 
         updated.setId(id);
-        updated.setDossierGrossesse(dossier);
-        updated.setSageFemme(sageFemme);
+//        updated.setDossierGrossesse(dossier);
+//        updated.setSageFemme(sageFemme);
 
         return accouchementRepository.save(updated);
     }
