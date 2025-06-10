@@ -1,4 +1,4 @@
-package com.gestion_hospitaliere.UeEntreprise.controller.RendezVous;
+package com.gestion_hospitaliere.UeEntreprise.controller.Appointments;
 
 import java.time.LocalDateTime;
 import java.util.List;
