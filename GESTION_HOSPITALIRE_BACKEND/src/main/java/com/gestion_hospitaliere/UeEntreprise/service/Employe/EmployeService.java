@@ -16,12 +16,12 @@ public class EmployeService {
 	private EmployeRepository employeRepository;
 	
 	// Créer un employe
-//	public Employe ajouterEmploye(Employe employe) {
-//		if (employe.getId() != null && employeRepository.existsById(employe.getId())) {
-//            throw new IllegalArgumentException("L'employé existe déjà. Utilisez updateEmploye pour mettre à jour.");
-//        }
-//		return employeRepository.save(employe);
-//	}
+	public Employe ajouterEmploye(Employe employe) {
+        if (employe.getId() != null && employeRepository.existsById(employe.getId())) {
+            throw new IllegalArgumentException("L'employé existe déjà. Utilisez mettreAjourEmploye pour mettre à jour.");
+        }
+        return employeRepository.save(employe);
+    }
 	
 	// Obtenir tous les employés
 	public List<Employe> recupererToutEmploye(){
