@@ -1,12 +1,13 @@
 package com.gestion_hospitaliere.UeEntreprise.model.Payments;
 
+import com.gestion_hospitaliere.UeEntreprise.model.Employe.Employe;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 
-import com.gestion_hospitaliere.UeEntreprise.model.Employe.Caissier;
 
 @Entity
 public class Caisse {
@@ -20,7 +21,7 @@ public class Caisse {
     // private List<RapportCaisse> rapportsCaisse;
 
     @ManyToOne
-    private Caissier caissier;
+    private Employe caissier;
 
     // Getters et setters
     public Long getId() {
@@ -55,11 +56,11 @@ public class Caisse {
     //     this.rapportsCaisse = rapportsCaisse;
     // }
 
-    public Caissier getCaissier() {
+    public Employe getCaissier() {
         return caissier;
     }
 
-    public void setCaissier(Caissier caissier) {
+    public void setCaissier(Employe caissier) {
         this.caissier = caissier;
     }
 }

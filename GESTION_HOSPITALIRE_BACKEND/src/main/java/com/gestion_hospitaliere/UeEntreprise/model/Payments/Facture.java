@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.gestion_hospitaliere.UeEntreprise.model.Employe.Caissier;
+import com.gestion_hospitaliere.UeEntreprise.model.Employe.Employe;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.GenerationType;
@@ -33,7 +33,7 @@ public class Facture {
     
     @ManyToOne
     @JoinColumn(name = "caissier_id")
-    private Caissier caissier;
+    private Employe caissier;
 
 	public Long getId() {
 		return id;
@@ -83,11 +83,11 @@ public class Facture {
 		this.paiements = paiements;
 	}
 
-	public Caissier getCaissier() {
+	public Employe getCaissier() {
 		return caissier;
 	}
 
-	public void setCaissier(Caissier caissier) {
+	public void setCaissier(Employe caissier) {
 		this.caissier = caissier;
 	}
     

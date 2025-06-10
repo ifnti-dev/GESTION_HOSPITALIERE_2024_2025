@@ -3,8 +3,7 @@ package com.gestion_hospitaliere.UeEntreprise.model.Appointments;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.gestion_hospitaliere.UeEntreprise.model.Employe.Medecin;
-import com.gestion_hospitaliere.UeEntreprise.model.Employe.SageFemme;
+import com.gestion_hospitaliere.UeEntreprise.model.Employe.Employe;
 import com.gestion_hospitaliere.UeEntreprise.model.Medical.Patient;
 
 import jakarta.persistence.Entity;
@@ -31,12 +30,18 @@ public class RendezVous {
     private Patient patient;
     
     @ManyToOne
-    @JoinColumn(name = "medecin_id")
-    private Medecin medecin;
+    @JoinColumn(name = "employe_id")
+    private Employe employe;
     
-    @ManyToOne
-    @JoinColumn(name = "sagefemme_id")
-    private SageFemme sageFemme;
+    
+
+	public Employe getEmploye() {
+		return employe;
+	}
+
+	public void setEmploye(Employe employe) {
+		this.employe = employe;
+	}
 
 	public Long getId() {
 		return id;
@@ -86,22 +91,9 @@ public class RendezVous {
 		this.patient = patient;
 	}
 
-	public Medecin getMedecin() {
-		return medecin;
-	}
+	
 
-	public void setMedecin(Medecin medecin) {
-		this.medecin = medecin;
-	}
-
-	public SageFemme getSageFemme() {
-		return sageFemme;
-	}
-
-	public void setSageFemme(SageFemme sageFemme) {
-		this.sageFemme = sageFemme;
-	}
-    
+	
     // Getters and setters
     
 }

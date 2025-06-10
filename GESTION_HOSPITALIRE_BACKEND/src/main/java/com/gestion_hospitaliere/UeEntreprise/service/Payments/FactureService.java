@@ -6,10 +6,10 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.gestion_hospitaliere.UeEntreprise.model.Employe.Employe;
 import com.gestion_hospitaliere.UeEntreprise.model.Payments.Facture;
-import com.gestion_hospitaliere.UeEntreprise.model.Employe.Caissier;
+import com.gestion_hospitaliere.UeEntreprise.repository.Employe.EmployeRepository;
 import com.gestion_hospitaliere.UeEntreprise.repository.Payments.FactureRepository;
-import com.gestion_hospitaliere.UeEntreprise.repository.Employe.CaissierRepository;
 
 @Service
 public class FactureService {
@@ -18,7 +18,7 @@ public class FactureService {
     private FactureRepository factureRepository;
 
     @Autowired
-    private CaissierRepository caissierRepository;
+    private EmployeRepository caissierRepository;
 
     public List<Facture> getAllFactures() {
         return factureRepository.findAll();
@@ -31,7 +31,7 @@ public class FactureService {
     public Facture createFacture(Facture facture) {
         // Récupérer et valider le caissier
         Long caissierId = facture.getCaissier().getId();
-        Caissier caissier = caissierRepository.findById(caissierId)
+        Employe caissier = caissierRepository.findById(caissierId)
             .orElseThrow(() -> new RuntimeException("Caissier non trouvé avec l'id : " + caissierId));
 
         facture.setCaissier(caissier);
@@ -51,7 +51,7 @@ public class FactureService {
 
         // Vérifier que le caissier existe
         Long caissierId = updatedFacture.getCaissier().getId();
-        Caissier caissier = caissierRepository.findById(caissierId)
+        Employe caissier = caissierRepository.findById(caissierId)
             .orElseThrow(() -> new RuntimeException("Caissier non trouvé avec l'id : " + caissierId));
 
         updatedFacture.setCaissier(caissier);

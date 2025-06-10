@@ -2,7 +2,7 @@ package com.gestion_hospitaliere.UeEntreprise.model.Pregnancy;
 
 import java.time.LocalDate;
 
-import com.gestion_hospitaliere.UeEntreprise.model.Employe.SageFemme;
+import com.gestion_hospitaliere.UeEntreprise.model.Employe.Employe;
 import com.gestion_hospitaliere.UeEntreprise.model.Medical.DossierGrossesse;
 
 import jakarta.persistence.CascadeType;
@@ -27,7 +27,7 @@ public class Accouchement {
     
     @ManyToOne
     @JoinColumn(name = "sagefemme_id")
-    private SageFemme sageFemme;
+    private Employe sageFemme;
     
     @ManyToOne
     @JoinColumn(name = "dossier_grossesse_id")
@@ -73,11 +73,11 @@ public class Accouchement {
 		this.bebePoids = bebePoids;
 	}
 
-	public SageFemme getSageFemme() {
+	public Employe getSageFemme() {
 		return sageFemme;
 	}
 
-	public void setSageFemme(SageFemme sageFemme) {
+	public void setSageFemme(Employe sageFemme) {
 		this.sageFemme = sageFemme;
 	}
 
