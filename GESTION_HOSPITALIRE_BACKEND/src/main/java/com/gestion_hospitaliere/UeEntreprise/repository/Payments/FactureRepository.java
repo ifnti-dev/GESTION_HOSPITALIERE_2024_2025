@@ -20,8 +20,6 @@ public interface FactureRepository extends JpaRepository<Facture, Long> {
     // Trouver les factures par date
     List<Facture> findByDate(LocalDate date);
     
-    // Trouver les factures par caissier ID
-    List<Facture> findByCaissierId(Long caissierId);
     
     // Trouver les factures dont le montant total est supérieur à une valeur donnée
     List<Facture> findByMontantTotalGreaterThan(Double montant);

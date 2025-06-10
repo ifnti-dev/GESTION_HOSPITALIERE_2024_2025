@@ -34,10 +34,10 @@ public class AccouchementController {
         return service.getByDossierGrossesseId(dossierId);
     }
 
-    @GetMapping("/sagefemme/{sageFemmeId}")
-    public List<Accouchement> getBySageFemme(@PathVariable Long sageFemmeId) {
-        return service.getBySageFemmeId(sageFemmeId);
-    }
+//    @GetMapping("/sagefemme/{sageFemmeId}")
+//    public List<Accouchement> getBySageFemme(@PathVariable Long sageFemmeId) {
+//        return service.getBySageFemmeId(sageFemmeId);
+//    }
 
     @PostMapping
     public ResponseEntity<Accouchement> create(@RequestBody Accouchement accouchement) {

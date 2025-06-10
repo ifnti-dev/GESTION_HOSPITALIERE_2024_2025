@@ -1,8 +1,16 @@
 package com.gestion_hospitaliere.UeEntreprise.model.User;
 
-import jakarta.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
+
+
+import com.gestion_hospitaliere.UeEntreprise.model.Employe.Employe;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 
 @Entity
 public class Personne {
@@ -10,6 +18,10 @@ public class Personne {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @OneToOne(mappedBy = "personne", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Employe employe;
+
 
     private String nom;
     private String prenom;
@@ -21,7 +33,14 @@ public class Personne {
     private String situationMatrimoniale;
     private String password;
     
-    
+    // Getter et Setter
+    public Employe getEmploye() {
+        return employe;
+    }
+
+    public void setEmploye(Employe employe) {
+        this.employe = employe;
+    }
 	public Long getId() {
 		return id;
 	}

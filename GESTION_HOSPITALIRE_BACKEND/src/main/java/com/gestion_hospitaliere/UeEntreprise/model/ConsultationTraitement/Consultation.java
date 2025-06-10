@@ -5,13 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import com.gestion_hospitaliere.UeEntreprise.model.Employe.Medecin;
+
 import com.gestion_hospitaliere.UeEntreprise.model.Medical.Patient;
 
 import jakarta.persistence.CascadeType;
@@ -39,9 +35,6 @@ public class Consultation {
 
     private List<Prescription> prescriptions = new ArrayList<>();
     
-    @ManyToOne
-    @JoinColumn(name = "medecin_id")
-    private Medecin medecin;
     
     @ManyToOne
     @JoinColumn(name = "patient_id")
@@ -85,14 +78,6 @@ public class Consultation {
 
 	public void setPrescriptions(List<Prescription> prescriptions) {
 		this.prescriptions = prescriptions;
-	}
-
-	public Medecin getMedecin() {
-		return medecin;
-	}
-
-	public void setMedecin(Medecin medecin) {
-		this.medecin = medecin;
 	}
 
 	public Patient getPatient() {

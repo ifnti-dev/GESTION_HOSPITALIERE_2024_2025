@@ -40,10 +40,10 @@ public class CaisseController {
         caisseService.deleteCaisse(id);
     }
 
-    @GetMapping("/caissier/{caissierId}")
-    public List<Caisse> findByCaissierId(@PathVariable("id") Long caissierId) {
-        return caisseService.findByCaissierId(caissierId);
-    }
+//    @GetMapping("/caissier/{caissierId}")
+//    public List<Caisse> findByCaissierId(@PathVariable("id") Long caissierId) {
+//        return caisseService.findByCaissierId(caissierId);
+//    }
 
 //     @GetMapping("/active")
 //     public List<Caisse> findByActive(@RequestParam Boolean active) {

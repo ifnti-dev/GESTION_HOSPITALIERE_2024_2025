@@ -4,8 +4,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.gestion_hospitaliere.UeEntreprise.model.Employe.Caissier;
-import com.gestion_hospitaliere.UeEntreprise.model.Employe.Pharmacien;
 import com.gestion_hospitaliere.UeEntreprise.model.Medical.Patient;
 
 import jakarta.persistence.CascadeType;
@@ -30,14 +28,6 @@ public class VenteMedicament {
     @ManyToOne
     @JoinColumn(name = "patient_id")
     private Patient patient;
-    
-    @ManyToOne
-    @JoinColumn(name = "caissier_id")
-    private Caissier caissier;
-    
-    @ManyToOne
-    @JoinColumn(name = "pharmacien_id")
-    private Pharmacien pharmacien;
     
     @OneToMany(mappedBy = "vente", cascade = CascadeType.ALL)
     private List<LigneVente> lignes = new ArrayList<>();
@@ -80,22 +70,6 @@ public class VenteMedicament {
 
 	public void setPatient(Patient patient) {
 		this.patient = patient;
-	}
-
-	public Caissier getCaissier() {
-		return caissier;
-	}
-
-	public void setCaissier(Caissier caissier) {
-		this.caissier = caissier;
-	}
-
-	public Pharmacien getPharmacien() {
-		return pharmacien;
-	}
-
-	public void setPharmacien(Pharmacien pharmacien) {
-		this.pharmacien = pharmacien;
 	}
 
 	public List<LigneVente> getLignes() {

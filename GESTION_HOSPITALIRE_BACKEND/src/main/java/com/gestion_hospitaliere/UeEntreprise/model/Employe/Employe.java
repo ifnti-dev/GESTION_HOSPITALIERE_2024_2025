@@ -15,13 +15,15 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToOne;
 
 
 @Entity
-public class Employe extends Personne{
+public class Employe{
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 	
 	@ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -30,6 +32,11 @@ public class Employe extends Personne{
         inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles = new HashSet<>();
+	
+	@OneToOne
+    @JoinColumn(name = "personne_id")
+    private Personne personne;
+	
 	
 	private String Horaire;
 	private Date DateAffectation;
@@ -67,10 +74,11 @@ public class Employe extends Personne{
 	public void setNumOrdre(String numOrdre) {
 		this.numOrdre = numOrdre;
 	}
+	public Personne getPersonne() {
+		return personne;
+	}
+	public void setPersonne(Personne personne) {
+		this.personne = personne;
+	}
 	
-	
-	
-	
-
-
 }

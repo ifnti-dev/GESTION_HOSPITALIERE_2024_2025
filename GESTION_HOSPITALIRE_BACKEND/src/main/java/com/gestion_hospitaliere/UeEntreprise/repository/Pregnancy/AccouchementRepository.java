@@ -10,5 +10,4 @@ import java.util.List;
 @Repository
 public interface AccouchementRepository extends JpaRepository<Accouchement, Long> {
     List<Accouchement> findByDossierGrossesseId(Long dossierId);
-    List<Accouchement> findBySageFemmeId(Long sageFemmeId);
 }

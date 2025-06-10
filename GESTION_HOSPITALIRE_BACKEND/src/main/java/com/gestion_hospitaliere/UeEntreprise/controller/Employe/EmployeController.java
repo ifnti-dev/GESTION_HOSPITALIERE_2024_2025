@@ -17,7 +17,7 @@ import com.gestion_hospitaliere.UeEntreprise.model.Employe.Employe;
 import com.gestion_hospitaliere.UeEntreprise.service.Employe.EmployeService;
 
 @RestController
-@RequestMapping("api/employe")
+@RequestMapping("api/employe/")
 public class EmployeController {
 
 	@Autowired
@@ -25,15 +25,15 @@ public class EmployeController {
 	
 	
 	// 🔹 Ajouter un employé
-    @PostMapping
-    public ResponseEntity<Employe> ajouterEmploye(@RequestBody Employe employe) {
-        try {
-            Employe nouveau = employeService.ajouterEmploye(employe);
-            return ResponseEntity.ok(nouveau);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(null);
-        }
-    }
+//    @PostMapping
+//    public ResponseEntity<Employe> ajouterEmploye(@RequestBody Employe employe) {
+//        try {
+//            Employe nouveau = employeService.ajouterEmploye(employe);
+//            return ResponseEntity.ok(nouveau);
+//        } catch (IllegalArgumentException e) {
+//            return ResponseEntity.badRequest().body(null);
+//        }
+//    }
 
     // 🔹 Récupérer tous les employés
     @GetMapping

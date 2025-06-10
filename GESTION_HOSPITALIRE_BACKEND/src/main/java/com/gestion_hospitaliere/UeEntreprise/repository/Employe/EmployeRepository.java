@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 
 import com.gestion_hospitaliere.UeEntreprise.model.Employe.Employe;
 
+
 @Repository
 public interface EmployeRepository extends JpaRepository<Employe, Long>{
 
