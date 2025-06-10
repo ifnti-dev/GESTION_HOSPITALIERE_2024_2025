@@ -23,6 +23,7 @@ public class Employe{
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 	
 	@ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
