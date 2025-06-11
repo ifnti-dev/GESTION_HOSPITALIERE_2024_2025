@@ -27,8 +27,8 @@ public class Employe{
 	
 	@ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
-        name = "utilisateur_roles",
-        joinColumns = @JoinColumn(name = "utilisateur_id"),
+        name = "personne_roles",
+        joinColumns = @JoinColumn(name = "personne_id"),
         inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles = new HashSet<>();
