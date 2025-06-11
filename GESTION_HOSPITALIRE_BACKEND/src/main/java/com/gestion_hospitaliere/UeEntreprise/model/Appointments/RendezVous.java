@@ -3,7 +3,7 @@ package com.gestion_hospitaliere.UeEntreprise.model.Appointments;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
+import com.gestion_hospitaliere.UeEntreprise.model.Employe.Employe;
 import com.gestion_hospitaliere.UeEntreprise.model.Medical.Patient;
 
 import jakarta.persistence.Entity;
