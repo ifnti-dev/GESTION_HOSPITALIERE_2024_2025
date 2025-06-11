@@ -14,6 +14,8 @@ import com.gestion_hospitaliere.UeEntreprise.model.Employe.Employe;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 @Entity
 public class Facture {
@@ -90,6 +92,8 @@ public class Facture {
 	public void setCaissier(Employe caissier) {
 		this.caissier = caissier;
 	}
+
+}
     
     
     

@@ -25,6 +25,12 @@ public class Employe{
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
+	public Long getId() {
+		return id;
+	}
+	public void setId(Long id) {
+		this.id = id;
+	}
 	@ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "utilisateur_roles",
