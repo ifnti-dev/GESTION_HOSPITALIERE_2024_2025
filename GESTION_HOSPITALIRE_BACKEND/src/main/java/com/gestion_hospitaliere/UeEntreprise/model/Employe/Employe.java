@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.gestion_hospitaliere.UeEntreprise.model.User.Personne;
 import com.gestion_hospitaliere.UeEntreprise.model.User.Role;
 
@@ -35,6 +36,7 @@ public class Employe{
 	
 	@OneToOne
     @JoinColumn(name = "personne_id")
+	@JsonBackReference
     private Personne personne;
 	
 	
