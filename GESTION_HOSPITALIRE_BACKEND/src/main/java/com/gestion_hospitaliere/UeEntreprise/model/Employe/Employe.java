@@ -1,14 +1,21 @@
 package com.gestion_hospitaliere.UeEntreprise.model.Employe;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.gestion_hospitaliere.UeEntreprise.model.Appointments.RendezVous;
+import com.gestion_hospitaliere.UeEntreprise.model.Payments.Facture;
+import com.gestion_hospitaliere.UeEntreprise.model.Pregnancy.Accouchement;
+import com.gestion_hospitaliere.UeEntreprise.model.Pregnancy.SuiviGrossesse;
 import com.gestion_hospitaliere.UeEntreprise.model.User.Personne;
 import com.gestion_hospitaliere.UeEntreprise.model.User.Role;
 
-import jakarta.persistence.Column;
+import jakarta.persistence.CascadeType;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -17,6 +24,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.UniqueConstraint;
 
@@ -43,9 +51,22 @@ public class Employe{
     private Set<Role> roles = new HashSet<>();
 	
 	@OneToOne
-    @JoinColumn(name = "personne_id",unique = true)
-	@JsonBackReference
+    @JoinColumn(name = "personne_id")
+	@JsonIgnore
+
     private Personne personne;
+	
+	@OneToMany(mappedBy = "employe", cascade = CascadeType.ALL)
+	@JsonIgnore  // Ignore dans le JSON
+    private List<Accouchement> accouchements = new ArrayList<>();
+	 
+	@OneToMany(mappedBy = "employe", cascade = CascadeType.ALL)
+	@JsonIgnore // Pour éviter la récursivité JSON
+	private List<SuiviGrossesse> suivisGrossesse = new ArrayList<>();
+
+	@OneToMany(mappedBy = "employe")
+	@JsonIgnore // Pour éviter la récursivité JSON
+    private List<Facture> factures;
 	
 	
 	private String Horaire;
@@ -53,6 +74,14 @@ public class Employe{
 	private String specialite;
 	@Column(unique = true)
 	private String numOrdre;
+
+
+	public List<Accouchement> getAccouchements() {
+		return accouchements;
+	}
+	public void setAccouchements(List<Accouchement> accouchements) {
+		this.accouchements = accouchements;
+	}
 	
 	
 	public Set<Role> getRoles() {
@@ -70,12 +99,7 @@ public class Employe{
 	public Date getDateAffectation() {
 		return DateAffectation;
 	}
-	public Long getId() {
-		return id;
-	}
-	public void setId(Long id) {
-		this.id = id;
-	}
+	
 	public void setDateAffectation(Date dateAffectation) {
 		DateAffectation = dateAffectation;
 	}
@@ -97,5 +121,17 @@ public class Employe{
 	public void setPersonne(Personne personne) {
 		this.personne = personne;
 	}
-	
+
+	public List<SuiviGrossesse> getSuivisGrossesse() {
+		return suivisGrossesse;
+	}
+	public void setSuivisGrossesse(List<SuiviGrossesse> suivisGrossesse) {
+		this.suivisGrossesse = suivisGrossesse;
+	}
+	public List<Facture> getFactures() {
+		return factures;
+	}
+	public void setFactures(List<Facture> factures) {
+		this.factures = factures;
+	}
 }

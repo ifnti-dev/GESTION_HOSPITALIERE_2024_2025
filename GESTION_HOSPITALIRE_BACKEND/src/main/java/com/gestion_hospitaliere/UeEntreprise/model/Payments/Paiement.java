@@ -20,50 +20,30 @@ public class Paiement {
     private String moyen;
     
     @ManyToOne
+    @JoinColumn(name = "caisse_id")
+    private Caisse caisse;
+
+    // Relation: Paiement → Facture (Many-to-One) → DÉJÀ PRÉSENTE
+    @ManyToOne
     @JoinColumn(name = "facture_id")
     private Facture facture;
 
     // Getters and setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-	public Long getId() {
-		return id;
-	}
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public Double getMontant() { return montant; }
+    public void setMontant(Double montant) { this.montant = montant; }
 
-	public Double getMontant() {
-		return montant;
-	}
+    public LocalDate getDate() { return date; }
+    public void setDate(LocalDate date) { this.date = date; }
 
-	public void setMontant(Double montant) {
-		this.montant = montant;
-	}
+    public String getMoyen() { return moyen; }
+    public void setMoyen(String moyen) { this.moyen = moyen; }
 
-	public LocalDate getDate() {
-		return date;
-	}
+    public Facture getFacture() { return facture; }
+    public void setFacture(Facture facture) { this.facture = facture; }
 
-	public void setDate(LocalDate date) {
-		this.date = date;
-	}
-
-	public String getMoyen() {
-		return moyen;
-	}
-
-	public void setMoyen(String moyen) {
-		this.moyen = moyen;
-	}
-
-	public Facture getFacture() {
-		return facture;
-	}
-
-	public void setFacture(Facture facture) {
-		this.facture = facture;
-	}
-    
-    
-    
+    public Caisse getCaisse() { return caisse; }
+    public void setCaisse(Caisse caisse) { this.caisse = caisse; }
 }

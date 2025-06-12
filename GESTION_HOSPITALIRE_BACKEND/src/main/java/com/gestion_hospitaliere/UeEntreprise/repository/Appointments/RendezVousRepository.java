@@ -18,7 +18,7 @@ public interface RendezVousRepository extends JpaRepository<RendezVous, Long> {
     List<RendezVous> findByType(String type);
     
     // Trouver les rendez-vous par patient ID
-    List<RendezVous> findByPatientId(Long patientId);
+    List<RendezVous> findByPersonne_Id(Long patientId);
     
     // Trouver les rendez-vous dans une plage de dates
     List<RendezVous> findByDateHeureBetween(LocalDateTime startDate, LocalDateTime endDate);

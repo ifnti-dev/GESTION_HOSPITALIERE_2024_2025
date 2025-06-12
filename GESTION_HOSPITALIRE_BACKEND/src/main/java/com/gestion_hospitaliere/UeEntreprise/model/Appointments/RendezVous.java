@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.gestion_hospitaliere.UeEntreprise.model.Employe.Employe;
-import com.gestion_hospitaliere.UeEntreprise.model.Medical.Patient;
+import com.gestion_hospitaliere.UeEntreprise.model.User.Personne;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -25,9 +25,9 @@ public class RendezVous {
     private String notes;
     
     @ManyToOne
-    @JoinColumn(name = "patient_id")
-	@JsonIgnore
-    private Patient patient;
+    @JoinColumn(name = "personne_id")
+	
+    private Personne personne;
     
     @ManyToOne
     @JoinColumn(name = "employe_id")
@@ -84,12 +84,12 @@ public class RendezVous {
 		this.notes = notes;
 	}
 
-	public Patient getPatient() {
-		return patient;
+	public Personne getPersonne() {
+		return personne;
 	}
 
-	public void setPatient(Patient patient) {
-		this.patient = patient;
+	public void setPersonne(Personne personne) {
+		this.personne = personne;
 	}
 
     // Getters and setters

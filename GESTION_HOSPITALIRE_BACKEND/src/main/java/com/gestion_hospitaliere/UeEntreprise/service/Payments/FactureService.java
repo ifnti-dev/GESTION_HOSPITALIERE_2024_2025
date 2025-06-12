@@ -7,20 +7,28 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.gestion_hospitaliere.UeEntreprise.model.Employe.Employe;
+import com.gestion_hospitaliere.UeEntreprise.model.Payments.Caisse;
 import com.gestion_hospitaliere.UeEntreprise.model.Payments.Facture;
+import com.gestion_hospitaliere.UeEntreprise.model.Payments.Paiement;
 import com.gestion_hospitaliere.UeEntreprise.repository.Employe.EmployeRepository;
-
+import com.gestion_hospitaliere.UeEntreprise.repository.Payments.CaisseRepository;
 import com.gestion_hospitaliere.UeEntreprise.repository.Payments.FactureRepository;
+import com.gestion_hospitaliere.UeEntreprise.repository.Payments.PaiementRepository;
 
 @Service
 public class FactureService {
 
     @Autowired
     private FactureRepository factureRepository;
-
+    
     @Autowired
-    private EmployeRepository caissierRepository;
-
+    private EmployeRepository employeRepository;
+    
+    @Autowired
+    private CaisseRepository caisseRepository;
+    
+    @Autowired
+    private PaiementRepository paiementRepository;
 
     public List<Facture> getAllFactures() {
         return factureRepository.findAll();
@@ -31,39 +39,66 @@ public class FactureService {
     }
 
     public Facture createFacture(Facture facture) {
-        // Récupérer et valider le caissier
-        Long caissierId = facture.getCaissier().getId();
-        Employe caissier = caissierRepository.findById(caissierId)
-            .orElseThrow(() -> new RuntimeException("Caissier non trouvé avec l'id : " + caissierId));
+        // Gestion de l'employé par ID
+        if(facture.getEmploye() == null || facture.getEmploye().getId() == null) {
+            throw new RuntimeException("L'ID de l'employé est requis");
+        }
+        Employe employe = employeRepository.findById(facture.getEmploye().getId())
+                .orElseThrow(() -> new RuntimeException("Employé non trouvé"));
+        facture.setEmploye(employe);
 
-        facture.setCaissier(caissier);
+        // Sauvegarde initiale pour obtenir l'ID de la facture
+        Facture savedFacture = factureRepository.save(facture);
 
+        // Gestion des paiements par IDs
+        if(facture.getPaiements() != null) {
+            for(Paiement paiement : facture.getPaiements()) {
+                if(paiement.getId() == null) {
+                    throw new RuntimeException("L'ID du paiement est requis");
+                }
+                
+                Paiement existingPaiement = paiementRepository.findById(paiement.getId())
+                        .orElseThrow(() -> new RuntimeException("Paiement non trouvé"));
+                
+                // Vérification de la caisse
+                if(existingPaiement.getCaisse() == null || existingPaiement.getCaisse().getId() == null) {
+                    throw new RuntimeException("La caisse du paiement n'est pas définie");
+                }
+                
+                Caisse caisse = caisseRepository.findById(existingPaiement.getCaisse().getId())
+                        .orElseThrow(() -> new RuntimeException("Caisse non trouvée"));
+                
+                // Vérification que la caisse appartient à l'employé
+                if(!caisse.getEmploye().getId().equals(employe.getId())) {
+                    throw new RuntimeException("La caisse n'appartient pas à cet employé");
+                }
+                
+                existingPaiement.setFacture(savedFacture);
+                paiementRepository.save(existingPaiement);
+            }
+        }
 
-        // Si tu veux t'assurer que chaque paiement connaît sa facture (relation bidirectionnelle)
-        facture.getPaiements().forEach(paiement -> paiement.setFacture(facture));
-
-        return factureRepository.save(facture);
+        return factureRepository.save(savedFacture);
     }
 
     public Facture updateFacture(Long id, Facture updatedFacture) {
-        if (!factureRepository.existsById(id)) {
-            return null;
+        Facture existingFacture = factureRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Facture non trouvée"));
+        
+        // Mise à jour des champs de base
+        existingFacture.setType(updatedFacture.getType());
+        existingFacture.setMontantTotal(updatedFacture.getMontantTotal());
+        existingFacture.setStatut(updatedFacture.getStatut());
+        existingFacture.setDate(updatedFacture.getDate());
+        
+        // Mise à jour de l'employé si nécessaire
+        if(updatedFacture.getEmploye() != null && updatedFacture.getEmploye().getId() != null) {
+            Employe employe = employeRepository.findById(updatedFacture.getEmploye().getId())
+                    .orElseThrow(() -> new RuntimeException("Employé non trouvé"));
+            existingFacture.setEmploye(employe);
         }
-
-        updatedFacture.setId(id);
-
-        // Vérifier que le caissier existe
-        Long caissierId = updatedFacture.getCaissier().getId();
-        Employe caissier = caissierRepository.findById(caissierId)
-            .orElseThrow(() -> new RuntimeException("Caissier non trouvé avec l'id : " + caissierId));
-
-        updatedFacture.setCaissier(caissier);
-
-
-        // Mettre à jour la relation bidirectionnelle avec les paiements
-        updatedFacture.getPaiements().forEach(paiement -> paiement.setFacture(updatedFacture));
-
-        return factureRepository.save(updatedFacture);
+        
+        return factureRepository.save(existingFacture);
     }
 
     public void deleteFacture(Long id) {

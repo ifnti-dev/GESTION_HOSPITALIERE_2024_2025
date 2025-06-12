@@ -13,5 +13,5 @@ public interface DossierMedicalRepository extends JpaRepository<DossierMedical, 
     Optional<DossierMedical> findByGroupeSanguin(String groupeSanguin);
 
     // Recherche par patient ID
-    Optional<DossierMedical> findByPatientId(Long patientId);
+    Optional<DossierMedical> findByPersonneId(Long personneId);
 }
