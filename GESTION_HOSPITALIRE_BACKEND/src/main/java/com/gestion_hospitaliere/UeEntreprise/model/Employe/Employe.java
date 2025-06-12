@@ -15,6 +15,7 @@ import com.gestion_hospitaliere.UeEntreprise.model.User.Personne;
 import com.gestion_hospitaliere.UeEntreprise.model.User.Role;
 
 import jakarta.persistence.CascadeType;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -25,6 +26,7 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.UniqueConstraint;
 
 
 @Entity
@@ -51,6 +53,7 @@ public class Employe{
 	@OneToOne
     @JoinColumn(name = "personne_id")
 	@JsonIgnore
+
     private Personne personne;
 	
 	@OneToMany(mappedBy = "employe", cascade = CascadeType.ALL)
@@ -69,6 +72,7 @@ public class Employe{
 	private String Horaire;
 	private Date DateAffectation;
 	private String specialite;
+	@Column(unique = true)
 	private String numOrdre;
 
 
