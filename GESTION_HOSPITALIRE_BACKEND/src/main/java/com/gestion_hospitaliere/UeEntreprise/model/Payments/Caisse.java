@@ -1,12 +1,19 @@
 package com.gestion_hospitaliere.UeEntreprise.model.Payments;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.gestion_hospitaliere.UeEntreprise.model.Employe.Employe;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 
 
 
@@ -21,8 +28,15 @@ public class Caisse {
     // @OneToMany(mappedBy = "caisse", cascade = CascadeType.ALL)
     // private List<RapportCaisse> rapportsCaisse;
 
+
+    // @OneToMany(mappedBy = "caisse", cascade = CascadeType.ALL)
+    // @JsonIgnore
+    // private List<Paiement> paiements = new ArrayList<>();
+
+
     @ManyToOne
-    private Employe caissier;
+    @JoinColumn(name = "employe_id")
+    private Employe employe;
 
 
     // Getters et setters
@@ -58,12 +72,21 @@ public class Caisse {
     //     this.rapportsCaisse = rapportsCaisse;
     // }
 
-    public Employe getCaissier() {
-        return caissier;
+    public Employe getEmploye() {
+        return employe;
     }
 
-    public void setCaissier(Employe caissier) {
-        this.caissier = caissier;
+    public void setEmploye(Employe employe) {
+        this.employe = employe;
     }
+
+    // public List<Paiement> getPaiements() {
+    //     return paiements;
+    // }
+
+    // public void setPaiements(List<Paiement> paiements) {
+    //     this.paiements = paiements;
+    // }
+
 
 }

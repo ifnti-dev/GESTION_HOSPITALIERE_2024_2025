@@ -28,14 +28,16 @@ public class Facture {
     private String statut;
     private LocalDate date;
     
-    @OneToMany(mappedBy = "facture", cascade = CascadeType.ALL)
-	@JsonIgnore
+   @OneToMany(mappedBy = "facture", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Paiement> paiements = new ArrayList<>();
-    
-    @ManyToOne
-    @JoinColumn(name = "caissier_id")
-    private Employe caissier;
 
+    // Relation: Facture → Employe (Many-to-One) → DÉJÀ PRÉSENTE
+    @ManyToOne
+    @JoinColumn(name = "employe_id")
+    private Employe employe;
+	 
+   
 
 	public Long getId() {
 		return id;
@@ -85,12 +87,12 @@ public class Facture {
 		this.paiements = paiements;
 	}
 
-	public Employe getCaissier() {
-		return caissier;
+	public Employe getEmploye() {
+		return employe;
 	}
 
-	public void setCaissier(Employe caissier) {
-		this.caissier = caissier;
+	public void setEmploye(Employe employe) {
+		this.employe = employe;
 	}
 
 }

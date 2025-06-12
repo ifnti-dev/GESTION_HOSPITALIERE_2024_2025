@@ -30,12 +30,12 @@ public class CaisseService {
     }
 
     public Caisse createCaisse(Caisse caisse) {
-        Long caissierId = caisse.getCaissier().getId();
-        Employe caissier = caissierRepository.findById(caissierId)
-            .orElseThrow(() -> new RuntimeException("Caissier non trouvé avec l'id : " + caissierId));
+        Long employeId = caisse.getEmploye().getId();
+        Employe employe = caissierRepository.findById(employeId)
+            .orElseThrow(() -> new RuntimeException("Caissier non trouvé avec l'id : " + employeId));
 
 
-//        caisse.setCaissier(caissier);
+       caisse.setEmploye(employe);
 
         return caisseRepository.save(caisse);
     }
@@ -45,12 +45,12 @@ public class CaisseService {
             return null;
         }
 
-        Long caissierId = updatedCaisse.getCaissier().getId();
-        Employe caissier = caissierRepository.findById(caissierId)
-            .orElseThrow(() -> new RuntimeException("Caissier non trouvé avec l'id : " + caissierId));
+        Long employeId = updatedCaisse.getEmploye().getId();
+        Employe employe = caissierRepository.findById(employeId)
+            .orElseThrow(() -> new RuntimeException("Caissier non trouvé avec l'id : " + employeId));
 
         updatedCaisse.setId(id);
-        updatedCaisse.setCaissier(caissier);
+        updatedCaisse.setEmploye(employe);
 
 
         return caisseRepository.save(updatedCaisse);

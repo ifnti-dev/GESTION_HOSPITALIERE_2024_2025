@@ -6,10 +6,14 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.gestion_hospitaliere.UeEntreprise.model.Payments.Paiement;
+import com.gestion_hospitaliere.UeEntreprise.model.Employe.Employe;
+import com.gestion_hospitaliere.UeEntreprise.model.Payments.Caisse;
 import com.gestion_hospitaliere.UeEntreprise.model.Payments.Facture;
-import com.gestion_hospitaliere.UeEntreprise.repository.Payments.PaiementRepository;
+import com.gestion_hospitaliere.UeEntreprise.model.Payments.Paiement;
+import com.gestion_hospitaliere.UeEntreprise.repository.Employe.EmployeRepository;
+import com.gestion_hospitaliere.UeEntreprise.repository.Payments.CaisseRepository;
 import com.gestion_hospitaliere.UeEntreprise.repository.Payments.FactureRepository;
+import com.gestion_hospitaliere.UeEntreprise.repository.Payments.PaiementRepository;
 
 @Service
 public class PaiementService {
@@ -19,6 +23,12 @@ public class PaiementService {
 
     @Autowired
     private FactureRepository factureRepository;
+    
+    @Autowired
+    private CaisseRepository caisseRepository;
+    
+    @Autowired
+    private EmployeRepository employeRepository;
 
     public List<Paiement> getAllPaiements() {
         return paiementRepository.findAll();
@@ -29,37 +39,76 @@ public class PaiementService {
     }
 
     public Paiement createPaiement(Paiement paiement) {
-        // Vérifier la facture
-        Long factureId = paiement.getFacture().getId();
-        Facture facture = factureRepository.findById(factureId)
-            .orElseThrow(() -> new RuntimeException("Facture non trouvée avec l'id : " + factureId));
-
+        // Validation de la caisse
+        if(paiement.getCaisse() == null || paiement.getCaisse().getId() == null) {
+            throw new RuntimeException("L'ID de la caisse est requis");
+        }
+        Caisse caisse = caisseRepository.findById(paiement.getCaisse().getId())
+                .orElseThrow(() -> new RuntimeException("Caisse non trouvée"));
+        
+        // Validation de la facture
+        if(paiement.getFacture() == null || paiement.getFacture().getId() == null) {
+            throw new RuntimeException("L'ID de la facture est requis");
+        }
+        Facture facture = factureRepository.findById(paiement.getFacture().getId())
+                .orElseThrow(() -> new RuntimeException("Facture non trouvée"));
+        
+        // Vérification de la cohérence employé
+        Employe employeCaisse = caisse.getEmploye();
+        Employe employeFacture = facture.getEmploye();
+        
+        if(employeCaisse == null || employeFacture == null) {
+            throw new RuntimeException("Employé non défini pour la caisse ou la facture");
+        }
+        
+        if(!employeCaisse.getId().equals(employeFacture.getId())) {
+            throw new RuntimeException("L'employé de la caisse ne correspond pas à l'employé de la facture");
+        }
+        
+        // Attribution des relations
+        paiement.setCaisse(caisse);
         paiement.setFacture(facture);
-
+        
         return paiementRepository.save(paiement);
     }
 
     public Paiement updatePaiement(Long id, Paiement updatedPaiement) {
-        if (!paiementRepository.existsById(id)) {
-            return null;
+        Paiement existingPaiement = paiementRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Paiement non trouvé"));
+        
+        // Mise à jour des champs de base
+        existingPaiement.setMontant(updatedPaiement.getMontant());
+        existingPaiement.setDate(updatedPaiement.getDate());
+        existingPaiement.setMoyen(updatedPaiement.getMoyen());
+        
+        // Validation et mise à jour de la caisse
+        if(updatedPaiement.getCaisse() != null && updatedPaiement.getCaisse().getId() != null) {
+            Caisse caisse = caisseRepository.findById(updatedPaiement.getCaisse().getId())
+                    .orElseThrow(() -> new RuntimeException("Caisse non trouvée"));
+            existingPaiement.setCaisse(caisse);
         }
-
-        updatedPaiement.setId(id);
-
-        // Vérifier la facture
-        Long factureId = updatedPaiement.getFacture().getId();
-        Facture facture = factureRepository.findById(factureId)
-            .orElseThrow(() -> new RuntimeException("Facture non trouvée avec l'id : " + factureId));
-
-        updatedPaiement.setFacture(facture);
-
-        return paiementRepository.save(updatedPaiement);
+        
+        // Validation et mise à jour de la facture
+        if(updatedPaiement.getFacture() != null && updatedPaiement.getFacture().getId() != null) {
+            Facture facture = factureRepository.findById(updatedPaiement.getFacture().getId())
+                    .orElseThrow(() -> new RuntimeException("Facture non trouvée"));
+            existingPaiement.setFacture(facture);
+        }
+        
+        // Vérification de la cohérence après mise à jour
+        if(!existingPaiement.getCaisse().getEmploye().getId()
+           .equals(existingPaiement.getFacture().getEmploye().getId())) {
+            throw new RuntimeException("L'employé de la caisse ne correspond pas à l'employé de la facture");
+        }
+        
+        return paiementRepository.save(existingPaiement);
     }
 
     public void deletePaiement(Long id) {
         paiementRepository.deleteById(id);
     }
 
+    // Les méthodes de recherche restent inchangées
     public List<Paiement> findByMontant(Double montant) {
         return paiementRepository.findByMontant(montant);
     }

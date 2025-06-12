@@ -33,19 +33,14 @@ public class Patient {
     private String sexe;
     private String adresse;
     
-	@OneToOne(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)	
-	@JsonIgnore  // Ignore dans le JSON
-    private DossierMedical dossierMedical;
+	// @OneToOne(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)	
+	// @JsonIgnore  // Ignore dans le JSON
+    // private DossierMedical dossierMedical;
     
-    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
-	@JsonIgnore  // Ignore dans le JSON
+    
 	
-	private List<DossierGrossesse> dossierGrossesse; 
 		
-    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
-	@JsonIgnore  // Ignore dans le JSON
-    private List<RendezVous> rendezVous = new ArrayList<>();
-    
+   
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
 	@JsonIgnore  // Ignore dans le JSON
     private List<Hospitalisation> hospitalisations = new ArrayList<>();
@@ -114,33 +109,19 @@ public class Patient {
 		this.adresse = adresse;
 	}
 
-	public DossierMedical getDossierMedical() {
-		return dossierMedical;
-	}
+	// public DossierMedical getDossierMedical() {
+	// 	return dossierMedical;
+	// }
 
-	public void setDossierMedical(DossierMedical dossierMedical) {
-		this.dossierMedical = dossierMedical;
-		if (dossierMedical != null) {
-			dossierMedical.setPatient(this);
-		}
-	}
+	// public void setDossierMedical(DossierMedical dossierMedical) {
+	// 	this.dossierMedical = dossierMedical;
+	// 	if (dossierMedical != null) {
+	// 		dossierMedical.setPatient(this);
+	// 	}
+	// }
 	
 
-	public List<DossierGrossesse> getDossierGrossesse() {
-		return dossierGrossesse;
-	}
-
-	public void setDossierGrossesse(List<DossierGrossesse> dossierGrossesse) {
-		this.dossierGrossesse = dossierGrossesse;
-	}
-
-	public List<RendezVous> getRendezVous() {
-		return rendezVous;
-	}
-
-	public void setRendezVous(List<RendezVous> rendezVous) {
-		this.rendezVous = rendezVous;
-	}
+	
 
 	public List<Hospitalisation> getHospitalisations() {
 		return hospitalisations;
