@@ -2,6 +2,7 @@ package com.gestion_hospitaliere.UeEntreprise.model.User;
 
 
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gestion_hospitaliere.UeEntreprise.model.Employe.Employe;
 
 import jakarta.persistence.CascadeType;
@@ -20,6 +21,7 @@ public class Personne {
     private Long id;
 
     @OneToOne(mappedBy = "personne", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JsonManagedReference
     private Employe employe;
 
 
