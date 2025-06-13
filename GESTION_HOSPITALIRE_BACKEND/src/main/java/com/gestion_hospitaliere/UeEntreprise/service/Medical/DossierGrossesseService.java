@@ -7,9 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.gestion_hospitaliere.UeEntreprise.model.Medical.DossierGrossesse;
-import com.gestion_hospitaliere.UeEntreprise.model.Medical.Patient;
+import com.gestion_hospitaliere.UeEntreprise.model.User.Personne;
 import com.gestion_hospitaliere.UeEntreprise.repository.Medical.DossierGrossesseRepository;
-import com.gestion_hospitaliere.UeEntreprise.repository.Medical.PatientRepository;
+import com.gestion_hospitaliere.UeEntreprise.repository.User.PersonneRepository;
 
 @Service
 public class DossierGrossesseService {
@@ -18,7 +18,7 @@ public class DossierGrossesseService {
     private DossierGrossesseRepository dossierGrossesseRepository;
 
     @Autowired
-    private PatientRepository patientRepository;
+    private PersonneRepository personneRepository;
 
     public List<DossierGrossesse> getAll() {
         return dossierGrossesseRepository.findAll();
@@ -28,15 +28,15 @@ public class DossierGrossesseService {
         return dossierGrossesseRepository.findById(id);
     }
 
-    public Optional<DossierGrossesse> getByPatientId(Long patientId) {
-        return dossierGrossesseRepository.findByPatientId(patientId);
+    public Optional<DossierGrossesse> getByPatientId(Long personneId) {
+        return dossierGrossesseRepository.findByPersonneId(personneId);
     }
 
     public DossierGrossesse create(DossierGrossesse dossier) {
-        Long patientId = dossier.getPatient().getId();
-        Patient patient = patientRepository.findById(patientId)
-                .orElseThrow(() -> new RuntimeException("Patient non trouvé avec l'id: " + patientId));
-        dossier.setPatient(patient);
+        Long personneId = dossier.getPersonne().getId();
+        Personne personne = personneRepository.findById(personneId)
+                .orElseThrow(() -> new RuntimeException("Patient non trouvé avec l'id: " + personneId));
+        dossier.setPersonne(personne);
         return dossierGrossesseRepository.save(dossier);
     }
 
@@ -44,11 +44,11 @@ public class DossierGrossesseService {
         if (!dossierGrossesseRepository.existsById(id)) {
             throw new RuntimeException("DossierGrossesse non trouvé avec l'id: " + id);
         }
-        Long patientId = updated.getPatient().getId();
-        Patient patient = patientRepository.findById(patientId)
-                .orElseThrow(() -> new RuntimeException("Patient non trouvé avec l'id: " + patientId));
+        Long personneId = updated.getPersonne().getId();
+        Personne personne = personneRepository.findById(personneId)
+                .orElseThrow(() -> new RuntimeException("Patient non trouvé avec l'id: " + personneId));
         updated.setId(id);
-        updated.setPatient(patient);
+        updated.setPersonne(personne);
         return dossierGrossesseRepository.save(updated);
     }
 

@@ -7,9 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.gestion_hospitaliere.UeEntreprise.model.Medical.DossierMedical;
-import com.gestion_hospitaliere.UeEntreprise.model.Medical.Patient;
+import com.gestion_hospitaliere.UeEntreprise.model.User.Personne;
 import com.gestion_hospitaliere.UeEntreprise.repository.Medical.DossierMedicalRepository;
-import com.gestion_hospitaliere.UeEntreprise.repository.Medical.PatientRepository;
+import com.gestion_hospitaliere.UeEntreprise.repository.User.PersonneRepository;
 
 import jakarta.transaction.Transactional;
 
@@ -20,7 +20,7 @@ public class DossierMedicalService {
     private DossierMedicalRepository dossierMedicalRepository;
 
     @Autowired
-    private PatientRepository patientRepository;
+    private PersonneRepository personneRepository;
 
     public List<DossierMedical> getAllDossiers() {
         return dossierMedicalRepository.findAll();
@@ -34,17 +34,17 @@ public class DossierMedicalService {
         return dossierMedicalRepository.findByGroupeSanguin(groupeSanguin);
     }
 
-    public Optional<DossierMedical> getDossierByPatientId(Long patientId) {
-        return dossierMedicalRepository.findByPatientId(patientId);
+    public Optional<DossierMedical> getDossierByPatientId(Long personneId) {
+        return dossierMedicalRepository.findByPersonneId(personneId);
     }
 
     public DossierMedical saveDossier(DossierMedical dossierMedical) {
-        Long patientId = dossierMedical.getPatient().getId();
+        Long personneId = dossierMedical.getPersonne().getId();
 
-        Patient patient = patientRepository.findById(patientId)
-            .orElseThrow(() -> new RuntimeException("Patient non trouvé avec l'id : " + patientId));
+        Personne personne = personneRepository.findById(personneId)
+            .orElseThrow(() -> new RuntimeException("Patient non trouvé avec l'id : " + personneId));
 
-        dossierMedical.setPatient(patient);
+        dossierMedical.setPersonne(personne);
 
         return dossierMedicalRepository.save(dossierMedical);
     }
@@ -55,11 +55,11 @@ public void deleteDossier(Long id) {
         .orElseThrow(() -> new RuntimeException("Dossier non trouvé"));
 
     // Détacher le dossier du Patient (côté propriétaire ET inverse)
-    Patient patient = dossier.getPatient();
-    if (patient != null) {
-        patient.setDossierMedical(null); // Côté inverse (Patient)
-        dossier.setPatient(null); // Côté propriétaire (DossierMedical)
-    }
+    // Patient patient = dossier.getPersonne();
+    // if (patient != null) {
+    //     patient.setDossierMedical(null); // Côté inverse (Patient)
+    //     dossier.setPersonne(null); // Côté propriétaire (DossierMedical)
+    // }
 
    
 
@@ -74,13 +74,13 @@ public void deleteDossier(Long id) {
             throw new RuntimeException("Dossier médical non trouvé avec l'id : " + id);
         }
     
-        Long patientId = updatedDossier.getPatient().getId();
+        Long patientId = updatedDossier.getPersonne().getId();
     
-        Patient patient = patientRepository.findById(patientId)
+        Personne patient = personneRepository.findById(patientId)
             .orElseThrow(() -> new RuntimeException("Patient non trouvé avec l'id : " + patientId));
     
         updatedDossier.setId(id);
-        updatedDossier.setPatient(patient);
+        updatedDossier.setPersonne(patient);
     
         return dossierMedicalRepository.save(updatedDossier);
     }

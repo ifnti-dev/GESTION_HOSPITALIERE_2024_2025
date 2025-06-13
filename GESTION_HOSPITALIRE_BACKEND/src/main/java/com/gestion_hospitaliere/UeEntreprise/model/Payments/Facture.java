@@ -1,22 +1,14 @@
 package com.gestion_hospitaliere.UeEntreprise.model.Payments;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.gestion_hospitaliere.UeEntreprise.model.Employe.Employe;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 
-// Supposons que vous ayez d'autres importations nécessaires comme Patient, Consultation, etc.
-// import com.gestion_hospitaliere.UeEntreprise.model.Patient; // Exemple
-import java.time.LocalDate;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.List; // Si vous avez une liste de lignes de facture par exemple
+import java.util.List;
 
 @Entity
 @Schema(description = "Représente une facture dans le système")
@@ -36,7 +28,7 @@ public class Facture {
     @Schema(description = "Date d'émission de la facture.", example = "2024-06-11", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDate dateEmission;
 
-    @Column(nullable = false, precision = 19, scale = 2) // Example precision and scale for monetary values
+    @Column(nullable = false, precision = 19, scale = 2)
     @Schema(description = "Montant total de la facture.", example = "250.75", requiredMode = Schema.RequiredMode.REQUIRED)
     private BigDecimal montantTotal;
 
@@ -45,26 +37,23 @@ public class Facture {
     @Schema(description = "Statut actuel de la facture (ex: NON_PAYEE, PAYEE, ANNULEE).", example = "NON_PAYEE", requiredMode = Schema.RequiredMode.REQUIRED)
     private StatutFacture statut;
 
-    // Exemple de relation : ID du patient concerné. Adaptez selon votre modèle.
-    // @ManyToOne
-    // @JoinColumn(name = "patient_id")
-    // @Schema(description = "Patient associé à cette facture.")
-    // private Patient patient;
-    // Ou simplement un ID:
     @Schema(description = "ID du patient concerné par la facture.", example = "102")
     private Long patientId;
 
-    @OneToMany(mappedBy = "facture", fetch = FetchType.LAZY) // fetch = FetchType.LAZY is often a good default
+    @OneToMany(mappedBy = "facture", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     @Schema(description = "Liste des paiements associés à cette facture.")
     private List<Paiement> paiements = new ArrayList<>();
 
-    // Constructeurs, Getters et Setters
+    @ManyToOne
+    @JoinColumn(name = "employe_id")
+    @Schema(description = "Employé ayant généré la facture.")
+    private Employe employe;
 
-    public Facture() {
-    }
+    // Constructeurs
+    public Facture() {}
 
-    // Ajoutez ici vos getters et setters pour tous les champs.
-    // Exemple :
+    // Getters et Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -83,11 +72,9 @@ public class Facture {
     public Long getPatientId() { return patientId; }
     public void setPatientId(Long patientId) { this.patientId = patientId; }
 
-    public List<Paiement> getPaiements() {
-        return paiements;
-    }
+    public List<Paiement> getPaiements() { return paiements; }
+    public void setPaiements(List<Paiement> paiements) { this.paiements = paiements; }
 
-    public void setPaiements(List<Paiement> paiements) {
-        this.paiements = paiements;
-    }
+    public Employe getEmploye() { return employe; }
+    public void setEmploye(Employe employe) { this.employe = employe; }
 }

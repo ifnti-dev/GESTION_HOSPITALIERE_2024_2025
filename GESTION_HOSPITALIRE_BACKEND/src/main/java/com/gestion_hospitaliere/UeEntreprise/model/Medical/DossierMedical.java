@@ -1,13 +1,10 @@
 package com.gestion_hospitaliere.UeEntreprise.model.Medical;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.gestion_hospitaliere.UeEntreprise.model.User.Personne;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Inheritance;
-import jakarta.persistence.InheritanceType;
+
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 
@@ -17,15 +14,17 @@ public class DossierMedical extends Dossier {
     
 	
     @OneToOne
-    @JoinColumn(name = "patient_id", referencedColumnName = "id", nullable = true) // Important: nullable=true	
-    private Patient patient;
+    @JoinColumn(name = "personne_id", referencedColumnName = "id", nullable = true) // Important: nullable=true	
+    private Personne personne;
 
-	public Patient getPatient() {
-		return patient;
+
+
+	public Personne getPersonne() {
+		return personne;
 	}
 
-	public void setPatient(Patient patient) {
-		this.patient = patient;
+	public void setPersonne(Personne personne) {
+		this.personne = personne;
 	}
     
     

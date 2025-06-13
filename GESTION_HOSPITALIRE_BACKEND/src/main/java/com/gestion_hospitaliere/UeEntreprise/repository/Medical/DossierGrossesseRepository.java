@@ -9,5 +9,5 @@ import java.util.Optional;
 
 @Repository
 public interface DossierGrossesseRepository extends JpaRepository<DossierGrossesse, Long> {
-    Optional<DossierGrossesse> findByPatientId(Long patientId);
+    Optional<DossierGrossesse> findByPersonneId(Long patientId);
 }
