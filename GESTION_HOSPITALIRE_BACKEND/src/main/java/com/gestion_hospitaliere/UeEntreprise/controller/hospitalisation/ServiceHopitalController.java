@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/services")
+@RequestMapping("/api/servicesHospitalisation")
 public class ServiceHopitalController {
      @Autowired
     private final ServiceService serviceService;

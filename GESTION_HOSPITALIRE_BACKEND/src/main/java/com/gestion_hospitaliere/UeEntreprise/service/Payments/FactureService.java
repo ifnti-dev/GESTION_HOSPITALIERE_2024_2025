@@ -106,6 +106,6 @@ public class FactureService {
     }
 
     public List<Facture> findByDate(LocalDate date) {
-        return factureRepository.findByDate(date);
+        return factureRepository.findByDateEmission(date); // Changed to use findByDateEmission
     }
 }
