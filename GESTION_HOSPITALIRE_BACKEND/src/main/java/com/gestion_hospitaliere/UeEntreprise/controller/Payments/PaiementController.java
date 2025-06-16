@@ -26,15 +26,15 @@ public class PaiementController {
         return paiementService.getPaiementById(id);
     }
 
-    // @PostMapping
-    // public Paiement createPaiement(@RequestBody Paiement paiement) {
-    //     return paiementService.createPaiement(paiement);
-    // }
+    @PostMapping
+    public Paiement createPaiement(@RequestBody Paiement paiement) {
+        return paiementService.createPaiement(paiement);
+    }
 
-    // @PutMapping("/{id}")
-    // public Paiement updatePaiement(@PathVariable("id") Long id, @RequestBody Paiement paiement) {
-    //     return paiementService.updatePaiement(id, paiement);
-    // }
+    @PutMapping("/{id}")
+    public Paiement updatePaiement(@PathVariable("id") Long id, @RequestBody Paiement paiement) {
+        return paiementService.updatePaiement(id, paiement);
+    }
 
     @DeleteMapping("/{id}")
     public void deletePaiement(@PathVariable("id") Long id) {
