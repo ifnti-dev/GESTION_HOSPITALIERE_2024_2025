@@ -29,7 +29,6 @@ public class Personne {
     private Long id;
 
     @OneToOne(mappedBy = "personne", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@JsonManagedReference
     private Employe employe;
 
 	@OneToMany(mappedBy = "personne", cascade = CascadeType.ALL)

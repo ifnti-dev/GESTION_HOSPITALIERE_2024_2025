@@ -15,7 +15,7 @@ import com.gestion_hospitaliere.UeEntreprise.model.User.Personne;
 import com.gestion_hospitaliere.UeEntreprise.model.User.Role;
 
 import jakarta.persistence.CascadeType;
-
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;

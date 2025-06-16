@@ -89,7 +89,7 @@ public class FactureService {
         existingFacture.setType(updatedFacture.getType());
         existingFacture.setMontantTotal(updatedFacture.getMontantTotal());
         existingFacture.setStatut(updatedFacture.getStatut());
-        existingFacture.setDate(updatedFacture.getDate());
+        existingFacture.setDateEmission(updatedFacture.getDateEmission());
         
         // Mise à jour de l'employé si nécessaire
         if(updatedFacture.getEmploye() != null && updatedFacture.getEmploye().getId() != null) {
