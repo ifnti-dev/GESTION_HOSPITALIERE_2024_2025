@@ -1,12 +1,7 @@
 package com.gestion_hospitaliere.UeEntreprise.service.ConsultationTraitement;
-
-
 import com.gestion_hospitaliere.UeEntreprise.model.ConsultationTraitement.Consultation;
 import com.gestion_hospitaliere.UeEntreprise.model.ConsultationTraitement.Prescription;
-import com.gestion_hospitaliere.UeEntreprise.model.Employe.Medecin;
-import com.gestion_hospitaliere.UeEntreprise.model.Medical.Patient;
 import com.gestion_hospitaliere.UeEntreprise.repository.ConsultationTraitement.ConsultationRepository;
-// import com.gestion_hospitaliere.UeEntreprise.exception.ResourceNotFoundException; // Example custom exception
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
  
@@ -41,8 +36,7 @@ public class ConsultationService {
                 prescription.setConsultation(consultation);
             }
         }
-        // Handle patient and medecin if they are new or need to be fetched
-        // For simplicity, assuming they are either already managed or correctly set by ID for cascading
+
         return consultationRepository.save(consultation);
     }
 
@@ -57,30 +51,13 @@ public class ConsultationService {
         existingConsultation.setSymptomes(consultationDetails.getSymptomes());
         existingConsultation.setDiagnostic(consultationDetails.getDiagnostic());
 
-        // Handle Medecin update (if ID is provided in consultationDetails)
-        if (consultationDetails.getMedecin() != null && consultationDetails.getMedecin().getId() != null) {
-            // Here you would typically fetch the Medecin entity from its repository
-            // Medecin medecin = medecinRepository.findById(consultationDetails.getMedecin().getId())
-            // .orElseThrow(() -> new RuntimeException("Medecin non trouvé"));
-            // existingConsultation.setMedecin(medecin);
-            // For now, if the Medecin object is passed correctly by the controller, this might work
-            // but fetching is safer to ensure it's a managed entity.
-            existingConsultation.setMedecin(consultationDetails.getMedecin());
-        }
-
         // Handle Patient update (if ID is provided in consultationDetails)
         if (consultationDetails.getPatient() != null && consultationDetails.getPatient().getId() != null) {
-            // Similar to Medecin, fetch Patient from its repository
-            // Patient patient = patientRepository.findById(consultationDetails.getPatient().getId())
-            // .orElseThrow(() -> new RuntimeException("Patient non trouvé"));
-            // existingConsultation.setPatient(patient);
+        
             existingConsultation.setPatient(consultationDetails.getPatient());
         }
 
-        // Gérer la mise à jour des prescriptions si nécessaire.
-        // Cela peut impliquer de vider la liste existante et d'ajouter les nouvelles,
-        // ou une logique plus complexe pour fusionner les changements.
-        // Pour une approche simple de remplacement :
+     
         if (consultationDetails.getPrescriptions() != null) {
             existingConsultation.getPrescriptions().clear();
             for (Prescription prescriptionDetail : consultationDetails.getPrescriptions()) {

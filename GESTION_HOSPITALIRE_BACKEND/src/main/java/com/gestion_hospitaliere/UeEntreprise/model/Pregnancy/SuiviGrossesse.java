@@ -1,5 +1,6 @@
 package com.gestion_hospitaliere.UeEntreprise.model.Pregnancy;
 
+import com.gestion_hospitaliere.UeEntreprise.model.Employe.Employe;
 import com.gestion_hospitaliere.UeEntreprise.model.Medical.DossierGrossesse;
 
 import jakarta.persistence.CascadeType;
@@ -21,8 +22,21 @@ public class SuiviGrossesse {
     private Float tension;
     private Float poids;
     private String remarque;
+
+	@ManyToOne
+	@JoinColumn(name = "employe_id")
+	private Employe employe;
+
     
-    @ManyToOne
+    public Employe getEmploye() {
+		return employe;
+	}
+
+	public void setEmploye(Employe employe) {
+		this.employe = employe;
+	}
+
+	@ManyToOne
     @JoinColumn(name = "dossier_grossesse_id")
     private DossierGrossesse dossierGrossesse;
 

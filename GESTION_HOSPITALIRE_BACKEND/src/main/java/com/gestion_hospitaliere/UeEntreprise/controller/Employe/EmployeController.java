@@ -22,51 +22,52 @@ public class EmployeController {
 
 	@Autowired
     private EmployeService employeService;
-	
-	
-	// 🔹 Ajouter un employé
+
+    // Ajouter un nouvel employé
     @PostMapping
     public ResponseEntity<Employe> ajouterEmploye(@RequestBody Employe employe) {
         try {
-            Employe nouveau = employeService.ajouterEmploye(employe);
-            return ResponseEntity.ok(nouveau);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(null);
+            Employe nouvelEmploye = employeService.ajouterEmploye(employe);
+            return new ResponseEntity<>(nouvelEmploye, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
     }
 
     // 🔹 Récupérer tous les employés
     @GetMapping
-    public ResponseEntity<List<Employe>> getAllEmployes() {
-        return ResponseEntity.ok(employeService.recupererToutEmploye());
+    public ResponseEntity<List<Employe>> obtenirTousLesEmployes() {
+        List<Employe> employes = employeService.obtenirTousLesEmployes();
+        return new ResponseEntity<>(employes, HttpStatus.OK);
     }
 
     // 🔹 Récupérer un employé par ID
     @GetMapping("/{id}")
-    public ResponseEntity<Employe> getEmployeById(@PathVariable Long id) {
-        return employeService.obtenirEmployParId(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<Employe> obtenirEmployeParId(@PathVariable Long id) {
+        Optional<Employe> employe = employeService.obtenirEmployeParId(id);
+        return employe.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     // 🔹 Mettre à jour un employé
     @PutMapping("/{id}")
-    public ResponseEntity<Employe> updateEmploye(@PathVariable Long id, @RequestBody Employe employe) {
+    public ResponseEntity<Employe> mettreAJourEmploye(@PathVariable Long id, @RequestBody Employe employeDetails) {
         try {
-            Employe updated = employeService.mettreAjourEmploye(id, employe);
-            return ResponseEntity.ok(updated);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
+            Employe employeMisAJour = employeService.mettreAJourEmploye(id, employeDetails);
+            return new ResponseEntity<>(employeMisAJour, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
     }
 
     // 🔹 Supprimer un employé
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteEmploye(@PathVariable Long id) {
-        if (!employeService.existsById(id)) {
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<Void> supprimerEmploye(@PathVariable Long id) {
+        try {
+            employeService.supprimerEmploye(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        employeService.deleteEmploye(id);
-        return ResponseEntity.noContent().build();
     }
 }

@@ -5,65 +5,52 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.gestion_hospitaliere.UeEntreprise.model.Employe.Employe;
+import com.gestion_hospitaliere.UeEntreprise.model.User.Personne;
+import com.gestion_hospitaliere.UeEntreprise.model.User.Role;
 import com.gestion_hospitaliere.UeEntreprise.repository.Employe.EmployeRepository;
+import com.gestion_hospitaliere.UeEntreprise.repository.User.PersonneRepository;
+import com.gestion_hospitaliere.UeEntreprise.repository.User.RoleRepository;
 
 @Service
 public class EmployeService {
-	
-	@Autowired
-	private EmployeRepository employeRepository;
-	
-	// Créer un employe
-	public Employe ajouterEmploye(Employe employe) {
-		if (employe.getId() != null && employeRepository.existsById(employe.getId())) {
-            throw new IllegalArgumentException("L'employé existe déjà. Utilisez updateEmploye pour mettre à jour.");
-        }
-		return employeRepository.save(employe);
-	}
-	
-	// Obtenir tous les employés
-	public List<Employe> recupererToutEmploye(){
-		return employeRepository.findAll();
-	}
-	
-	// Obtenir un employe
-	public Optional<Employe> obtenirEmployParId(Long id){
-		return employeRepository.findById(id);
-	}
-	
-	// Effacé un employe
-	public void deleteEmploye(Long id) {
-		employeRepository.deleteById(id);
-	}
-	
-	
-	
-	// 🔹 Mettre à jour un employé existant
-    public Employe mettreAjourEmploye(Long id, Employe updatedEmploye) {
-        Optional<Employe> existingEmployeOpt = employeRepository.findById(id);
 
-        if (existingEmployeOpt.isEmpty()) {
-            throw new IllegalArgumentException("Aucun employé trouvé avec l'ID : " + id);
-        }
+    @Autowired
+    private EmployeRepository employeRepository;
 
-        Employe existingEmploye = existingEmployeOpt.get();
-
-        // Met à jour uniquement les champs modifiables
-        existingEmploye.setHoraire(updatedEmploye.getHoraire());
-        existingEmploye.setDateAffectation(updatedEmploye.getDateAffectation());
-        existingEmploye.setSpecialite(updatedEmploye.getSpecialite());
-        existingEmploye.setNumOrdre(updatedEmploye.getNumOrdre());
-        existingEmploye.setRoles(updatedEmploye.getRoles());
-
-        return employeRepository.save(existingEmploye);
-    }
-    
-    
-    // 🔹 Vérifier l'existence
-    public boolean existsById(Long id) {
-        return employeRepository.existsById(id);
+    // Ajouter un employé
+    public Employe ajouterEmploye(Employe employe) {
+        return employeRepository.save(employe);
     }
 
+    // Récupérer tous les employés
+    public List<Employe> obtenirTousLesEmployes() {
+        return employeRepository.findAll();
+    }
+
+    // Récupérer un employé par ID
+    public Optional<Employe> obtenirEmployeParId(Long id) {
+        return employeRepository.findById(id);
+    }
+
+    // Mettre à jour un employé
+    public Employe mettreAJourEmploye(Long id, Employe employeDetails) {
+        Optional<Employe> employeOptional = employeRepository.findById(id);
+        if (employeOptional.isPresent()) {
+            Employe employe = employeOptional.get();
+            // Exemple : mise à jour des champs
+            employe.setId(employeDetails.getId());
+            // employe.setRole(employeDetails.getRole());
+            return employeRepository.save(employe);
+        } else {
+            throw new RuntimeException("Employé non trouvé avec l'ID : " + id);
+        }
+    }
+
+    // Supprimer un employé
+    public void supprimerEmploye(Long id) {
+        employeRepository.deleteById(id);
+    }
 }

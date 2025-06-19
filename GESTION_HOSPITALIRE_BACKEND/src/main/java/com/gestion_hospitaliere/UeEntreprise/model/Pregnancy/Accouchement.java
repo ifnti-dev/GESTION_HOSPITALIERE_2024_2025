@@ -2,17 +2,17 @@ package com.gestion_hospitaliere.UeEntreprise.model.Pregnancy;
 
 import java.time.LocalDate;
 
-import com.gestion_hospitaliere.UeEntreprise.model.Employe.SageFemme;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.gestion_hospitaliere.UeEntreprise.model.Employe.Employe;
+
 import com.gestion_hospitaliere.UeEntreprise.model.Medical.DossierGrossesse;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 
 @Entity
 public class Accouchement {
@@ -26,11 +26,13 @@ public class Accouchement {
     private Float bebePoids;
     
     @ManyToOne
-    @JoinColumn(name = "sagefemme_id")
-    private SageFemme sageFemme;
+    @JoinColumn(name = "employe_id")
+    private Employe employe;
     
     @ManyToOne
+
     @JoinColumn(name = "dossier_grossesse_id")
+	
     private DossierGrossesse dossierGrossesse;
 
 	public Long getId() {
@@ -73,13 +75,14 @@ public class Accouchement {
 		this.bebePoids = bebePoids;
 	}
 
-	public SageFemme getSageFemme() {
-		return sageFemme;
+	public Employe getEmploye() {
+		return employe;
 	}
 
-	public void setSageFemme(SageFemme sageFemme) {
-		this.sageFemme = sageFemme;
+	public void setEmploye(Employe employe) {
+		this.employe = employe;
 	}
+
 
 	public DossierGrossesse getDossierGrossesse() {
 		return dossierGrossesse;

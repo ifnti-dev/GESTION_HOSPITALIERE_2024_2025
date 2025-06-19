@@ -1,8 +1,25 @@
 package com.gestion_hospitaliere.UeEntreprise.model.User;
 
-import jakarta.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
+
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.gestion_hospitaliere.UeEntreprise.model.Appointments.RendezVous;
+
+import com.gestion_hospitaliere.UeEntreprise.model.Employe.Employe;
+import com.gestion_hospitaliere.UeEntreprise.model.Medical.DossierGrossesse;
+import com.gestion_hospitaliere.UeEntreprise.model.Medical.DossierMedical;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 
 @Entity
 public class Personne {
@@ -10,6 +27,18 @@ public class Personne {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @OneToOne(mappedBy = "personne", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Employe employe;
+
+	@OneToMany(mappedBy = "personne", cascade = CascadeType.ALL)
+	@JsonIgnore  // Ignore dans le JSON
+	private List<DossierGrossesse> dossierGrossesse; 
+
+	@OneToOne(mappedBy = "personne", cascade = CascadeType.ALL, orphanRemoval = true)	
+	@JsonIgnore  // Ignore dans le JSON
+    private DossierMedical dossierMedical;
+    
 
     private String nom;
     private String prenom;
@@ -20,8 +49,20 @@ public class Personne {
     private String dateNaissance;
     private String situationMatrimoniale;
     private String password;
+
+	@OneToMany(mappedBy = "personne", cascade = CascadeType.ALL)
+	@JsonIgnore  // Ignore dans le JSON
+    private List<RendezVous> rendezVous = new ArrayList<>();
     
     
+    // Getter et Setter
+    public Employe getEmploye() {
+        return employe;
+    }
+
+    public void setEmploye(Employe employe) {
+        this.employe = employe;
+    }
 	public Long getId() {
 		return id;
 	}
@@ -82,5 +123,29 @@ public class Personne {
 	public void setPassword(String password) {
 		this.password = password;
 	}
+
+	public List<RendezVous> getRendezVous() {
+		return rendezVous;
+	}
+
+	public void setRendezVous(List<RendezVous> rendezVous) {
+		this.rendezVous = rendezVous;
+	}
     
+
+	public List<DossierGrossesse> getDossierGrossesse() {
+		return dossierGrossesse;
+	}
+
+	public void setDossierGrossesse(List<DossierGrossesse> dossierGrossesse) {
+		this.dossierGrossesse = dossierGrossesse;
+	}
+
+	public DossierMedical getDossierMedical() {
+		return dossierMedical;
+	}
+
+	 public void setDossierMedical(DossierMedical dossierMedical) {
+		this.dossierMedical = dossierMedical;
+	}
 }

@@ -1,96 +1,74 @@
 package com.gestion_hospitaliere.UeEntreprise.model.Payments;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.gestion_hospitaliere.UeEntreprise.model.Employe.Employe;
+import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.gestion_hospitaliere.UeEntreprise.model.Employe.Caissier;
-
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 @Entity
 public class Facture {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
-    private String type;
-    private Double montantTotal;
-    private String statut;
-    private LocalDate date;
-    
-    @OneToMany(mappedBy = "facture", cascade = CascadeType.ALL)
-	@JsonIgnore
+
+    @Column(nullable = false, unique = true)
+    private String numeroFacture;
+
+    @Column(nullable = false)
+    private LocalDate dateEmission;
+
+    @Column(nullable = false, precision = 19, scale = 2)
+    private BigDecimal montantTotal;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private StatutFacture statut;
+
+    private Long personneId;
+
+    @OneToMany(mappedBy = "facture", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Paiement> paiements = new ArrayList<>();
-    
+
     @ManyToOne
-    @JoinColumn(name = "caissier_id")
-    private Caissier caissier;
+    @JoinColumn(name = "employe_id")
+    private Employe employe;
 
-	public Long getId() {
-		return id;
-	}
-	public void setId(Long id) {
-		this.id = id;
-	}
-    // Getters and setters
+    private String type;
 
-	public String getType() {
+    public String getType() {
 		return type;
 	}
-
 	public void setType(String type) {
 		this.type = type;
 	}
+	// Getters et Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-	public Double getMontantTotal() {
-		return montantTotal;
-	}
+    public String getNumeroFacture() { return numeroFacture; }
+    public void setNumeroFacture(String numeroFacture) { this.numeroFacture = numeroFacture; }
 
-	public void setMontantTotal(Double montantTotal) {
-		this.montantTotal = montantTotal;
-	}
+    public LocalDate getDateEmission() { return dateEmission; }
+    public void setDateEmission(LocalDate dateEmission) { this.dateEmission = dateEmission; }
 
-	public String getStatut() {
-		return statut;
-	}
+    public BigDecimal getMontantTotal() { return montantTotal; }
+    public void setMontantTotal(BigDecimal montantTotal) { this.montantTotal = montantTotal; }
 
-	public void setStatut(String statut) {
-		this.statut = statut;
-	}
+    public StatutFacture getStatut() { return statut; }
+    public void setStatut(StatutFacture statut) { this.statut = statut; }
 
-	public LocalDate getDate() {
-		return date;
-	}
+    public Long getPatientId() { return personneId; }
+    public void setPatientId(Long personneId) { this.personneId = personneId; }
 
-	public void setDate(LocalDate date) {
-		this.date = date;
-	}
+    public List<Paiement> getPaiements() { return paiements; }
+    public void setPaiements(List<Paiement> paiements) { this.paiements = paiements; }
 
-	public List<Paiement> getPaiements() {
-		return paiements;
-	}
-
-	public void setPaiements(List<Paiement> paiements) {
-		this.paiements = paiements;
-	}
-
-	public Caissier getCaissier() {
-		return caissier;
-	}
-
-	public void setCaissier(Caissier caissier) {
-		this.caissier = caissier;
-	}
-    
-    
-    
+    public Employe getEmploye() { return employe; }
+    public void setEmploye(Employe employe) { this.employe = employe; }
 }

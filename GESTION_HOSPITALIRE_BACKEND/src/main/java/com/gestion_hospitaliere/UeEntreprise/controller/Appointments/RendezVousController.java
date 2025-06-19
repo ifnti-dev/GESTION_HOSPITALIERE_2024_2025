@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import com.gestion_hospitaliere.UeEntreprise.model.Appointments.RendezVous;
 import com.gestion_hospitaliere.UeEntreprise.service.Appointments.RendezVousService;
 
-@RestController
+@RestController("appointmentRendezVousController") // Nom de bean unique spécifié ici
 @RequestMapping("/api/rendezvous")
 public class RendezVousController {
 

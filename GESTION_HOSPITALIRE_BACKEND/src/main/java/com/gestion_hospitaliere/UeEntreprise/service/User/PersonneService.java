@@ -16,8 +16,12 @@ public class PersonneService {
     private PersonneRepository personneRepository;
 
     // Ajouter un utilisateur
-    public Personne ajouterPersonne(Personne utilisateur) {
-        return personneRepository.save(utilisateur);
+    public Personne ajouterPersonne(Personne personne) {
+    	// Validation des données
+        if (personne.getNom() == null || personne.getEmail() == null) {
+            throw new IllegalArgumentException("Nom et email sont requis.");
+        }
+        return personneRepository.save(personne);
     }
 
     // Récupérer tous les utilisateurs
@@ -38,10 +42,13 @@ public class PersonneService {
         if (personnelOptional.isPresent()) {
             Personne personnel = personnelOptional.get();
             personnel.setNom(personneDetails.getNom());
+            personnel.setPrenom(personneDetails.getPrenom());
+            personnel.setEmail(personneDetails.getEmail());
             personnel.setPassword(personneDetails.getPassword());
+            // Ajoutez d'autres champs à mettre à jour ici
             return personneRepository.save(personnel);
         } else {
-            throw new RuntimeException("Personnel non trouvé avec l'ID : " + id);
+            throw new RuntimeException("Personne non trouvée avec l'ID : " + id);
         }
     }
 

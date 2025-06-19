@@ -3,9 +3,8 @@ package com.gestion_hospitaliere.UeEntreprise.model.Appointments;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.gestion_hospitaliere.UeEntreprise.model.Employe.Medecin;
-import com.gestion_hospitaliere.UeEntreprise.model.Employe.SageFemme;
-import com.gestion_hospitaliere.UeEntreprise.model.Medical.Patient;
+import com.gestion_hospitaliere.UeEntreprise.model.Employe.Employe;
+import com.gestion_hospitaliere.UeEntreprise.model.User.Personne;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -26,17 +25,24 @@ public class RendezVous {
     private String notes;
     
     @ManyToOne
-    @JoinColumn(name = "patient_id")
-	@JsonIgnore
-    private Patient patient;
+    @JoinColumn(name = "personne_id")
+	
+    private Personne personne;
     
     @ManyToOne
-    @JoinColumn(name = "medecin_id")
-    private Medecin medecin;
+    @JoinColumn(name = "employe_id")
+    private Employe employe;
     
-    @ManyToOne
-    @JoinColumn(name = "sagefemme_id")
-    private SageFemme sageFemme;
+    
+
+	public Employe getEmploye() {
+		return employe;
+	}
+
+	public void setEmploye(Employe employe) {
+		this.employe = employe;
+	}
+
 
 	public Long getId() {
 		return id;
@@ -78,30 +84,14 @@ public class RendezVous {
 		this.notes = notes;
 	}
 
-	public Patient getPatient() {
-		return patient;
+	public Personne getPersonne() {
+		return personne;
 	}
 
-	public void setPatient(Patient patient) {
-		this.patient = patient;
+	public void setPersonne(Personne personne) {
+		this.personne = personne;
 	}
 
-	public Medecin getMedecin() {
-		return medecin;
-	}
-
-	public void setMedecin(Medecin medecin) {
-		this.medecin = medecin;
-	}
-
-	public SageFemme getSageFemme() {
-		return sageFemme;
-	}
-
-	public void setSageFemme(SageFemme sageFemme) {
-		this.sageFemme = sageFemme;
-	}
-    
     // Getters and setters
     
 }
