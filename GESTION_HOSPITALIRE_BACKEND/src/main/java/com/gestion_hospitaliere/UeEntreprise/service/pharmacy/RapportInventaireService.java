@@ -1,54 +1,45 @@
 package com.gestion_hospitaliere.UeEntreprise.service.pharmacy;
 
-import com.gestion_hospitaliere.UeEntreprise.model.Pharmacy.RapportInventaire;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.gestion_hospitaliere.UeEntreprise.repository.pharmacy.RapportInventaireRepository;
-
-import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.stereotype.Service;
+
+import com.gestion_hospitaliere.UeEntreprise.repository.pharmacy.RapportInventaireRepository;
+import com.gestion_hospitaliere.UeEntreprise.model.pharmacy.RapportInventaire; 
+
 @Service
-@Transactional
 public class RapportInventaireService {
+    private final RapportInventaireRepository rapportInventaireRepository;
 
-    private final RapportInventaireRepository rapportRepository;
-
-    public RapportInventaireService(RapportInventaireRepository rapportRepository) {
-        this.rapportRepository = rapportRepository;
+    public RapportInventaireService(RapportInventaireRepository rapportInventaireRepository) {
+        this.rapportInventaireRepository = rapportInventaireRepository;
     }
 
-    public RapportInventaire createRapport(RapportInventaire rapport) {
-        rapport.setDateGeneration(LocalDate.now());
-        return rapportRepository.save(rapport);
+    public List<RapportInventaire> getAllRapportsInventaire() {
+        return rapportInventaireRepository.findAll();
     }
 
-    public RapportInventaire updateRapport(Long id, RapportInventaire rapportDetails) {
-        RapportInventaire rapport = rapportRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Rapport non trouvé"));
-        rapport.setContenu(rapportDetails.getContenu());
-        return rapportRepository.save(rapport);
+    public RapportInventaire getRapportInventaireById(Long id) {
+        return rapportInventaireRepository.findById(id).orElse(null);
     }
 
-    public List<RapportInventaire> getAllRapports() {
-        return rapportRepository.findAll();
+    public RapportInventaire saveRapportInventaire(RapportInventaire rapportInventaire) {
+        return rapportInventaireRepository.save(rapportInventaire);
     }
 
-    public RapportInventaire getRapportById(Long id) {
-        return rapportRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Rapport non trouvé"));
+    public void deleteRapportInventaire(Long id) {
+        rapportInventaireRepository.deleteById(id);
     }
 
-    public void deleteRapport(Long id) {
-        rapportRepository.deleteById(id);
+    public List<RapportInventaire> getByEmployeId(Long employeId) {
+        return rapportInventaireRepository.findByEmployeId(employeId);
     }
 
-    public List<RapportInventaire> getRapportsByDate(LocalDate date) {
-        return rapportRepository.findByDateGeneration(date);
+    public List<RapportInventaire> getByDateRapport(String date) {
+        return rapportInventaireRepository.findByDateRapport(date);
     }
 
-    public List<RapportInventaire> getRapportsBetweenDates(LocalDate startDate, LocalDate endDate) {
-        return rapportRepository.findByDateGenerationBetween(startDate, endDate);
+    public List<RapportInventaire> searchByContenuContaining(String keyword) {
+        return rapportInventaireRepository.findByContenuContaining(keyword);
     }
 }
