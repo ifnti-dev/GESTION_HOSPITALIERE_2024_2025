@@ -1,4 +1,4 @@
-package com.gestion_hospitaliere.UeEntreprise.service.Employe;
+package com.gestion_hospitaliere.UeEntreprise.service.User;
 
 import java.util.List;
 import java.util.Optional;
@@ -7,10 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.gestion_hospitaliere.UeEntreprise.model.Employe.Employe;
+import com.gestion_hospitaliere.UeEntreprise.model.User.Employe;
 import com.gestion_hospitaliere.UeEntreprise.model.User.Personne;
 import com.gestion_hospitaliere.UeEntreprise.model.User.Role;
-import com.gestion_hospitaliere.UeEntreprise.repository.Employe.EmployeRepository;
+import com.gestion_hospitaliere.UeEntreprise.repository.User.EmployeRepository;
 import com.gestion_hospitaliere.UeEntreprise.repository.User.PersonneRepository;
 import com.gestion_hospitaliere.UeEntreprise.repository.User.RoleRepository;
 

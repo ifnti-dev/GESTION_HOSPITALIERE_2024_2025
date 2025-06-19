@@ -7,11 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.gestion_hospitaliere.UeEntreprise.model.Appointments.RendezVous;
-import com.gestion_hospitaliere.UeEntreprise.model.Employe.Employe;
+import com.gestion_hospitaliere.UeEntreprise.model.User.Employe;
 import com.gestion_hospitaliere.UeEntreprise.model.User.Personne;
 import com.gestion_hospitaliere.UeEntreprise.repository.Appointments.RendezVousRepository;
-import com.gestion_hospitaliere.UeEntreprise.repository.Employe.EmployeRepository;
-
+import com.gestion_hospitaliere.UeEntreprise.repository.User.EmployeRepository;
 import com.gestion_hospitaliere.UeEntreprise.repository.User.PersonneRepository;
 
 @Service

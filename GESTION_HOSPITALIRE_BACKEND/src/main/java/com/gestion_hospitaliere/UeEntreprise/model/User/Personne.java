@@ -7,8 +7,6 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.gestion_hospitaliere.UeEntreprise.model.Appointments.RendezVous;
-
-import com.gestion_hospitaliere.UeEntreprise.model.Employe.Employe;
 import com.gestion_hospitaliere.UeEntreprise.model.Medical.DossierGrossesse;
 import com.gestion_hospitaliere.UeEntreprise.model.Medical.DossierMedical;
 

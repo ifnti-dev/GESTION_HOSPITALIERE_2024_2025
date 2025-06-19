@@ -1,4 +1,4 @@
-package com.gestion_hospitaliere.UeEntreprise.model.Employe;
+package com.gestion_hospitaliere.UeEntreprise.model.User;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -11,8 +11,6 @@ import com.gestion_hospitaliere.UeEntreprise.model.Appointments.RendezVous;
 import com.gestion_hospitaliere.UeEntreprise.model.Payments.Facture;
 import com.gestion_hospitaliere.UeEntreprise.model.Pregnancy.Accouchement;
 import com.gestion_hospitaliere.UeEntreprise.model.Pregnancy.SuiviGrossesse;
-import com.gestion_hospitaliere.UeEntreprise.model.User.Personne;
-import com.gestion_hospitaliere.UeEntreprise.model.User.Role;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
