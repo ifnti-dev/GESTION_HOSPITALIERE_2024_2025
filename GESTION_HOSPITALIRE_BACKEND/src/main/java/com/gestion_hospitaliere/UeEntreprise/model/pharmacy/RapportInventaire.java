@@ -2,6 +2,7 @@ package com.gestion_hospitaliere.UeEntreprise.model.pharmacy;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.gestion_hospitaliere.UeEntreprise.model.User.Employe;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,7 +11,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
-import com.gestion_hospitaliere.UeEntreprise.model.Employe.Employe;
 
 @Entity
 public class RapportInventaire {
