@@ -1,4 +1,4 @@
-package com.gestion_hospitaliere.UeEntreprise.controller.Employe;
+package com.gestion_hospitaliere.UeEntreprise.controller.User;
 
 import java.util.List;
 
@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.gestion_hospitaliere.UeEntreprise.model.Employe.Employe;
-import com.gestion_hospitaliere.UeEntreprise.service.Employe.EmployeService;
+import com.gestion_hospitaliere.UeEntreprise.model.User.Employe;
+import com.gestion_hospitaliere.UeEntreprise.service.User.EmployeService;
 
 @RestController
 @RequestMapping("api/employe")

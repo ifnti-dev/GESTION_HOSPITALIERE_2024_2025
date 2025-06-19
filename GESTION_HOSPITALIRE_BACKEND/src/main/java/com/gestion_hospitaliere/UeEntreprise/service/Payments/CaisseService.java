@@ -5,11 +5,10 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.gestion_hospitaliere.UeEntreprise.model.Employe.Employe;
 import com.gestion_hospitaliere.UeEntreprise.model.Payments.Caisse;
-import com.gestion_hospitaliere.UeEntreprise.repository.Employe.EmployeRepository;
-
+import com.gestion_hospitaliere.UeEntreprise.model.User.Employe;
 import com.gestion_hospitaliere.UeEntreprise.repository.Payments.CaisseRepository;
+import com.gestion_hospitaliere.UeEntreprise.repository.User.EmployeRepository;
 
 @Service
 public class CaisseService {

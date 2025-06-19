@@ -7,12 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.gestion_hospitaliere.UeEntreprise.model.Pregnancy.Accouchement;
-import com.gestion_hospitaliere.UeEntreprise.model.Employe.Employe;
+import com.gestion_hospitaliere.UeEntreprise.model.User.Employe;
 import com.gestion_hospitaliere.UeEntreprise.model.Medical.DossierGrossesse;
-import com.gestion_hospitaliere.UeEntreprise.repository.Employe.EmployeRepository;
-
 import com.gestion_hospitaliere.UeEntreprise.repository.Medical.DossierGrossesseRepository;
 import com.gestion_hospitaliere.UeEntreprise.repository.Pregnancy.AccouchementRepository;
+import com.gestion_hospitaliere.UeEntreprise.repository.User.EmployeRepository;
 
 @Service
 public class AccouchementService {

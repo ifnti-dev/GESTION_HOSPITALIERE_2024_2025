@@ -3,9 +3,8 @@ package com.gestion_hospitaliere.UeEntreprise.model.Pregnancy;
 import java.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.gestion_hospitaliere.UeEntreprise.model.Employe.Employe;
-
 import com.gestion_hospitaliere.UeEntreprise.model.Medical.DossierGrossesse;
+import com.gestion_hospitaliere.UeEntreprise.model.User.Employe;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
