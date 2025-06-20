@@ -33,7 +33,17 @@ public class RendezVous {
     @JoinColumn(name = "employe_id")
     private Employe employe;
     
+	private int dureeMinutes = 30; // par défaut 30 minutes
+
     
+
+	public int getDureeMinutes() {
+		return dureeMinutes;
+	}
+
+	public void setDureeMinutes(int dureeMinutes) {
+		this.dureeMinutes = dureeMinutes;
+	}
 
 	public Employe getEmploye() {
 		return employe;

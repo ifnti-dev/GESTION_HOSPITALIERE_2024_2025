@@ -12,4 +12,6 @@ public interface CaisseRepository extends JpaRepository<Caisse, Long> {
 
     // // Trouver les caisses actives
     // List<Caisse> findByActive(Boolean active);
+    boolean existsByNumeroCaisse(String numeroCaisse);
+
 }
