@@ -55,13 +55,4 @@ public class ReferenceController {
         return referenceService.searchByNomContaining(nom);
     }
 
-//    @GetMapping("/by-medicament/{medicamentId}")
-//    public List<Reference> getByMedicamentId(@PathVariable Long medicamentId) {
-//        return referenceService.getByMedicamentId(medicamentId);
-//    }
-
-//    @GetMapping("/by-quantite")
-//    public List<Reference> getByQuantiteCalculeeGreaterThan(@RequestParam Integer quantite) {
-//        return referenceService.getByQuantiteCalculeeGreaterThan(quantite);
-//    }
 }
