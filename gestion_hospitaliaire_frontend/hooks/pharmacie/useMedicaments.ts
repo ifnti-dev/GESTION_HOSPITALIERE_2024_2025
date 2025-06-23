@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import type { Medicament, MedicamentSearchParams } from "@/types/pharmacie"
-import { medicamentService } from "../services/medicament.service"
+import { medicamentService } from "../../services/pharmacie/medicament.service"
 import { useDebounce } from "./useDebounce"
 
 // Hook pour récupérer tous les médicaments

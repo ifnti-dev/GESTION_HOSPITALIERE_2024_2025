@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import type { Reference, ReferenceSearchParams } from "@/types/pharmacie"
-import { referenceService } from "@/services/reference.service"
+import { referenceService } from "@/services/pharmacie/reference.service"
 import { useDebounce } from "./useDebounce"
 
 // Hook pour récupérer toutes les références

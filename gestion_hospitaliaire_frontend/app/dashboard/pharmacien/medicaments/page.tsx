@@ -21,8 +21,8 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Pill, Plus, Search, Edit, Trash2, Package, Filter, AlertTriangle, Eye, Loader2 } from "lucide-react"
 import { PharmacienSidebar } from "@/components/sidebars/pharmacien-sidebar"
-import { useMedicaments, useMedicamentSearch, useMedicamentMutations } from "@/hooks/useMedicaments"
-import { useCategories } from "@/hooks/useCategories"
+import { useMedicaments, useMedicamentSearch, useMedicamentMutations } from "@/hooks/pharmacie/useMedicaments"
+import { useCategories } from "@/hooks/pharmacie/useCategories"
 import type { Medicament } from "@/types/pharmacie"
 import { toast } from "sonner"
 

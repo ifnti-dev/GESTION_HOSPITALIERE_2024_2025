@@ -37,9 +37,9 @@ import {
   useMedicamentReferences,
   useMedicamentReferenceSearch,
   useMedicamentReferenceMutations,
-} from "@/hooks/useMedicamentReferences"
-import { useMedicaments } from "@/hooks/useMedicaments"
-import { useReferences } from "@/hooks/useReferences"
+} from "@/hooks/pharmacie/useMedicamentReferences"
+import { useMedicaments } from "@/hooks/pharmacie/useMedicaments"
+import { useReferences } from "@/hooks/pharmacie/useReferences"
 import type { MedicamentReference } from "@/types/pharmacie"
 import { toast } from "sonner"
 

@@ -1,5 +1,5 @@
 
-import { apiClient } from "./api"
+import { apiClient } from "../api"
 import type { Reference, ReferenceSearchParams } from "@/types/pharmacie"
 import { API_ENDPOINTS } from "@/config/api"
 

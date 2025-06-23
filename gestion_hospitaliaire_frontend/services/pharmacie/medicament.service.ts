@@ -1,4 +1,4 @@
-import { apiClient } from "./api"
+import { apiClient } from "../api"
 import type { Medicament, MedicamentSearchParams } from "@/types/pharmacie"
 import { API_ENDPOINTS } from "@/config/api"
 

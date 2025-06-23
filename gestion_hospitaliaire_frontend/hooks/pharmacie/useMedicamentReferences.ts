@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import type { MedicamentReference, MedicamentReferenceSearchParams } from "@/types/pharmacie"
-import { medicamentReferenceService } from "@/services/medicament-reference.service"
+import { medicamentReferenceService } from "@/services/pharmacie/medicament-reference.service"
 
 // Hook pour récupérer toutes les références de médicaments
 export function useMedicamentReferences() {

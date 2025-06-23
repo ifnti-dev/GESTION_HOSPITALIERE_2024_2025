@@ -20,7 +20,7 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Tags, Plus, Search, Edit, Trash2, Package, Filter, Loader2, AlertCircle } from "lucide-react"
 import { PharmacienSidebar } from "@/components/sidebars/pharmacien-sidebar"
-import { useCategories, useCategorieMutations, useCategorieSearch } from "@/hooks/useCategories"
+import { useCategories, useCategorieMutations, useCategorieSearch } from "@/hooks/pharmacie/useCategories"
 import { toast } from "sonner"
 import type { Categorie } from "@/types/pharmacie"
 

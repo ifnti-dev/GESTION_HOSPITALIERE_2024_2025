@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { categorieService } from "@/services/categorie.service"
+import { categorieService } from "@/services/pharmacie/categorie.service"
 import type { Categorie, CategorieSearchParams } from "@/types/pharmacie"
 
 // Hook pour récupérer toutes les catégories

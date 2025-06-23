@@ -18,7 +18,7 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { BookOpen, Plus, Search, Edit, Trash2, Package, Filter, Eye, Link, Loader2 } from "lucide-react"
 import { PharmacienSidebar } from "@/components/sidebars/pharmacien-sidebar"
-import { useReferences, useReferenceSearch, useReferenceMutations } from "@/hooks/useReferences"
+import { useReferences, useReferenceSearch, useReferenceMutations } from "@/hooks/pharmacie/useReferences"
 import type { Reference } from "@/types/pharmacie"
 import { toast } from "sonner"
 import { Label } from "@/components/ui/label"
