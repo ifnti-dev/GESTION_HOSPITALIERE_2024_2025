@@ -2,6 +2,7 @@ package com.gestion_hospitaliere.UeEntreprise.model.Pregnancy;
 
 import com.gestion_hospitaliere.UeEntreprise.model.Employe.Employe;
 import com.gestion_hospitaliere.UeEntreprise.model.Medical.DossierGrossesse;
+import com.gestion_hospitaliere.UeEntreprise.model.User.Personne;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -22,6 +23,11 @@ public class SuiviGrossesse {
     private Float tension;
     private Float poids;
     private String remarque;
+
+
+	@ManyToOne
+@JoinColumn(name = "personne_id")
+private Personne personne;
 
 	@ManyToOne
 	@JoinColumn(name = "employe_id")

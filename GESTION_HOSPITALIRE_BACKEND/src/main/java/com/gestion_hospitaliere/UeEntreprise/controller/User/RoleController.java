@@ -41,16 +41,16 @@ public class RoleController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // Récupérer un rôle par nom
-    @GetMapping("/nom")
-    public ResponseEntity<Role> obtenirRoleParNom(@RequestParam String nom) {
-        Role role = roleService.obtenirRoleParNom(nom);
-        if (role != null) {
-            return ResponseEntity.ok(role);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
+    //Récupérer un rôle par nom
+    // @GetMapping("/nom")
+    // public ResponseEntity<Role> obtenirRoleParNom(@RequestParam String nom) {
+    //     Role role = roleService.obtenirRoleParNom(nom);
+    //     if (role != null) {
+    //         return ResponseEntity.ok(role);
+    //     } else {
+    //         return ResponseEntity.notFound().build();
+    //     }
+    // }
 
     // Mettre à jour un rôle
     @PutMapping("/{id}")

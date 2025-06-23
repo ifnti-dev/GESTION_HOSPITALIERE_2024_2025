@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.gestion_hospitaliere.UeEntreprise.model.Employe.Employe;
 
 import com.gestion_hospitaliere.UeEntreprise.model.Medical.DossierGrossesse;
+import com.gestion_hospitaliere.UeEntreprise.model.User.Personne;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -24,6 +25,11 @@ public class Accouchement {
     private String type;
     private String complications;
     private Float bebePoids;
+
+	@ManyToOne
+	@JoinColumn(name = "personne_id")
+	private Personne personne;
+
     
     @ManyToOne
     @JoinColumn(name = "employe_id")

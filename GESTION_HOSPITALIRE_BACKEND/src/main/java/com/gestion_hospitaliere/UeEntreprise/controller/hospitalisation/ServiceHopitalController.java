@@ -1,16 +1,11 @@
 package com.gestion_hospitaliere.UeEntreprise.controller.hospitalisation;
 import com.gestion_hospitaliere.UeEntreprise.model.HospitalisationService.ServiceHopital;
 import com.gestion_hospitaliere.UeEntreprise.service.Hospitalisation.ServiceService;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Optional;
 
 @RestController

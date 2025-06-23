@@ -49,9 +49,9 @@ public class RoleService {
     }
 
     // Récupérer un rôle par nom
-    public Role obtenirRoleParNom(String nom) {
-        return roleRepository.findByNom(nom);
-    }
+    // public Role obtenirRoleParNom(String nom) {
+    //     return roleRepository.findByNom(nom);
+    // }
 
     public Role mettreAJourRole(Long id, RoleRequest roleRequest) {
         return roleRepository.findById(id).map(role -> {

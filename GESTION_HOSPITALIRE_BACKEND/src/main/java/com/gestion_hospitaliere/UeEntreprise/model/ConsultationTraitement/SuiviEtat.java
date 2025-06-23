@@ -2,8 +2,7 @@ package com.gestion_hospitaliere.UeEntreprise.model.ConsultationTraitement;
 
 import java.time.LocalDate;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.gestion_hospitaliere.UeEntreprise.model.Medical.Patient;
+import com.gestion_hospitaliere.UeEntreprise.model.User.Personne;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -23,10 +22,10 @@ public class SuiviEtat {
     private Float tension;
     private String observations;
     
-    @ManyToOne
-    @JoinColumn(name = "patient_id")
-	@JsonIgnore
-    private Patient patient;
+ @ManyToOne
+@JoinColumn(name = "personne_id")
+private Personne personne;
+
 
 	public Long getId() {
 		return id;
@@ -68,16 +67,7 @@ public class SuiviEtat {
 		this.observations = observations;
 	}
 
-	public Patient getPatient() {
-		return patient;
-	}
-
-	public void setPatient(Patient patient) {
-		this.patient = patient;
-	}
-    
-    // Getters and setters
-    
+	
     
     
 }

@@ -3,7 +3,7 @@ package com.gestion_hospitaliere.UeEntreprise.model.HospitalisationService;
 import java.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.gestion_hospitaliere.UeEntreprise.model.Medical.Patient;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -31,12 +31,12 @@ public class Hospitalisation {
     // Si elle est présente, dateSortie devrait être postérieure à dateEntree (ceci nécessiterait une validation personnalisée ou au niveau du service).
     private LocalDate dateSortie;
     
-    @NotNull(message = "Le patient ne peut pas être nul pour une hospitalisation.")
-    // @Valid // Décommentez si la classe Patient a ses propres annotations de validation à vérifier
-    @ManyToOne
-    @JoinColumn(name = "patient_id")
-	//@JsonIgnore
-    private Patient patient;
+    // @NotNull(message = "Le patient ne peut pas être nul pour une hospitalisation.")
+    // // @Valid // Décommentez si la classe Patient a ses propres annotations de validation à vérifier
+    // @ManyToOne
+    // @JoinColumn(name = "patient_id")
+	// //@JsonIgnore
+    // private Patient patient;
     
     @NotNull(message = "Le service ne peut pas être nul pour une hospitalisation.")
     // @Valid // Décommentez si la classe ServiceHopital a ses propres annotations de validation à vérifier
@@ -73,13 +73,7 @@ public class Hospitalisation {
 		this.dateSortie = dateSortie;
 	}
 
-	public Patient getPatient() {
-		return patient;
-	}
-
-	public void setPatient(Patient patient) {
-		this.patient = patient;
-	}
+	
 
 	public ServiceHopital getService() {
 		return service;

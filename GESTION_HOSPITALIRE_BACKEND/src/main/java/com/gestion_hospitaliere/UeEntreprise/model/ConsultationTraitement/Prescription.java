@@ -1,11 +1,8 @@
 package com.gestion_hospitaliere.UeEntreprise.model.ConsultationTraitement;
-
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-
 import com.gestion_hospitaliere.UeEntreprise.model.Pharmacy.Medicament;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -13,7 +10,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+
+
 
 @Entity
 public class Prescription {
@@ -85,7 +83,7 @@ public class Prescription {
 		this.medicament = medicament;
 	}
     
-    // Getters and setters
+ 
     
     
 }
