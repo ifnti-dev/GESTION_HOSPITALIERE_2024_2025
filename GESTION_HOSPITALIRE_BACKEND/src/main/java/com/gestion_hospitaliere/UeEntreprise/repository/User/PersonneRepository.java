@@ -13,4 +13,5 @@ import com.gestion_hospitaliere.UeEntreprise.model.User.Personne;
 public interface PersonneRepository extends JpaRepository<Personne, Long> {
     // Méthode pour trouver un utilisateur par son adresse e-mail
     boolean existsByEmail(String email);
+    Optional<Personne> findByEmail(String email);
 }

@@ -6,8 +6,10 @@ import com.gestion_hospitaliere.UeEntreprise.service.ConsultationTraitement.Cons
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
-
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,13 +17,9 @@ import java.util.Optional;
 @RequestMapping("/api/consultations")
 public class ConsultationController {
 
-    private final ConsultationService consultationService;
-
-    // Constructeur pour injection de dépendance
-    public ConsultationController(ConsultationService consultationService) {
-        this.consultationService = consultationService;
-    }
-
+    @Autowired
+    private  ConsultationService consultationService;
+  
     // Récupérer toutes les consultations
     @GetMapping
     public ResponseEntity<List<Consultation>> getAllConsultations() {
@@ -37,12 +35,20 @@ public class ConsultationController {
                            .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // Créer une nouvelle consultation
-    @PostMapping
-    public ResponseEntity<Consultation> createConsultation(@RequestBody Consultation consultation) {
+    // // Créer une nouvelle consultation
+   @PostMapping
+public ResponseEntity<?> createConsultation(@RequestBody Consultation consultation) {
+    try {
         Consultation savedConsultation = consultationService.saveConsultation(consultation);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedConsultation);
+    } catch (IllegalArgumentException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404 avec message lisible
+    } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur interne : " + e.getMessage());
     }
+}
+
+
 
     // Mettre à jour une consultation existante
     @PutMapping("/{id}")
@@ -65,4 +71,28 @@ public class ConsultationController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    // Récupérer les consultations par date
+    @GetMapping("/by-date")
+    public ResponseEntity<List<Consultation>> getConsultationsByDate(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        List<Consultation> consultations = consultationService.getConsultationsByDate(date);
+        return ResponseEntity.ok(consultations);
+    }
+
+    // Récupérer les consultations par ID de personne (patient)
+    // Note: "Personne" est utilisé ici en se basant sur la méthode findByPersonne_Id du repository.
+    @GetMapping("/by-personne/{personneId}")
+    public ResponseEntity<List<Consultation>> getConsultationsByPersonneId(@PathVariable Long personneId) {
+        List<Consultation> consultations = consultationService.getConsultationsByPersonneId(personneId);
+        return ResponseEntity.ok(consultations);
+    }
+
+    // Récupérer les consultations par mot-clé dans le diagnostic
+    @GetMapping("/by-diagnostic")
+    public ResponseEntity<List<Consultation>> getConsultationsByDiagnostic(@RequestParam String keyword) {
+        List<Consultation> consultations = consultationService.getConsultationsByDiagnosticContaining(keyword);
+        return ResponseEntity.ok(consultations);
+    }
+
+
 }

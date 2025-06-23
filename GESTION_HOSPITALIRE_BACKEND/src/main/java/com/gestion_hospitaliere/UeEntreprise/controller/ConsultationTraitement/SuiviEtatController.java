@@ -3,12 +3,9 @@ import com.gestion_hospitaliere.UeEntreprise.model.ConsultationTraitement.SuiviE
 import com.gestion_hospitaliere.UeEntreprise.service.ConsultationTraitement.SuiviEtatService;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 

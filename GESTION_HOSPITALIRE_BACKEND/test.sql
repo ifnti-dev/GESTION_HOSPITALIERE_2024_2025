@@ -8,21 +8,21 @@ INSERT INTO service_hopital (nom, type) VALUES
 
 -- 2. Utilisateurs (employés) – correction en supprimant les colonnes manquantes
 INSERT INTO utilisateur (dtype, nom, prenom, specialite, horaires_travail, date_debut_affectation, actif, service_id) VALUES 
-('Medecin', 'Dupont', 'Jean', 'Cardiologie', '8h-18h', '2015-03-10', true, 2),
-('Medecin', 'Martin', 'Sophie', 'Pédiatrie', '9h-17h', '2010-06-15', true, 3),
-('Medecin', 'Leblanc', 'Pierre', 'Chirurgie', '7h-19h', '2018-01-20', true, 4),
-('SageFemme', 'Dubois', 'Marie', 'Accouchement', '8h-20h', '2017-05-12', true, 1),
-('SageFemme', 'Bernard', 'Julie', 'Suivi grossesse', '9h-17h', '2019-02-28', true, 1),
-('Caissier', 'Petit', 'Luc', 'Caissier principal', '8h-16h', '2018-04-05', true, NULL),
-('Caissier', 'Robert', 'Anne', 'Caissier adjoint', '9h-17h', '2020-07-22', true, NULL);
+('Medecin', 'vivi', 'lolo', 'Cardiologie', '8h-18h', '2015-03-10', true, 2),
+('Medecin', 'joie', 'majoie', 'Pédiatrie', '9h-17h', '2010-06-15', true, 3),
+('Medecin', 'love', 'coco', 'Chirurgie', '7h-19h', '2018-01-20', true, 4),
+('SageFemme', 'riz', 'loiloi', 'Accouchement', '8h-20h', '2017-05-12', true, 1),
+('SageFemme', 'bene', 'jojo', 'Suivi grossesse', '9h-17h', '2019-02-28', true, 1),
+('Caissier', 'vivu', 'jyce', 'Caissier principal', '8h-16h', '2018-04-05', true, NULL),
+('Caissier', 'voie', 'lolo', 'Caissier adjoint', '9h-17h', '2020-07-22', true, NULL);
 
 -- 3. Patients – En s'assurant que l'ID patient soit unique
 INSERT INTO patient (nom, prenom, date_naissance) VALUES 
-('Durand', 'Alice', '1990-02-15'),
-('Moreau', 'Paul', '1985-07-22'),
-('Leroy', 'Emma', '1995-11-30'),
-('Simon', 'Thomas', '1988-04-18'),
-('Michel', 'Laura', '1992-09-05');
+('lili', 'Alice', '1990-02-15'),
+('love', 'Paul', '1985-07-22'),
+('brave', 'love', '1995-11-30'),
+('momo', 'joiejoie', '1988-04-18'),
+('loi', 'Lajjjjura', '1992-09-05');
 
 -- 4. Dossiers médicaux
 INSERT INTO dossier_medical (dtype, antecedents, allergies, groupe_sanguin, patient_id) VALUES 

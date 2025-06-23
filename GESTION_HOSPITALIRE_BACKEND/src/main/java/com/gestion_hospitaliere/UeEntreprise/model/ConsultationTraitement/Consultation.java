@@ -3,13 +3,9 @@ package com.gestion_hospitaliere.UeEntreprise.model.ConsultationTraitement;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
-
-import com.gestion_hospitaliere.UeEntreprise.model.Medical.Patient;
-
+import com.gestion_hospitaliere.UeEntreprise.model.User.Employe;
+import com.gestion_hospitaliere.UeEntreprise.model.User.Personne;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -37,8 +33,23 @@ public class Consultation {
     
     
     @ManyToOne
-    @JoinColumn(name = "patient_id")
-    private Patient patient;
+    @JoinColumn(name = "personne_id")
+    private Personne personne;
+
+
+
+    @ManyToOne
+    @JoinColumn(name = "employe_id")
+    private Employe employe;
+
+
+	public Employe getEmploye() {
+		return employe;
+	}
+
+	public void setEmploye(Employe employe) {
+		this.employe = employe;
+	}
 
 	public Long getId() {
 		return id;
@@ -80,15 +91,12 @@ public class Consultation {
 		this.prescriptions = prescriptions;
 	}
 
-	public Patient getPatient() {
-		return patient;
+	public Personne getPersonne() {
+		return personne;
 	}
 
-	public void setPatient(Patient patient) {
-		this.patient = patient;
+	public void setPersonne(Personne personne) {
+		this.personne = personne;
 	}
-    
-    // Getters and setters
-    
-    
+
 }

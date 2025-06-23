@@ -29,21 +29,21 @@ public class LigneCommande {
     @JsonIgnore
     private Medicament medicament;
 
-	public Long getId() {
-		return id;
-	}
+// 	public Long getId() {
+// 		return id;
+// 	}
 
-	public void setId(Long id) {
+ 	public void setId(Long id) {
 		this.id = id;
 	}
 
-	public Integer getQuantite() {
-		return quantite;
-	}
+// 	public Integer getQuantite() {
+// 		return quantite;
+// 	}
 
-	public void setQuantite(Integer quantite) {
-		this.quantite = quantite;
-	}
+// 	public void setQuantite(Integer quantite) {
+// 		this.quantite = quantite;
+// 	}
 
 	public Integer getPrixUnitaire() {
 		return prixUnitaire;
@@ -61,13 +61,13 @@ public class LigneCommande {
 		this.commande = commande;
 	}
 
-	public Medicament getMedicament() {
-		return medicament;
-	}
+// 	public Medicament getMedicament() {
+// 		return medicament;
+// 	}
 
-	public void setMedicament(Medicament medicament) {
-		this.medicament = medicament;
-	}
+// 	public void setMedicament(Medicament medicament) {
+// 		this.medicament = medicament;
+// 	}
     
     
     
