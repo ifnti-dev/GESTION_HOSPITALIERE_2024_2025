@@ -1,17 +1,23 @@
-package com.gestion_hospitaliere.UeEntreprise.controller.pharmacy;
-
-import com.gestion_hospitaliere.UeEntreprise.model.Pharmacy.Reference;
-import com.gestion_hospitaliere.UeEntreprise.service.pharmacy.ReferenceService;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+package com.gestion_hospitaliere.UeEntreprise.controller.pharmacy; 
 
 import java.util.List;
+
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.gestion_hospitaliere.UeEntreprise.service.pharmacy.ReferenceService;
+import com.gestion_hospitaliere.UeEntreprise.model.pharmacy.Reference;
 
 @RestController
 @RequestMapping("/api/references")
 public class ReferenceController {
-
     private final ReferenceService referenceService;
 
     public ReferenceController(ReferenceService referenceService) {
@@ -24,33 +30,38 @@ public class ReferenceController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Reference> getReferenceById(@PathVariable Long id) {
-        return ResponseEntity.ok(referenceService.getReferenceById(id));
+    public Reference getReferenceById(@PathVariable Long id) {
+        return referenceService.getReferenceById(id);
     }
 
     @PostMapping
     public Reference createReference(@RequestBody Reference reference) {
-        return referenceService.createReference(reference);
+        return referenceService.saveReference(reference);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Reference> updateReference(@PathVariable Long id, @RequestBody Reference referenceDetails) {
-        return ResponseEntity.ok(referenceService.updateReference(id, referenceDetails));
+    public Reference updateReference(@PathVariable Long id, @RequestBody Reference reference) {
+        reference.setId(id);
+        return referenceService.saveReference(reference);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteReference(@PathVariable Long id) {
+    public void deleteReference(@PathVariable Long id) {
         referenceService.deleteReference(id);
-        return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/medicament/{medicamentId}")
-    public List<Reference> getReferencesByMedicament(@PathVariable Long medicamentId) {
-        return referenceService.getReferencesByMedicament(medicamentId);
+    @GetMapping("/search/nom")
+    public List<Reference> searchByNomContaining(@RequestParam String nom) {
+        return referenceService.searchByNomContaining(nom);
     }
 
-    @GetMapping("/search")
-    public List<Reference> searchReferencesByName(@RequestParam String nom) {
-        return referenceService.searchReferencesByName(nom);
-    }
+//    @GetMapping("/by-medicament/{medicamentId}")
+//    public List<Reference> getByMedicamentId(@PathVariable Long medicamentId) {
+//        return referenceService.getByMedicamentId(medicamentId);
+//    }
+
+//    @GetMapping("/by-quantite")
+//    public List<Reference> getByQuantiteCalculeeGreaterThan(@RequestParam Integer quantite) {
+//        return referenceService.getByQuantiteCalculeeGreaterThan(quantite);
+//    }
 }

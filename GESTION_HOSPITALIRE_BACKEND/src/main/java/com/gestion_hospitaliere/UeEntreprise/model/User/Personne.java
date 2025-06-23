@@ -161,7 +161,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.gestion_hospitaliere.UeEntreprise.model.Appointments.RendezVous;
 import com.gestion_hospitaliere.UeEntreprise.model.ConsultationTraitement.Consultation;
 import com.gestion_hospitaliere.UeEntreprise.model.ConsultationTraitement.SuiviEtat;
-import com.gestion_hospitaliere.UeEntreprise.model.Employe.Employe;
+import com.gestion_hospitaliere.UeEntreprise.model.User.Employe;
 import com.gestion_hospitaliere.UeEntreprise.model.Medical.DossierGrossesse;
 import com.gestion_hospitaliere.UeEntreprise.model.Medical.DossierMedical;
 import com.gestion_hospitaliere.UeEntreprise.model.Pregnancy.Accouchement;

@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.gestion_hospitaliere.UeEntreprise.model.Employe.Employe;
+import com.gestion_hospitaliere.UeEntreprise.model.User.Employe;
 import com.gestion_hospitaliere.UeEntreprise.model.User.Personne;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;

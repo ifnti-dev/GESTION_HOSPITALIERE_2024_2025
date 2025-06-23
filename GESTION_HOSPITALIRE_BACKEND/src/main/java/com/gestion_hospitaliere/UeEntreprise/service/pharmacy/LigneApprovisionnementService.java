@@ -1,52 +1,46 @@
 package com.gestion_hospitaliere.UeEntreprise.service.pharmacy;
 
-import com.gestion_hospitaliere.UeEntreprise.model.Pharmacy.LigneApprovisionnement;
-import com.gestion_hospitaliere.UeEntreprise.repository.pharmacy.LigneApprovisionnementRepository;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
+import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.stereotype.Service;
+
+import com.gestion_hospitaliere.UeEntreprise.repository.pharmacy.LigneApprovisionnementRepository;
+import com.gestion_hospitaliere.UeEntreprise.model.pharmacy.LigneApprovisionnement;
+
 @Service
-@Transactional
 public class LigneApprovisionnementService {
+    private final LigneApprovisionnementRepository ligneApprovisionnementRepository;
 
-    private final LigneApprovisionnementRepository ligneRepository;
-
-    public LigneApprovisionnementService(LigneApprovisionnementRepository ligneRepository) {
-        this.ligneRepository = ligneRepository;
+    public LigneApprovisionnementService(LigneApprovisionnementRepository ligneApprovisionnementRepository) {
+        this.ligneApprovisionnementRepository = ligneApprovisionnementRepository;
     }
 
-    public LigneApprovisionnement createLigne(LigneApprovisionnement ligne) {
-        return ligneRepository.save(ligne);
+    public List<LigneApprovisionnement> getAllLignesApprovisionnement() {
+        return ligneApprovisionnementRepository.findAll();
     }
 
-    public LigneApprovisionnement updateLigne(Long id, LigneApprovisionnement ligneDetails) {
-        LigneApprovisionnement ligne = ligneRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Ligne non trouvée"));
-        ligne.setQuantite(ligneDetails.getQuantite());
-        return ligneRepository.save(ligne);
+    public LigneApprovisionnement getLigneApprovisionnementById(Long id) {
+        return ligneApprovisionnementRepository.findById(id).orElse(null);
     }
 
-    public List<LigneApprovisionnement> getAllLignes() {
-        return ligneRepository.findAll();
+    public LigneApprovisionnement saveLigneApprovisionnement(LigneApprovisionnement ligneApprovisionnement) {
+        return ligneApprovisionnementRepository.save(ligneApprovisionnement);
     }
 
-    public LigneApprovisionnement getLigneById(Long id) {
-        return ligneRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Ligne non trouvée"));
+    public void deleteLigneApprovisionnement(Long id) {
+        ligneApprovisionnementRepository.deleteById(id);
     }
 
-    public void deleteLigne(Long id) {
-        ligneRepository.deleteById(id);
+    public List<LigneApprovisionnement> getByApprovisionnementId(Long approvisionnementId) {
+        return ligneApprovisionnementRepository.findByApprovisionnementId(approvisionnementId);
     }
 
-    public List<LigneApprovisionnement> getLignesByApprovisionnement(Long approvisionnementId) {
-        return ligneRepository.findByApprovisionnementId(approvisionnementId);
-    }
+//    public List<LigneApprovisionnement> getByMedicamentId(Long medicamentId) {
+//        return ligneApprovisionnementRepository.findByMedicamentId(medicamentId);
+//    }
 
-    public List<LigneApprovisionnement> getLignesByMedicament(Long medicamentId) {
-        return ligneRepository.findByMedicamentId(medicamentId);
+    public List<LigneApprovisionnement> getByDateExpirationBefore(LocalDate date) {
+        return ligneApprovisionnementRepository.findByDateExpirationBefore(date);
     }
 }

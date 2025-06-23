@@ -2,9 +2,9 @@ package com.gestion_hospitaliere.UeEntreprise.service.ConsultationTraitement;
 import com.gestion_hospitaliere.UeEntreprise.model.ConsultationTraitement.Consultation;
 import com.gestion_hospitaliere.UeEntreprise.model.ConsultationTraitement.Prescription;
 import com.gestion_hospitaliere.UeEntreprise.repository.ConsultationTraitement.ConsultationRepository;
-import com.gestion_hospitaliere.UeEntreprise.repository.Employe.EmployeRepository;
+import com.gestion_hospitaliere.UeEntreprise.repository.User.EmployeRepository;
 import com.gestion_hospitaliere.UeEntreprise.repository.User.PersonneRepository;
-import com.gestion_hospitaliere.UeEntreprise.model.Employe.Employe;
+import com.gestion_hospitaliere.UeEntreprise.model.User.Employe;
 import com.gestion_hospitaliere.UeEntreprise.model.User.Personne;
 import com.gestion_hospitaliere.UeEntreprise.service.Employe.EmployeService;
 

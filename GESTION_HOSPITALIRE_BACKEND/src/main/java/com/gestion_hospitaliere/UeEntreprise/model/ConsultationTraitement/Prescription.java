@@ -2,7 +2,7 @@ package com.gestion_hospitaliere.UeEntreprise.model.ConsultationTraitement;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.gestion_hospitaliere.UeEntreprise.model.Pharmacy.Medicament;
+import com.gestion_hospitaliere.UeEntreprise.model.pharmacy.Medicament;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

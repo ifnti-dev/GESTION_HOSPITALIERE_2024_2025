@@ -3,7 +3,7 @@ package com.gestion_hospitaliere.UeEntreprise.model.Appointments;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.gestion_hospitaliere.UeEntreprise.model.Employe.Employe;
+import com.gestion_hospitaliere.UeEntreprise.model.User.Employe;
 import com.gestion_hospitaliere.UeEntreprise.model.User.Personne;
 
 import jakarta.persistence.Entity;
@@ -33,7 +33,17 @@ public class RendezVous {
     @JoinColumn(name = "employe_id")
     private Employe employe;
     
+	private int dureeMinutes = 30; // par défaut 30 minutes
+
     
+
+	public int getDureeMinutes() {
+		return dureeMinutes;
+	}
+
+	public void setDureeMinutes(int dureeMinutes) {
+		this.dureeMinutes = dureeMinutes;
+	}
 
 	public Employe getEmploye() {
 		return employe;

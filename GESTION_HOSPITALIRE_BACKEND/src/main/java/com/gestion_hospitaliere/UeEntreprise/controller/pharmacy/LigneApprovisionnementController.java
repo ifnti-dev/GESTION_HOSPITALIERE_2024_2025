@@ -1,56 +1,68 @@
 package com.gestion_hospitaliere.UeEntreprise.controller.pharmacy;
 
-import com.gestion_hospitaliere.UeEntreprise.model.Pharmacy.LigneApprovisionnement;
-import com.gestion_hospitaliere.UeEntreprise.service.pharmacy.LigneApprovisionnementService;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
+import java.time.LocalDate;
 import java.util.List;
+
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.gestion_hospitaliere.UeEntreprise.model.pharmacy.LigneApprovisionnement;
+import com.gestion_hospitaliere.UeEntreprise.service.pharmacy.LigneApprovisionnementService;
 
 @RestController
 @RequestMapping("/api/lignes-approvisionnement")
 public class LigneApprovisionnementController {
+    private final LigneApprovisionnementService ligneApprovisionnementService;
 
-    private final LigneApprovisionnementService ligneService;
-
-    public LigneApprovisionnementController(LigneApprovisionnementService ligneService) {
-        this.ligneService = ligneService;
+    public LigneApprovisionnementController(LigneApprovisionnementService ligneApprovisionnementService) {
+        this.ligneApprovisionnementService = ligneApprovisionnementService;
     }
 
     @GetMapping
-    public List<LigneApprovisionnement> getAllLignes() {
-        return ligneService.getAllLignes();
+    public List<LigneApprovisionnement> getAllLignesApprovisionnement() {
+        return ligneApprovisionnementService.getAllLignesApprovisionnement();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<LigneApprovisionnement> getLigneById(@PathVariable Long id) {
-        return ResponseEntity.ok(ligneService.getLigneById(id));
+    public LigneApprovisionnement getLigneApprovisionnementById(@PathVariable Long id) {
+        return ligneApprovisionnementService.getLigneApprovisionnementById(id);
     }
 
     @PostMapping
-    public LigneApprovisionnement createLigne(@RequestBody LigneApprovisionnement ligne) {
-        return ligneService.createLigne(ligne);
+    public LigneApprovisionnement createLigneApprovisionnement(@RequestBody LigneApprovisionnement ligneApprovisionnement) {
+        return ligneApprovisionnementService.saveLigneApprovisionnement(ligneApprovisionnement);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<LigneApprovisionnement> updateLigne(@PathVariable Long id, @RequestBody LigneApprovisionnement ligneDetails) {
-        return ResponseEntity.ok(ligneService.updateLigne(id, ligneDetails));
+    public LigneApprovisionnement updateLigneApprovisionnement(@PathVariable Long id, @RequestBody LigneApprovisionnement ligneApprovisionnement) {
+        ligneApprovisionnement.setId(id);
+        return ligneApprovisionnementService.saveLigneApprovisionnement(ligneApprovisionnement);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteLigne(@PathVariable Long id) {
-        ligneService.deleteLigne(id);
-        return ResponseEntity.noContent().build();
+    public void deleteLigneApprovisionnement(@PathVariable Long id) {
+        ligneApprovisionnementService.deleteLigneApprovisionnement(id);
     }
 
-    @GetMapping("/approvisionnement/{approvisionnementId}")
-    public List<LigneApprovisionnement> getLignesByApprovisionnement(@PathVariable Long approvisionnementId) {
-        return ligneService.getLignesByApprovisionnement(approvisionnementId);
+    @GetMapping("/by-approvisionnement/{approvisionnementId}")
+    public List<LigneApprovisionnement> getByApprovisionnementId(@PathVariable Long approvisionnementId) {
+        return ligneApprovisionnementService.getByApprovisionnementId(approvisionnementId);
     }
 
-    @GetMapping("/medicament/{medicamentId}")
-    public List<LigneApprovisionnement> getLignesByMedicament(@PathVariable Long medicamentId) {
-        return ligneService.getLignesByMedicament(medicamentId);
+//    @GetMapping("/by-medicament/{medicamentId}")
+//    public List<LigneApprovisionnement> getByMedicamentId(@PathVariable Long medicamentId) {
+//        return ligneApprovisionnementService.getByMedicamentId(medicamentId);
+//    }
+
+    @GetMapping("/expiration-before")
+    public List<LigneApprovisionnement> getByDateExpirationBefore(@RequestParam LocalDate date) {
+        return ligneApprovisionnementService.getByDateExpirationBefore(date);
     }
 }

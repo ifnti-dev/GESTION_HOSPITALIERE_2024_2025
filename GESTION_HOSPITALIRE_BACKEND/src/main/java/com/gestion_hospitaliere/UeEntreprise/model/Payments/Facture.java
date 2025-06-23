@@ -1,7 +1,8 @@
 package com.gestion_hospitaliere.UeEntreprise.model.Payments;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.gestion_hospitaliere.UeEntreprise.model.Employe.Employe;
+import com.gestion_hospitaliere.UeEntreprise.model.User.Employe;
+
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;

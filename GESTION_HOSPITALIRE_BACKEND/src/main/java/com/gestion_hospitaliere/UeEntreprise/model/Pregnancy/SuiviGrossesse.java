@@ -1,7 +1,7 @@
 package com.gestion_hospitaliere.UeEntreprise.model.Pregnancy;
 
-import com.gestion_hospitaliere.UeEntreprise.model.Employe.Employe;
 import com.gestion_hospitaliere.UeEntreprise.model.Medical.DossierGrossesse;
+import com.gestion_hospitaliere.UeEntreprise.model.User.Employe;
 import com.gestion_hospitaliere.UeEntreprise.model.User.Personne;
 
 import jakarta.persistence.CascadeType;
