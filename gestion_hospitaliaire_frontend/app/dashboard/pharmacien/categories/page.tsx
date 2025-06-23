@@ -1,6 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import type React from "react"
+
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -16,77 +18,123 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Tags, Plus, Search, Edit, Trash2, Package, Filter } from "lucide-react"
+import { Tags, Plus, Search, Edit, Trash2, Package, Filter, Loader2, AlertCircle } from "lucide-react"
 import { PharmacienSidebar } from "@/components/sidebars/pharmacien-sidebar"
+import { useCategories, useCategorieMutations, useCategorieSearch } from "@/hooks/useCategories"
+import { toast } from "sonner"
+import type { Categorie } from "@/types/pharmacie"
 
-// Garder tout le contenu existant de la page mais l'envelopper dans PharmacienSidebar
 export default function CategoriesPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [editingCategory, setEditingCategory] = useState<any>(null)
+  const [editingCategory, setEditingCategory] = useState<Categorie | null>(null)
+  const [formData, setFormData] = useState({ nom: "", description: "" })
 
-  const categories = [
-    {
-      id: 1,
-      nom: "Antalgiques",
-      description: "Médicaments contre la douleur et l'inflammation",
-      nombreMedicaments: 45,
-      dateCreation: "2024-01-15",
-      statut: "active",
-    },
-    {
-      id: 2,
-      nom: "Antibiotiques",
-      description: "Médicaments antimicrobiens pour traiter les infections",
-      nombreMedicaments: 32,
-      dateCreation: "2024-01-10",
-      statut: "active",
-    },
-    {
-      id: 3,
-      nom: "Cardiologie",
-      description: "Médicaments pour les troubles cardiovasculaires",
-      nombreMedicaments: 28,
-      dateCreation: "2024-01-08",
-      statut: "active",
-    },
-    {
-      id: 4,
-      nom: "Anesthésie",
-      description: "Produits anesthésiques et sédatifs",
-      nombreMedicaments: 15,
-      dateCreation: "2024-01-05",
-      statut: "active",
-    },
-    {
-      id: 5,
-      nom: "Urgences",
-      description: "Médicaments d'urgence et de réanimation",
-      nombreMedicaments: 22,
-      dateCreation: "2024-01-03",
-      statut: "active",
-    },
-  ]
+  // Hooks pour l'API
+  const { categories: allCategories, loading: loadingAll, error: errorAll, refetch } = useCategories()
+  const { categories: searchResults, loading: loadingSearch, searchCategories } = useCategorieSearch()
+  const { createCategorie, updateCategorie, deleteCategorie, loading: mutationLoading } = useCategorieMutations()
 
-  const filteredCategories = categories.filter(
-    (category) =>
-      category.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      category.description.toLowerCase().includes(searchTerm.toLowerCase()),
-  )
+  // Utiliser les résultats de recherche si une recherche est active, sinon toutes les catégories
+  const categories = searchTerm ? searchResults : allCategories
+  const loading = searchTerm ? loadingSearch : loadingAll
 
-  const handleEdit = (category: any) => {
+  // Effet pour la recherche en temps réel
+  useEffect(() => {
+    if (searchTerm.trim()) {
+      const timeoutId = setTimeout(() => {
+        searchCategories({
+          nom: searchTerm,
+          description: searchTerm,
+        })
+      }, 300) // Debounce de 300ms
+
+      return () => clearTimeout(timeoutId)
+    }
+  }, [searchTerm, searchCategories])
+
+  const handleEdit = (category: Categorie) => {
     setEditingCategory(category)
+    setFormData({
+      nom: category.nom,
+      description: category.description,
+    })
     setIsDialogOpen(true)
   }
 
   const handleAdd = () => {
     setEditingCategory(null)
+    setFormData({ nom: "", description: "" })
     setIsDialogOpen(true)
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!formData.nom.trim() || !formData.description.trim()) {
+      toast.error("Veuillez remplir tous les champs")
+      return
+    }
+
+    try {
+      if (editingCategory) {
+        await updateCategorie(editingCategory.id!, formData)
+        toast.success("Catégorie modifiée avec succès")
+      } else {
+        await createCategorie(formData)
+        toast.success("Catégorie créée avec succès")
+      }
+
+      setIsDialogOpen(false)
+      setFormData({ nom: "", description: "" })
+      refetch() // Recharger la liste
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Une erreur est survenue")
+    }
+  }
+
+  const handleDelete = async (id: number, nom: string) => {
+    if (!confirm(`Êtes-vous sûr de vouloir supprimer la catégorie "${nom}" ?`)) {
+      return
+    }
+
+    try {
+      await deleteCategorie(id)
+      toast.success("Catégorie supprimée avec succès")
+      refetch() // Recharger la liste
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Erreur lors de la suppression")
+    }
+  }
+
+  // Calcul des statistiques
+  const totalCategories = allCategories.length
+  const totalMedicaments = allCategories.reduce((sum, cat) => sum + (cat.medicaments?.length || 0), 0)
+  const moyenneMedicaments = totalCategories > 0 ? Math.round(totalMedicaments / totalCategories) : 0
+  const categorieImportante = allCategories.reduce(
+    (max, cat) => ((cat.medicaments?.length || 0) > (max.medicaments?.length || 0) ? cat : max),
+    allCategories[0] || { nom: "Aucune", medicaments: [] },
+  )
+
+  if (errorAll) {
+    return (
+      <PharmacienSidebar>
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Erreur de chargement</h3>
+            <p className="text-gray-600 mb-4">{errorAll}</p>
+            <Button onClick={refetch} variant="outline">
+              Réessayer
+            </Button>
+          </div>
+        </div>
+      </PharmacienSidebar>
+    )
   }
 
   return (
     <PharmacienSidebar>
-      {/* Tout le contenu existant de la page */}
       <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -101,9 +149,10 @@ export default function CategoriesPage() {
           </div>
           <Button
             onClick={handleAdd}
+            disabled={mutationLoading}
             className="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 shadow-lg"
           >
-            <Plus className="h-4 w-4 mr-2" />
+            {mutationLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Plus className="h-4 w-4 mr-2" />}
             Nouvelle Catégorie
           </Button>
         </div>
@@ -115,7 +164,7 @@ export default function CategoriesPage() {
               <CardTitle className="text-sm font-medium text-teal-700">Total Catégories</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-teal-900">{categories.length}</div>
+              <div className="text-2xl font-bold text-teal-900">{totalCategories}</div>
               <p className="text-xs text-teal-600 mt-1">Catégories actives</p>
             </CardContent>
           </Card>
@@ -124,9 +173,7 @@ export default function CategoriesPage() {
               <CardTitle className="text-sm font-medium text-cyan-700">Médicaments Total</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-cyan-900">
-                {categories.reduce((sum, cat) => sum + cat.nombreMedicaments, 0)}
-              </div>
+              <div className="text-2xl font-bold text-cyan-900">{totalMedicaments}</div>
               <p className="text-xs text-cyan-600 mt-1">Tous médicaments</p>
             </CardContent>
           </Card>
@@ -135,9 +182,7 @@ export default function CategoriesPage() {
               <CardTitle className="text-sm font-medium text-blue-700">Moyenne/Catégorie</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-blue-900">
-                {Math.round(categories.reduce((sum, cat) => sum + cat.nombreMedicaments, 0) / categories.length)}
-              </div>
+              <div className="text-2xl font-bold text-blue-900">{moyenneMedicaments}</div>
               <p className="text-xs text-blue-600 mt-1">Médicaments par catégorie</p>
             </CardContent>
           </Card>
@@ -146,8 +191,8 @@ export default function CategoriesPage() {
               <CardTitle className="text-sm font-medium text-teal-700">Plus Importante</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-lg font-bold text-teal-900">Antalgiques</div>
-              <p className="text-xs text-teal-600 mt-1">45 médicaments</p>
+              <div className="text-lg font-bold text-teal-900">{categorieImportante.nom}</div>
+              <p className="text-xs text-teal-600 mt-1">{categorieImportante.medicaments?.length || 0} médicaments</p>
             </CardContent>
           </Card>
         </div>
@@ -181,121 +226,140 @@ export default function CategoriesPage() {
               Liste des Catégories
             </CardTitle>
             <CardDescription className="text-teal-600">
-              {filteredCategories.length} catégorie(s) trouvée(s)
+              {loading ? "Chargement..." : `${categories.length} catégorie(s) trouvée(s)`}
             </CardDescription>
           </CardHeader>
           <CardContent className="p-0">
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-gray-50/50 hover:bg-gray-50/50">
-                    <TableHead className="font-semibold text-gray-700 py-4">Nom</TableHead>
-                    <TableHead className="font-semibold text-gray-700 py-4">Description</TableHead>
-                    <TableHead className="font-semibold text-gray-700 py-4">Médicaments</TableHead>
-                    <TableHead className="font-semibold text-gray-700 py-4">Date Création</TableHead>
-                    <TableHead className="font-semibold text-gray-700 py-4">Statut</TableHead>
-                    <TableHead className="text-right font-semibold text-gray-700 py-4">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredCategories.map((category, index) => (
-                    <TableRow
-                      key={category.id}
-                      className={`
-                        hover:bg-teal-50/50 transition-all duration-200 border-b border-gray-100
-                        ${index % 2 === 0 ? "bg-white" : "bg-gray-50/30"}
-                      `}
-                    >
-                      <TableCell className="font-medium text-gray-900 py-4">
-                        <div className="flex items-center gap-2">
-                          <div className="w-2 h-2 bg-teal-500 rounded-full"></div>
-                          {category.nom}
-                        </div>
-                      </TableCell>
-                      <TableCell className="max-w-xs truncate text-gray-600 py-4">{category.description}</TableCell>
-                      <TableCell className="py-4">
-                        <Badge variant="outline" className="bg-teal-50 text-teal-700 border-teal-200 font-medium">
-                          {category.nombreMedicaments} médicaments
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-gray-600 py-4">
-                        {new Date(category.dateCreation).toLocaleDateString("fr-FR")}
-                      </TableCell>
-                      <TableCell className="py-4">
-                        <Badge className="bg-green-100 text-green-800 hover:bg-green-100 font-medium">Actif</Badge>
-                      </TableCell>
-                      <TableCell className="text-right py-4">
-                        <div className="flex items-center justify-end gap-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleEdit(category)}
-                            className="h-8 px-3 bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100 hover:border-blue-300 transition-all duration-200"
-                          >
-                            <Edit className="h-3 w-3 mr-1" />
-                           
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="h-8 px-3 bg-red-50 border-red-200 text-red-700 hover:bg-red-100 hover:border-red-300 transition-all duration-200"
-                          >
-                            <Trash2 className="h-3 w-3 mr-1" />
-                            
-                          </Button>
-                        </div>
-                      </TableCell>
+            {loading ? (
+              <div className="flex items-center justify-center h-64">
+                <Loader2 className="h-8 w-8 animate-spin text-teal-600" />
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-gray-50/50 hover:bg-gray-50/50">
+                      <TableHead className="font-semibold text-gray-700 py-4">ID</TableHead>
+                      <TableHead className="font-semibold text-gray-700 py-4">Nom</TableHead>
+                      <TableHead className="font-semibold text-gray-700 py-4">Description</TableHead>
+                      <TableHead className="font-semibold text-gray-700 py-4">Médicaments</TableHead>
+                      <TableHead className="text-right font-semibold text-gray-700 py-4">Actions</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+                  </TableHeader>
+                  <TableBody>
+                    {categories.map((category, index) => (
+                      <TableRow
+                        key={category.id}
+                        className={`
+                          hover:bg-teal-50/50 transition-all duration-200 border-b border-gray-100
+                          ${index % 2 === 0 ? "bg-white" : "bg-gray-50/30"}
+                        `}
+                      >
+                        <TableCell className="font-medium text-gray-900 py-4">#{category.id}</TableCell>
+                        <TableCell className="font-medium text-gray-900 py-4">
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-teal-500 rounded-full"></div>
+                            {category.nom}
+                          </div>
+                        </TableCell>
+                        <TableCell className="max-w-xs truncate text-gray-600 py-4">{category.description}</TableCell>
+                        <TableCell className="py-4">
+                          <Badge variant="outline" className="bg-teal-50 text-teal-700 border-teal-200 font-medium">
+                            {category.medicaments?.length || 0} médicaments
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right py-4">
+                          <div className="flex items-center justify-end gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleEdit(category)}
+                              disabled={mutationLoading}
+                              className="h-8 px-3 bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100 hover:border-blue-300 transition-all duration-200"
+                            >
+                              <Edit className="h-3 w-3 mr-1" />
+                              Modifier
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleDelete(category.id!, category.nom)}
+                              disabled={mutationLoading}
+                              className="h-8 px-3 bg-red-50 border-red-200 text-red-700 hover:bg-red-100 hover:border-red-300 transition-all duration-200"
+                            >
+                              <Trash2 className="h-3 w-3 mr-1" />
+                              Supprimer
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
           </CardContent>
         </Card>
 
         {/* Add/Edit Dialog */}
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <Tags className="h-5 w-5 text-teal-600" />
-                {editingCategory ? "Modifier la Catégorie" : "Nouvelle Catégorie"}
-              </DialogTitle>
-              <DialogDescription>
-                {editingCategory
-                  ? "Modifiez les informations de la catégorie."
-                  : "Ajoutez une nouvelle catégorie de médicaments."}
-              </DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid gap-2">
-                <Label htmlFor="nom">Nom de la catégorie</Label>
-                <Input
-                  id="nom"
-                  defaultValue={editingCategory?.nom || ""}
-                  placeholder="Ex: Antalgiques"
-                  className="border-teal-200 focus:border-teal-500 focus:ring-teal-500"
-                />
+            <form onSubmit={handleSubmit}>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <Tags className="h-5 w-5 text-teal-600" />
+                  {editingCategory ? "Modifier la Catégorie" : "Nouvelle Catégorie"}
+                </DialogTitle>
+                <DialogDescription>
+                  {editingCategory
+                    ? "Modifiez les informations de la catégorie."
+                    : "Ajoutez une nouvelle catégorie de médicaments."}
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="nom">Nom de la catégorie *</Label>
+                  <Input
+                    id="nom"
+                    value={formData.nom}
+                    onChange={(e) => setFormData({ ...formData, nom: e.target.value })}
+                    placeholder="Ex: Antalgiques"
+                    className="border-teal-200 focus:border-teal-500 focus:ring-teal-500"
+                    required
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="description">Description *</Label>
+                  <Textarea
+                    id="description"
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    placeholder="Description de la catégorie..."
+                    className="border-teal-200 focus:border-teal-500 focus:ring-teal-500"
+                    rows={3}
+                    required
+                  />
+                </div>
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                  id="description"
-                  defaultValue={editingCategory?.description || ""}
-                  placeholder="Description de la catégorie..."
-                  className="border-teal-200 focus:border-teal-500 focus:ring-teal-500"
-                  rows={3}
-                />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-                Annuler
-              </Button>
-              <Button className="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700">
-                {editingCategory ? "Modifier" : "Créer"}
-              </Button>
-            </DialogFooter>
+              <DialogFooter>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsDialogOpen(false)}
+                  disabled={mutationLoading}
+                >
+                  Annuler
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={mutationLoading}
+                  className="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700"
+                >
+                  {mutationLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
+                  {editingCategory ? "Modifier" : "Créer"}
+                </Button>
+              </DialogFooter>
+            </form>
           </DialogContent>
         </Dialog>
       </div>

@@ -36,6 +36,8 @@ class SpringBootApiClient {
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const url = `${this.baseURL}${endpoint}`
 
+    console.log(`🌐 API Request: ${options.method || "GET"} ${url}`)
+
     const config: RequestInit = {
       ...CORS_CONFIG,
       ...options,
@@ -65,18 +67,25 @@ class SpringBootApiClient {
 
       clearTimeout(timeoutId)
 
+      console.log(`📡 API Response: ${response.status} ${response.statusText}`)
+
       if (!response.ok) {
         await this.handleSpringBootError(response)
       }
 
-      // Spring Boot peut retourner du texte vide pour certaines opérations
+      // Spring Boot peut retourner du texte vide pour certaines opérations (DELETE)
       const contentType = response.headers.get("content-type")
       if (contentType && contentType.includes("application/json")) {
-        return await response.json()
+        const data = await response.json()
+        console.log(`✅ API Data:`, data)
+        return data
       }
 
+      // Pour les réponses vides (comme DELETE)
       return {} as T
     } catch (error) {
+      console.error(`❌ API Error:`, error)
+
       if (error instanceof ApiError) {
         throw error
       }
@@ -85,7 +94,7 @@ class SpringBootApiClient {
         throw new ApiError("Timeout de la requête", 408)
       }
 
-      throw new ApiError("Erreur de connexion au serveur", 0)
+      throw new ApiError("Erreur de connexion au serveur Spring Boot", 0)
     }
   }
 
