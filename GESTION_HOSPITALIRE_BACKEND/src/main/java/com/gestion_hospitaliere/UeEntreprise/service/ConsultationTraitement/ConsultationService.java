@@ -6,8 +6,7 @@ import com.gestion_hospitaliere.UeEntreprise.repository.User.EmployeRepository;
 import com.gestion_hospitaliere.UeEntreprise.repository.User.PersonneRepository;
 import com.gestion_hospitaliere.UeEntreprise.model.User.Employe;
 import com.gestion_hospitaliere.UeEntreprise.model.User.Personne;
-import com.gestion_hospitaliere.UeEntreprise.service.Employe.EmployeService;
-import com.gestion_hospitaliere.UeEntreprise.service.Employe.EmployeServicee;
+import com.gestion_hospitaliere.UeEntreprise.service.User.EmployeService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -111,8 +110,7 @@ public class ConsultationService {
                 .orElseThrow(() -> new RuntimeException("Consultation non trouvée avec l'id : " + id)); 
         existingConsultation.setDate(consultationDetails.getDate());
         existingConsultation.setSymptomes(consultationDetails.getSymptomes());
-        existingConsultation.setDiagnhttps://chatgpt.com/c/68592c1e-ee30-8005-8b0d-51fd69de098dostic(consultationDetails.getDiagnostic());
-
+      
         // Mettre à jour l'employé associé si fourni
         if (consultationDetails.getEmploye() != null) {
             Employe medecinUpdateDetails = consultationDetails.getEmploye();
