@@ -50,11 +50,12 @@ export const API_ENDPOINTS = {
   },
 
   
-  // Personnel
-  PERSONNEL: {
-    EMPLOYES: "/api/employes",
+  // Utilisateur
+  UTILISATEUR: {
+    EMPLOYES: "/api/employe",
     ROLES: "/api/roles",
     PERMISSIONS: "/api/permissions",
+    PERSONNES : "/api/personne",
   },
 
   // Patients
