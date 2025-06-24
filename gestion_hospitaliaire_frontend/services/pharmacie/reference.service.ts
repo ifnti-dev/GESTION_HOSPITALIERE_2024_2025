@@ -8,7 +8,7 @@ export class ReferenceService {
   async getAllReferences(): Promise<Reference[]> {
     console.log("🔍 Fetching all references...")
     try {
-      const references = await apiClient.get<Reference[]>(API_ENDPOINTS.REFERENCES)
+      const references = await apiClient.get<Reference[]>(API_ENDPOINTS.PHARMACIE.REFERENCES)
       console.log("✅ References fetched:", references?.length || 0)
       return references || []
     } catch (error) {
@@ -21,7 +21,7 @@ export class ReferenceService {
   async getReferenceById(id: number): Promise<Reference> {
     console.log(`🔍 Fetching reference with ID: ${id}`)
     try {
-      const reference = await apiClient.get<Reference>(`${API_ENDPOINTS.REFERENCES}/${id}`)
+      const reference = await apiClient.get<Reference>(`${API_ENDPOINTS.PHARMACIE.REFERENCES}/${id}`)
       console.log("✅ Reference fetched:", reference)
       return reference
     } catch (error) {
@@ -34,7 +34,7 @@ export class ReferenceService {
   async createReference(reference: Omit<Reference, "id">): Promise<Reference> {
     console.log("➕ Creating reference:", reference)
     try {
-      const newReference = await apiClient.post<Reference>(API_ENDPOINTS.REFERENCES, reference)
+      const newReference = await apiClient.post<Reference>(API_ENDPOINTS.PHARMACIE.REFERENCES, reference)
       console.log("✅ Reference created:", newReference)
       return newReference
     } catch (error) {
@@ -47,7 +47,7 @@ export class ReferenceService {
   async updateReference(id: number, reference: Partial<Reference>): Promise<Reference> {
     console.log(`✏️ Updating reference ${id}:`, reference)
     try {
-      const updatedReference = await apiClient.put<Reference>(`${API_ENDPOINTS.REFERENCES}/${id}`, {
+      const updatedReference = await apiClient.put<Reference>(`${API_ENDPOINTS.PHARMACIE.REFERENCES}/${id}`, {
         ...reference,
         id,
       })
@@ -63,7 +63,7 @@ export class ReferenceService {
   async deleteReference(id: number): Promise<void> {
     console.log(`🗑️ Deleting reference ${id}`)
     try {
-      await apiClient.delete(`${API_ENDPOINTS.REFERENCES}/${id}`)
+      await apiClient.delete(`${API_ENDPOINTS.PHARMACIE.REFERENCES}/${id}`)
       console.log("✅ Reference deleted successfully")
     } catch (error) {
       console.error(`❌ Error deleting reference ${id}:`, error)
@@ -75,7 +75,7 @@ export class ReferenceService {
   async searchByNom(nom: string): Promise<Reference[]> {
     console.log(`🔍 Searching references by nom: ${nom}`)
     try {
-      const references = await apiClient.get<Reference[]>(API_ENDPOINTS.REFERENCES_SEARCH.BY_NOM, { nom })
+      const references = await apiClient.get<Reference[]>(API_ENDPOINTS.PHARMACIE.REFERENCES_SEARCH.BY_NOM, { nom })
       console.log("✅ Search results:", references?.length || 0)
       return references || []
     } catch (error) {

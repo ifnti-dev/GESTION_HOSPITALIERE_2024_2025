@@ -7,7 +7,7 @@ export class MedicamentService {
   async getAllMedicaments(): Promise<Medicament[]> {
     console.log("🔍 Fetching all medicaments...")
     try {
-      const medicaments = await apiClient.get<Medicament[]>(API_ENDPOINTS.MEDICAMENTS)
+      const medicaments = await apiClient.get<Medicament[]>(API_ENDPOINTS.PHARMACIE.MEDICAMENTS)
       console.log("✅ Medicaments fetched:", medicaments?.length || 0)
       return medicaments || []
     } catch (error) {
@@ -20,7 +20,7 @@ export class MedicamentService {
   async getMedicamentById(id: number): Promise<Medicament> {
     console.log(`🔍 Fetching medicament with ID: ${id}`)
     try {
-      const medicament = await apiClient.get<Medicament>(`${API_ENDPOINTS.MEDICAMENTS}/${id}`)
+      const medicament = await apiClient.get<Medicament>(`${API_ENDPOINTS.PHARMACIE.MEDICAMENTS}/${id}`)
       console.log("✅ Medicament fetched:", medicament)
       return medicament
     } catch (error) {
@@ -33,7 +33,7 @@ export class MedicamentService {
   async createMedicament(medicament: Omit<Medicament, "id">): Promise<Medicament> {
     console.log("➕ Creating medicament:", medicament)
     try {
-      const newMedicament = await apiClient.post<Medicament>(API_ENDPOINTS.MEDICAMENTS, medicament)
+      const newMedicament = await apiClient.post<Medicament>(API_ENDPOINTS.PHARMACIE.MEDICAMENTS, medicament)
       console.log("✅ Medicament created:", newMedicament)
       return newMedicament
     } catch (error) {
@@ -46,7 +46,7 @@ export class MedicamentService {
   async updateMedicament(id: number, medicament: Partial<Medicament>): Promise<Medicament> {
     console.log(`✏️ Updating medicament ${id}:`, medicament)
     try {
-      const updatedMedicament = await apiClient.put<Medicament>(`${API_ENDPOINTS.MEDICAMENTS}/${id}`, {
+      const updatedMedicament = await apiClient.put<Medicament>(`${API_ENDPOINTS.PHARMACIE.MEDICAMENTS}/${id}`, {
         ...medicament,
         id,
       })
@@ -62,7 +62,7 @@ export class MedicamentService {
   async deleteMedicament(id: number): Promise<void> {
     console.log(`🗑️ Deleting medicament ${id}`)
     try {
-      await apiClient.delete(`${API_ENDPOINTS.MEDICAMENTS}/${id}`)
+      await apiClient.delete(`${API_ENDPOINTS.PHARMACIE.MEDICAMENTS}/${id}`)
       console.log("✅ Medicament deleted successfully")
     } catch (error) {
       console.error(`❌ Error deleting medicament ${id}:`, error)
@@ -74,7 +74,7 @@ export class MedicamentService {
   async searchByNom(nom: string): Promise<Medicament[]> {
     console.log(`🔍 Searching medicaments by nom: ${nom}`)
     try {
-      const medicaments = await apiClient.get<Medicament[]>(API_ENDPOINTS.MEDICAMENTS_SEARCH.BY_NOM, { nom })
+      const medicaments = await apiClient.get<Medicament[]>(API_ENDPOINTS.PHARMACIE.MEDICAMENTS_SEARCH.BY_NOM, { nom })
       console.log("✅ Search results:", medicaments?.length || 0)
       return medicaments || []
     } catch (error) {
@@ -87,7 +87,7 @@ export class MedicamentService {
   async searchByDescription(keyword: string): Promise<Medicament[]> {
     console.log(`🔍 Searching medicaments by description: ${keyword}`)
     try {
-      const medicaments = await apiClient.get<Medicament[]>(API_ENDPOINTS.MEDICAMENTS_SEARCH.BY_DESCRIPTION, {
+      const medicaments = await apiClient.get<Medicament[]>(API_ENDPOINTS.PHARMACIE.MEDICAMENTS_SEARCH.BY_DESCRIPTION, {
         keyword,
       })
       console.log("✅ Search results:", medicaments?.length || 0)
@@ -102,7 +102,7 @@ export class MedicamentService {
   async getMedicamentsLowStock(seuil: number): Promise<Medicament[]> {
     console.log(`🔍 Fetching medicaments with low stock (seuil: ${seuil})`)
     try {
-      const medicaments = await apiClient.get<Medicament[]>(API_ENDPOINTS.MEDICAMENTS_SEARCH.LOW_STOCK, { seuil })
+      const medicaments = await apiClient.get<Medicament[]>(API_ENDPOINTS.PHARMACIE.MEDICAMENTS_SEARCH.LOW_STOCK, { seuil })
       console.log("✅ Low stock medicaments:", medicaments?.length || 0)
       return medicaments || []
     } catch (error) {
@@ -116,7 +116,7 @@ export class MedicamentService {
     console.log(`🔍 Fetching medicaments by categorie ID: ${categorieId}`)
     try {
       const medicaments = await apiClient.get<Medicament[]>(
-        `${API_ENDPOINTS.MEDICAMENTS_SEARCH.BY_CATEGORIE}/${categorieId}`,
+        `${API_ENDPOINTS.PHARMACIE.MEDICAMENTS_SEARCH.BY_CATEGORIE}/${categorieId}`,
       )
       console.log("✅ Medicaments by categorie:", medicaments?.length || 0)
       return medicaments || []
