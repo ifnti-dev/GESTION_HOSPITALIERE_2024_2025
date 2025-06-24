@@ -93,42 +93,6 @@ export interface SearchFilters {
 }
 
 // Autres types existants...
-export interface Personne extends BaseEntity {
-  prenom: string
-  nom: string
-  email: string
-  telephone: string
-  adresse: string
-  dateNaissance: string
-  situationMatrimoniale: "Célibataire" | "Marié(e)" | "Divorcé(e)" | "Veuf(ve)"
-}
-
-export interface Employe extends BaseEntity {
-  personneId: number
-  personne?: Personne
-  horaireDebut: string
-  horaireFin: string
-  dateAffectation: string
-  specialite: string
-  numeroOrdre?: string
-  statut: "Actif" | "Congé" | "Absent" | "Suspendu"
-  roles: Role[]
-}
-
-export interface Role extends BaseEntity {
-  nom: string
-  description: string
-  permissions: Permission[]
-  employeCount?: number
-}
-
-export interface Permission extends BaseEntity {
-  nom: string
-  description: string
-  categorie: "Patients" | "Médical" | "Pharmacie" | "Finance" | "Administration" | "Système" | "Rapports"
-  niveau: "Lecture" | "Écriture" | "Administration"
-}
-
 export interface Patient extends BaseEntity {
   numeroSecuriteSociale: string
   prenom: string
