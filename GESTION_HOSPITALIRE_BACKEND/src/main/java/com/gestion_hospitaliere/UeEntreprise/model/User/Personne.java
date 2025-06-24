@@ -186,7 +186,9 @@ public class Personne {
     private String situationMatrimoniale;
     private String password;
 
+    
     @OneToOne(mappedBy = "personne", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private Employe employe;
 
     @OneToOne(mappedBy = "personne", cascade = CascadeType.ALL, orphanRemoval = true)

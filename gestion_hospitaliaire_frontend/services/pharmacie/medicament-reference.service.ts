@@ -7,7 +7,7 @@ export class MedicamentReferenceService {
   async getAllMedicamentReferences(): Promise<MedicamentReference[]> {
     console.log("🔍 Fetching all medicament references...")
     try {
-      const medicamentReferences = await apiClient.get<MedicamentReference[]>(API_ENDPOINTS.MEDICAMENT_REFERENCES)
+      const medicamentReferences = await apiClient.get<MedicamentReference[]>(API_ENDPOINTS.PHARMACIE.MEDICAMENT_REFERENCES)
       console.log("✅ MedicamentReferences fetched:", medicamentReferences?.length || 0)
       return medicamentReferences || []
     } catch (error) {
@@ -21,7 +21,7 @@ export class MedicamentReferenceService {
     console.log(`🔍 Fetching medicament reference with ID: ${id}`)
     try {
       const medicamentReference = await apiClient.get<MedicamentReference>(
-        `${API_ENDPOINTS.MEDICAMENT_REFERENCES}/${id}`,
+        `${API_ENDPOINTS.PHARMACIE.MEDICAMENT_REFERENCES}/${id}`,
       )
       console.log("✅ MedicamentReference fetched:", medicamentReference)
       return medicamentReference
@@ -36,7 +36,7 @@ export class MedicamentReferenceService {
     console.log("➕ Creating medicament reference:", medicamentReference)
     try {
       const newMedicamentReference = await apiClient.post<MedicamentReference>(
-        API_ENDPOINTS.MEDICAMENT_REFERENCES,
+        API_ENDPOINTS.PHARMACIE.MEDICAMENT_REFERENCES,
         medicamentReference,
       )
       console.log("✅ MedicamentReference created:", newMedicamentReference)
@@ -55,7 +55,7 @@ export class MedicamentReferenceService {
     console.log(`✏️ Updating medicament reference ${id}:`, medicamentReference)
     try {
       const updatedMedicamentReference = await apiClient.put<MedicamentReference>(
-        `${API_ENDPOINTS.MEDICAMENT_REFERENCES}/${id}`,
+        `${API_ENDPOINTS.PHARMACIE.MEDICAMENT_REFERENCES}/${id}`,
         {
           ...medicamentReference,
           id,
@@ -73,7 +73,7 @@ export class MedicamentReferenceService {
   async deleteMedicamentReference(id: number): Promise<void> {
     console.log(`🗑️ Deleting medicament reference ${id}`)
     try {
-      await apiClient.delete(`${API_ENDPOINTS.MEDICAMENT_REFERENCES}/${id}`)
+      await apiClient.delete(`${API_ENDPOINTS.PHARMACIE.MEDICAMENT_REFERENCES}/${id}`)
       console.log("✅ MedicamentReference deleted successfully")
     } catch (error) {
       console.error(`❌ Error deleting medicament reference ${id}:`, error)
@@ -86,7 +86,7 @@ export class MedicamentReferenceService {
     console.log(`🔍 Fetching medicament references by medicament ID: ${medicamentId}`)
     try {
       const medicamentReferences = await apiClient.get<MedicamentReference[]>(
-        `${API_ENDPOINTS.MEDICAMENT_REFERENCES_SEARCH.BY_MEDICAMENT}/${medicamentId}`,
+        `${API_ENDPOINTS.PHARMACIE.MEDICAMENT_REFERENCES_SEARCH.BY_MEDICAMENT}/${medicamentId}`,
       )
       console.log("✅ MedicamentReferences by medicament:", medicamentReferences?.length || 0)
       return medicamentReferences || []
@@ -101,7 +101,7 @@ export class MedicamentReferenceService {
     console.log(`🔍 Fetching medicament references by reference ID: ${referenceId}`)
     try {
       const medicamentReferences = await apiClient.get<MedicamentReference[]>(
-        `${API_ENDPOINTS.MEDICAMENT_REFERENCES_SEARCH.BY_REFERENCE}/${referenceId}`,
+        `${API_ENDPOINTS.PHARMACIE.MEDICAMENT_REFERENCES_SEARCH.BY_REFERENCE}/${referenceId}`,
       )
       console.log("✅ MedicamentReferences by reference:", medicamentReferences?.length || 0)
       return medicamentReferences || []
