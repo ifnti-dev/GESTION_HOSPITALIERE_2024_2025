@@ -21,7 +21,7 @@ public class Reference {
 	
 	private String nom;
 	private String description;
-//	private Integer quantiteCalculee;
+
 	
 	@OneToMany(mappedBy="reference")
 	@JsonIgnore

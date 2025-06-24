@@ -31,13 +31,12 @@ public class Employe{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+
+	@OneToOne
+    @JoinColumn(name = "personne_id")
+	@JsonIgnore
+    private Personne personne;
 	
-	public Long getId() {
-		return id;
-	}
-	public void setId(Long id) {
-		this.id = id;
-	}
 	@ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "personne_roles",
@@ -49,6 +48,7 @@ public class Employe{
 	@OneToOne
     @JoinColumn(name = "personne_id")
     private Personne personne;
+
 	
 	@OneToMany(mappedBy = "employe", cascade = CascadeType.ALL)
 	@JsonIgnore  // Ignore dans le JSON
@@ -69,6 +69,14 @@ public class Employe{
 	@Column(unique = true)
 	private String numOrdre;
 
+
+
+	public Long getId() {
+		return id;
+	}
+	public void setId(Long id) {
+		this.id = id;
+	}
 
 	public List<Accouchement> getAccouchements() {
 		return accouchements;

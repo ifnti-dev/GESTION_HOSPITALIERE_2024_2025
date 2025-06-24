@@ -30,7 +30,7 @@ public class Medicament {
 	
 	
 	@OneToMany(mappedBy="medicament")
-	@JsonIgnore
+//	@JsonIgnore
 	private List<MedicamentReference> medicamentsReference;
 
 

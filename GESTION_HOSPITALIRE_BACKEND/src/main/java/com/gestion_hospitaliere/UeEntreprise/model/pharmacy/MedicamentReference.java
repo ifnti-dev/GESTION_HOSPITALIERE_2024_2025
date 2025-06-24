@@ -28,11 +28,11 @@ public class MedicamentReference {
 
     @ManyToOne
     @JoinColumn(name="reference_id")
-    @JsonIgnore
+//    @JsonIgnore
     private Reference reference;
 
     @OneToMany(mappedBy = "medicamentReference")
-    @JsonIgnore
+//    @JsonIgnore
     private List<LigneApprovisionnement> lignesApprovisionnement;
 
 	public Long getId() {

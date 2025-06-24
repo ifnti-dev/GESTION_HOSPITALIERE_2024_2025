@@ -16,6 +16,7 @@ import {
 import {
   Pill,
   Package,
+  Package2,
   ShoppingCart,
   Activity,
   Settings,
@@ -39,6 +40,7 @@ interface PharmacienSidebarProps {
 export function PharmacienSidebar({ children }: PharmacienSidebarProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [isMobile, setIsMobile] = useState(false)
+  const [medicamentReferences, setMedicamentReferences] = useState<any[]>([]) // Added state for medicamentReferences
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -47,6 +49,15 @@ export function PharmacienSidebar({ children }: PharmacienSidebarProps) {
         setSidebarOpen(false)
       }
     }
+
+    // Mock data for medicamentReferences (replace with actual data fetching)
+    const mockMedicamentReferences = [
+      { id: 1, quantite: 3 },
+      { id: 2, quantite: 7 },
+      { id: 3, quantite: 1 },
+      { id: 4, quantite: 5 },
+    ]
+    setMedicamentReferences(mockMedicamentReferences)
 
     checkScreenSize()
     window.addEventListener("resize", checkScreenSize)
@@ -78,6 +89,13 @@ export function PharmacienSidebar({ children }: PharmacienSidebarProps) {
       icon: <BookOpen className="h-5 w-5" />,
       href: "/dashboard/pharmacien/references",
       gradient: "from-blue-500 to-teal-500",
+    },
+    {
+      title: "Produits Finaux",
+      icon: <Package2 className="h-5 w-5" />,
+      href: "/dashboard/pharmacien/produits",
+      badge: medicamentReferences?.filter((p) => p.quantite < 5).length?.toString(),
+      gradient: "from-purple-500 to-pink-500",
     },
     {
       title: "Stock & Inventaire",
