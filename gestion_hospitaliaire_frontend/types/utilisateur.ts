@@ -10,14 +10,14 @@ export interface BaseEntity {
 
 
 // Interfaces qui représentent l'entité Permission
-export interface Permission {
+export interface Permission extends BaseEntity {
     id?: number
     nom: string
     description?: string
 }
 
 // Interface qui représente l'entité Role
-export interface Role {
+export interface Role extends BaseEntity {
     id?: number
     nom: string
     permissions?: Permission[] // Relation Many-to-Many avec Permissions
@@ -26,7 +26,7 @@ export interface Role {
 
 
 // Interface qui représente l'entité Personne
-export interface Personne {
+export interface Personne extends BaseEntity {
     id?: number
     nom: string
     prenom: string
@@ -49,7 +49,7 @@ export interface Personne {
 
 
 
-export interface Employe {
+export interface Employe extends BaseEntity {
     id?: number
     horaire: string
     dateAffectation: Date
