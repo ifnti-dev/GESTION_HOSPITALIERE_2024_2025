@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.gestion_hospitaliere.UeEntreprise.model.User.Personne;
@@ -15,6 +16,9 @@ public class PersonneService {
 
     @Autowired
     private PersonneRepository personneRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     // Ajouter un utilisateur
     public Personne ajouterPersonne(Personne personne) {
@@ -50,11 +54,20 @@ public class PersonneService {
             throw new IllegalArgumentException("Le numéro de téléphone est requis.");
         }
         
+        if (personne.getPassword() != null && !personne.getPassword().isEmpty()) {
+            String hashedPassword = passwordEncoder.encode(personne.getPassword());
+            personne.setPassword(hashedPassword);
+        } else {
+            throw new IllegalArgumentException("Le mot de passe est requis.");
+        }
+
         // Vérification que le téléphone ne contient que des chiffres
         Pattern phonePattern = Pattern.compile("^[0-9]+$");
         if (!phonePattern.matcher(personne.getTelephone()).matches()) {
             throw new IllegalArgumentException("Le numéro de téléphone doit contenir uniquement des chiffres.");
         }
+
+        
 
         return personneRepository.save(personne);
     }
