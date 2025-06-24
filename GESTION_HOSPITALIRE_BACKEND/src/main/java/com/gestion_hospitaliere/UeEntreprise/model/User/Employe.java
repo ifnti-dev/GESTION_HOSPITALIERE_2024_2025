@@ -32,10 +32,6 @@ public class Employe{
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@OneToOne
-    @JoinColumn(name = "personne_id")
-	@JsonIgnore
-    private Personne personne;
 	
 	@ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
