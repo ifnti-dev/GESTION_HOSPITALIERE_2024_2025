@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.gestion_hospitaliere.UeEntreprise.model.Appointments.RendezVous;
 import com.gestion_hospitaliere.UeEntreprise.model.Payments.Facture;
 import com.gestion_hospitaliere.UeEntreprise.model.Pregnancy.Accouchement;
 import com.gestion_hospitaliere.UeEntreprise.model.Pregnancy.SuiviGrossesse;
@@ -24,7 +23,6 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
-import jakarta.persistence.UniqueConstraint;
 
 
 @Entity
@@ -47,7 +45,10 @@ public class Employe{
     )
     private Set<Role> roles = new HashSet<>();
 	
-	
+	@OneToOne
+    @JoinColumn(name = "personne_id")
+    private Personne personne;
+
 	
 	@OneToMany(mappedBy = "employe", cascade = CascadeType.ALL)
 	@JsonIgnore  // Ignore dans le JSON

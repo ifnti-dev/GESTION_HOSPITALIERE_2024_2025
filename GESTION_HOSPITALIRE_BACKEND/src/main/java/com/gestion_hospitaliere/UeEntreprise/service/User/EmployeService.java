@@ -33,6 +33,7 @@ public class EmployeService {
     public Employe creerEmploye(Employe employe) {
         // Gérer la Personne associée à l'Employe
         Personne personneInput = employe.getPersonne();
+        System.out.println("Création de l'employé avec les détails suivants : " + employe.getPersonne());
         if (personneInput == null) {
             throw new IllegalArgumentException("Les détails personnels (Personne) sont requis pour créer un employé.");
         }
