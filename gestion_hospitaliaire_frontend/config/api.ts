@@ -65,7 +65,20 @@ export const API_ENDPOINTS = {
     LOGOUT: "/api/auth/logout",
     REFRESH: "/api/auth/refresh",
   },
-} as const
+
+  //Consultation
+  CONSULTATIONS_TRAITEMENTS:{
+  CONSULTATIONS: "/api/consultations",
+  PRESCRIPTIONS: "/api/prescriptions",
+  SUIVIETATS: "/api/suivietats",
+  }
+
+    
+
+  }
+
+
+
 
 // Types pour la configuration
 export type ApiEndpoint = (typeof API_ENDPOINTS)[keyof typeof API_ENDPOINTS]
