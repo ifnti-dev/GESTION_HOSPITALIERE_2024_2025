@@ -73,9 +73,22 @@ export const API_ENDPOINTS = {
   CONSULTATIONS: "/api/consultations",
   PRESCRIPTIONS: "/api/prescriptions",
   SUIVIETATS: "/api/suivietats",
-  }
+  },
 
-    
+  DOSSIER: {
+    DOSSIER_MEDICAL: "/api/dossier-medical",
+    DOSSIER_MEDICAL_SEARCH: {
+      BY_PATIENT: "/api/dossier-medical/search/patient",
+      BY_DATE: "/api/dossier-medical/search/date",
+      
+    },
+    DOSSIER_MEDICAL_DETAILS: "/api/dossier-medical/details",
+    DOSSIER_GROSSES: "/api/dossier-grossesses",
+    DOSSIER_GROSSES_SEARCH: {
+      BY_PATIENT: "/api/dossier-grossesses/search/patient",
+      BY_DATE: "/api/dossier-grossesses/search/date",
+    },
+  },
 
   }
 

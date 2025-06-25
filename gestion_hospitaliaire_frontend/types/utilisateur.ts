@@ -1,4 +1,7 @@
+
+import { DossierMedical } from "./medical"
 import { Consultation, SuiviEtat } from "./consultstionsTraitement"
+
 
 // Types pour les entités de l'application de gestion hospitalière
 export interface BaseEntity {
