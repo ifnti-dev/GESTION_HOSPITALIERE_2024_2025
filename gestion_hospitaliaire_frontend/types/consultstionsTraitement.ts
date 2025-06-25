@@ -1,4 +1,5 @@
-import { Employe, Medicament, Personne } from "./pharmacie"
+import { Medicament } from "./pharmacie"
+import { Employe, Personne } from "./utilisateur"
 
 // Types de base
 export interface BaseEntity {
