@@ -47,3 +47,24 @@ export async function deleteEmploye(employeId: number): Promise<void> {
         method: "DELETE",
     });
 }
+
+// Ajouter un rôle à un employé
+export async function addRoleToEmploye(employeId: number, roleId: number): Promise<Employe> {
+    return apiFetch<Employe>(`${API_ENDPOINTS.UTILISATEUR.EMPLOYES}/${employeId}/roles/${roleId}`, {
+        method: "POST",
+    });
+}
+
+// Retirer un rôle à un employé
+export async function removeRoleFromEmploye(employeId: number, roleId: number): Promise<Employe> {
+    return apiFetch<Employe>(`${API_ENDPOINTS.UTILISATEUR.EMPLOYES}/${employeId}/roles/${roleId}`, {
+        method: "DELETE",
+    });
+}
+
+// Affecter une personne à un employé
+export async function assignPersonToEmploye(employeId: number, personneId: number): Promise<Employe> {
+    return apiFetch<Employe>(`${API_ENDPOINTS.UTILISATEUR.EMPLOYES}/${employeId}/personne/${personneId}`, {
+        method: "PUT",
+    });
+}
