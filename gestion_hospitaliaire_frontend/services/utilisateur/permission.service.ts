@@ -13,6 +13,11 @@ export async function getPermissionById(permissionId: number): Promise<Permissio
     return apiFetch<Permission>(`${API_ENDPOINTS.UTILISATEUR.PERMISSIONS}/${permissionId}`);
 }
 
+// Récupérer une permission par nom
+export async function getPermissionByName(nom: string): Promise<Permission> {
+    return apiFetch<Permission>(`${API_ENDPOINTS.UTILISATEUR.PERMISSIONS}/nom?nom=${encodeURIComponent(nom)}`);
+}
+
 // Ajouter une nouvelle permission
 export async function addPermission(newPermission: Permission): Promise<Permission> {
     const response = await apiFetch<Permission>(API_ENDPOINTS.UTILISATEUR.PERMISSIONS, {

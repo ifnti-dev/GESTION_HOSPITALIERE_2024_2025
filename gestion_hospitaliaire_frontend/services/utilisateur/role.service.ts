@@ -13,7 +13,7 @@ export async function getRoleById(roleId: number): Promise<Role> {
 }
 
 // Ajouter un nouveau rôle
-export async function addRole(newRole: Role): Promise<Role> {
+export async function addRole(newRole: { nom: string; permissions: number[] }): Promise<Role> {
     const response = await apiFetch<Role>(API_ENDPOINTS.UTILISATEUR.ROLES, {
         method: "POST",
         headers: {
@@ -26,9 +26,9 @@ export async function addRole(newRole: Role): Promise<Role> {
 }
 
 // Mettre à jour un rôle existant
-export async function updateRole(updatedRole: Role): Promise<Role> {
+export async function updateRole(roleId: number, updatedRole: { nom: string; permissions: number[] }): Promise<Role> {
     const response = await apiFetch<Role>(
-        `${API_ENDPOINTS.UTILISATEUR.ROLES}/${updatedRole.id}`,
+        `${API_ENDPOINTS.UTILISATEUR.ROLES}/${roleId}`,
         {
             method: "PUT",
             headers: {
