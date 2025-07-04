@@ -79,11 +79,12 @@ export const API_ENDPOINTS = {
   },
 
   
-  // Personnel
-  PERSONNEL: {
-    EMPLOYES: "/api/employes",
+  // Utilisateur
+  UTILISATEUR: {
+    EMPLOYES: "/api/employe",
     ROLES: "/api/roles",
     PERMISSIONS: "/api/permissions",
+    PERSONNES : "/api/personne",
   },
 
   // Patients
@@ -95,7 +96,33 @@ export const API_ENDPOINTS = {
     LOGOUT: "/api/auth/logout",
     REFRESH: "/api/auth/refresh",
   },
-} as const
+
+  //Consultation
+  CONSULTATIONS_TRAITEMENTS:{
+  CONSULTATIONS: "/api/consultations",
+  PRESCRIPTIONS: "/api/prescriptions",
+  SUIVIETATS: "/api/suivietats",
+  },
+
+  DOSSIER: {
+    DOSSIER_MEDICAL: "/api/dossier-medical",
+    DOSSIER_MEDICAL_SEARCH: {
+      BY_PATIENT: "/api/dossier-medical/search/patient",
+      BY_DATE: "/api/dossier-medical/search/date",
+      
+    },
+    DOSSIER_MEDICAL_DETAILS: "/api/dossier-medical/details",
+    DOSSIER_GROSSES: "/api/dossier-grossesses",
+    DOSSIER_GROSSES_SEARCH: {
+      BY_PATIENT: "/api/dossier-grossesses/search/patient",
+      BY_DATE: "/api/dossier-grossesses/search/date",
+    },
+  },
+
+  }
+
+
+
 
 // Types pour la configuration
 export type ApiEndpoint = (typeof API_ENDPOINTS)[keyof typeof API_ENDPOINTS]

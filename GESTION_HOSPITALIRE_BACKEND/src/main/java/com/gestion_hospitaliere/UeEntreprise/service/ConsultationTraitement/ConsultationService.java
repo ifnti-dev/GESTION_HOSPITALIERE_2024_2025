@@ -110,8 +110,7 @@ public class ConsultationService {
                 .orElseThrow(() -> new RuntimeException("Consultation non trouvée avec l'id : " + id)); 
         existingConsultation.setDate(consultationDetails.getDate());
         existingConsultation.setSymptomes(consultationDetails.getSymptomes());
-        existingConsultation.setDiagnostic(consultationDetails.getDiagnostic());
-
+      
         // Mettre à jour l'employé associé si fourni
         if (consultationDetails.getEmploye() != null) {
             Employe medecinUpdateDetails = consultationDetails.getEmploye();

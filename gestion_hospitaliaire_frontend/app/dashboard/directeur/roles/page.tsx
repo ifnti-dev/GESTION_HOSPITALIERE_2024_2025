@@ -1,11 +1,24 @@
 "use client"
 
 import { DashboardLayout } from "@/components/dashboard-layout"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 import {
   Dialog,
   DialogContent,
@@ -16,148 +29,167 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Shield, Plus, Search, Filter, Eye, Edit, Trash2, Users, MoreHorizontal, Key, Lock } from "lucide-react"
-import { useState } from "react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import {
+  Shield,
+  Plus,
+  Search,
+  Filter,
+  Eye,
+  Edit,
+  Trash2,
+  Users,
+  MoreHorizontal,
+  Lock,
+} from "lucide-react"
+import { useState, useRef } from "react"
+import { useRole } from "@/hooks/utilisateur/useRole"
+import { usePermissions } from "@/hooks/utilisateur/usePermission"
+import { Role, Permission } from "@/types/utilisateur"
 
 export default function RolesPage() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
-  const [selectedRole, setSelectedRole] = useState<any>(null)
+  const [selectedRole, setSelectedRole] = useState<Role | null>(null)
 
-  const roles = [
-    {
-      id: "ROL001",
-      nom: "Médecin",
-      description: "Professionnel de santé autorisé à diagnostiquer et traiter les patients",
-      permissions: ["Consulter patients", "Prescrire médicaments", "Accéder dossiers médicaux", "Modifier diagnostics"],
-      employesCount: 45,
-      dateCreation: "2020-01-15",
-      statut: "Actif",
-    },
-    {
-      id: "ROL002",
-      nom: "Infirmier",
-      description: "Professionnel de santé chargé des soins aux patients",
-      permissions: ["Consulter patients", "Administrer soins", "Accéder planning", "Modifier observations"],
-      employesCount: 120,
-      dateCreation: "2020-01-15",
-      statut: "Actif",
-    },
-    {
-      id: "ROL003",
-      nom: "Pharmacien",
-      description: "Professionnel responsable de la gestion des médicaments",
-      permissions: ["Gérer stock", "Valider prescriptions", "Consulter médicaments", "Générer rapports"],
-      employesCount: 8,
-      dateCreation: "2020-01-15",
-      statut: "Actif",
-    },
-    {
-      id: "ROL004",
-      nom: "Directeur",
-      description: "Direction générale de l'établissement",
-      permissions: ["Accès total", "Gérer personnel", "Consulter finances", "Modifier paramètres système"],
-      employesCount: 3,
-      dateCreation: "2020-01-15",
-      statut: "Actif",
-    },
-    {
-      id: "ROL005",
-      nom: "Sage-femme",
-      description: "Professionnel spécialisé dans l'accompagnement des grossesses",
-      permissions: [
-        "Consulter patientes",
-        "Gérer accouchements",
-        "Accéder suivi grossesse",
-        "Modifier dossiers maternité",
-      ],
-      employesCount: 15,
-      dateCreation: "2020-01-15",
-      statut: "Actif",
-    },
-  ]
+  // Hooks pour rôles et permissions
+  const { roles, loading: loadingRoles, error: errorRoles, addRole, updateRole, deleteRole } = useRole()
+  const { permissions, loading: loadingPermissions, error: errorPermissions } = usePermissions()
 
-  const permissions = [
-    { id: "PERM001", nom: "Consulter patients", description: "Accès en lecture aux dossiers patients" },
-    { id: "PERM002", nom: "Modifier patients", description: "Modification des informations patients" },
-    { id: "PERM003", nom: "Prescrire médicaments", description: "Création et modification de prescriptions" },
-    { id: "PERM004", nom: "Gérer stock", description: "Gestion des stocks de médicaments" },
-    { id: "PERM005", nom: "Accéder finances", description: "Consultation des données financières" },
-    { id: "PERM006", nom: "Gérer personnel", description: "Gestion des employés et affectations" },
-    { id: "PERM007", nom: "Modifier paramètres", description: "Configuration du système" },
-    { id: "PERM008", nom: "Générer rapports", description: "Création de rapports et statistiques" },
-  ]
+  // Statistiques simples
+  // const stats = [
+  //   {
+  //     title: "Total Rôles",
+  //     value: roles.length.toString(),
+  //     icon: <Shield className="h-5 w-5" />,
+  //     color: "text-blue-600",
+  //   },
+  //   {
+  //     title: "Permissions",
+  //     value: permissions.length.toString(),
+  //     icon: <Lock className="h-5 w-5" />,
+  //     color: "text-purple-600",
+  //   },
+  //   {
+  //     title: "Employés assignés",
+  //     value: roles.reduce((acc, r) => acc + (r.employesCount || 0), 0).toString(),
+  //     icon: <Users className="h-5 w-5" />,
+  //     color: "text-orange-600",
+  //   },
+  // ]
 
-  const getStatusBadge = (statut: string) => {
-    switch (statut) {
-      case "Actif":
-        return <Badge className="bg-green-100 text-green-800 border-green-200">Actif</Badge>
-      case "Inactif":
-        return <Badge className="bg-red-100 text-red-800 border-red-200">Inactif</Badge>
-      case "Suspendu":
-        return <Badge className="bg-orange-100 text-orange-800 border-orange-200">Suspendu</Badge>
-      default:
-        return <Badge variant="outline">{statut}</Badge>
+  // Formulaire pour ajouter/modifier un rôle
+  function RoleForm({
+    role = null,
+    onClose,
+    onSubmit,
+  }: {
+    role?: Role | null
+    onClose: () => void
+    onSubmit: (data: { nom: string; permissions: number[] }) => void
+  }) {
+    const formRef = useRef<HTMLFormElement>(null)
+    const [formError, setFormError] = useState<string | null>(null)
+
+    function handleSubmit(e: React.FormEvent) {
+      e.preventDefault()
+      const form = formRef.current
+      if (!form) return
+
+      const formData = new FormData(form)
+      const nom = formData.get("nom")?.toString().trim()
+      const permissionsChecked = permissions
+        .filter((perm) => formData.get(`perm_${perm.id}`))
+        .map((perm) => perm.id!)
+      
+      if (!nom) {
+        setFormError("Le nom du rôle est requis.")
+        return
+      }
+      if (permissionsChecked.length === 0) {
+        setFormError("Veuillez sélectionner au moins une permission.")
+        return
+      }
+
+      setFormError(null)
+      onSubmit({
+        nom,
+        permissions: permissionsChecked,
+      })
     }
+
+    return (
+      <form ref={formRef} onSubmit={handleSubmit} className="grid gap-4 py-4" id={role ? "editRoleForm" : "addRoleForm"}>
+        <div className="space-y-2">
+          <Label htmlFor="nom">Nom du rôle</Label>
+          <Input id="nom" name="nom" defaultValue={role?.nom || ""} placeholder="Ex: Médecin, Infirmier..." />
+        </div>
+        <div className="space-y-2">
+          <Label>Permissions associées</Label>
+          {loadingPermissions ? (
+            <div className="text-gray-500">Chargement des permissions...</div>
+          ) : errorPermissions ? (
+            <div className="text-red-600">Erreur lors du chargement des permissions</div>
+          ) : (
+            <div className="grid grid-cols-1 gap-3 max-h-48 overflow-y-auto border rounded-lg p-4">
+              {permissions.map((permission) => (
+                <div key={permission.id} className="flex items-start space-x-3">
+                  <Checkbox
+                    id={`perm_${permission.id}`}
+                    name={`perm_${permission.id}`}
+                    defaultChecked={role?.permissions?.some((p) => p.id === permission.id)}
+                  />
+                  <div className="grid gap-1.5 leading-none">
+                    <label
+                      htmlFor={`perm_${permission.id}`}
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      {permission.nom}
+                    </label>
+                    <p className="text-xs text-muted-foreground">{permission.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        {formError && <div className="text-red-600 text-sm">{formError}</div>}
+        <div className="hidden">
+          <button type="submit" />
+        </div>
+      </form>
+    )
   }
 
-  const stats = [
-    { title: "Total Rôles", value: "12", icon: <Shield className="h-5 w-5" />, color: "text-blue-600" },
-    { title: "Rôles Actifs", value: "10", icon: <Key className="h-5 w-5" />, color: "text-green-600" },
-    { title: "Permissions", value: "45", icon: <Lock className="h-5 w-5" />, color: "text-purple-600" },
-    { title: "Employés assignés", value: "247", icon: <Users className="h-5 w-5" />, color: "text-orange-600" },
-  ]
+  // Handlers pour créer, modifier, supprimer
+  const handleAddRole = async (data: { nom: string; permissions: number[] }) => {
+    await addRole(data)
+    setIsAddDialogOpen(false)
+  }
 
-  const handleEdit = (role: any) => {
+  const handleEdit = (role: Role) => {
     setSelectedRole(role)
     setIsEditDialogOpen(true)
   }
 
-  const handleDelete = (id: string) => {
-    if (confirm("Êtes-vous sûr de vouloir supprimer ce rôle ?")) {
-      console.log("Suppression de:", id)
-    }
+  const handleUpdateRole = async (data: { nom: string; permissions: number[] }) => {
+    if (!selectedRole) return
+    await updateRole(selectedRole.id!, data)
+    setIsEditDialogOpen(false)
+    setSelectedRole(null)
   }
 
-  const RoleForm = ({ role = null, onClose }: { role?: any; onClose: () => void }) => (
-    <div className="grid gap-4 py-4">
-      <div className="space-y-2">
-        <Label htmlFor="nom">Nom du rôle</Label>
-        <Input id="nom" defaultValue={role?.nom || ""} placeholder="Ex: Médecin, Infirmier..." />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="description">Description</Label>
-        <Textarea
-          id="description"
-          defaultValue={role?.description || ""}
-          placeholder="Description détaillée du rôle..."
-          rows={3}
-        />
-      </div>
-      <div className="space-y-2">
-        <Label>Permissions associées</Label>
-        <div className="grid grid-cols-1 gap-3 max-h-48 overflow-y-auto border rounded-lg p-4">
-          {permissions.map((permission) => (
-            <div key={permission.id} className="flex items-start space-x-3">
-              <Checkbox id={permission.id} defaultChecked={role?.permissions?.includes(permission.nom)} />
-              <div className="grid gap-1.5 leading-none">
-                <label
-                  htmlFor={permission.id}
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  {permission.nom}
-                </label>
-                <p className="text-xs text-muted-foreground">{permission.description}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  )
+  const handleDelete = async (id: number) => {
+    if (confirm("Êtes-vous sûr de vouloir supprimer ce rôle ?")) {
+      await deleteRole(id)
+    }
+  }
 
   return (
     <DashboardLayout userRole="Directeur">
@@ -180,12 +212,17 @@ export default function RolesPage() {
                 <DialogTitle>Créer un nouveau rôle</DialogTitle>
                 <DialogDescription>Définissez un nouveau rôle avec ses permissions associées.</DialogDescription>
               </DialogHeader>
-              <RoleForm onClose={() => setIsAddDialogOpen(false)} />
+              <RoleForm onClose={() => setIsAddDialogOpen(false)} onSubmit={handleAddRole} />
               <DialogFooter>
                 <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
                   Annuler
                 </Button>
-                <Button className="bg-teal-600 hover:bg-teal-700" onClick={() => setIsAddDialogOpen(false)}>
+                <Button
+                  className="bg-teal-600 hover:bg-teal-700"
+                  type="submit"
+                  form="addRoleForm"
+                  onClick={() => {}}
+                >
                   Créer
                 </Button>
               </DialogFooter>
@@ -194,7 +231,7 @@ export default function RolesPage() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6">
           {stats.map((stat, index) => (
             <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-all duration-200">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -206,9 +243,9 @@ export default function RolesPage() {
               </CardContent>
             </Card>
           ))}
-        </div>
+        </div> */}
 
-        {/* Filters */}
+        {/* Filtres */}
         <Card className="border-0 shadow-lg">
           <CardHeader>
             <div className="flex flex-col sm:flex-row gap-4">
@@ -226,7 +263,13 @@ export default function RolesPage() {
           </CardHeader>
         </Card>
 
-        {/* Roles Table */}
+        {/* Affichage erreurs et chargements */}
+        {errorRoles && <div className="text-red-600 text-center">{typeof errorRoles === "string" ? errorRoles : errorRoles.message}</div>}
+        {loadingRoles && <div className="text-center text-gray-500">Chargement des rôles...</div>}
+        {errorPermissions && <div className="text-red-600 text-center">{typeof errorPermissions === "string" ? errorPermissions : errorPermissions.message}</div>}
+        {loadingPermissions && <div className="text-center text-gray-500">Chargement des permissions...</div>}
+
+        {/* Table des rôles */}
         <Card className="border-0 shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -242,10 +285,8 @@ export default function RolesPage() {
                   <TableRow className="bg-gradient-to-r from-teal-50 to-cyan-50 hover:from-teal-100 hover:to-cyan-100">
                     <TableHead className="font-semibold text-teal-900">ID</TableHead>
                     <TableHead className="font-semibold text-teal-900">Rôle</TableHead>
-                    <TableHead className="font-semibold text-teal-900">Description</TableHead>
                     <TableHead className="font-semibold text-teal-900">Permissions</TableHead>
                     <TableHead className="font-semibold text-teal-900">Employés</TableHead>
-                    <TableHead className="font-semibold text-teal-900">Statut</TableHead>
                     <TableHead className="font-semibold text-teal-900 text-center">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -265,49 +306,38 @@ export default function RolesPage() {
                             {role.nom}
                           </div>
                           <div className="text-xs text-gray-500">
-                            Créé le {new Date(role.dateCreation).toLocaleDateString()}
+                            Créé le {role.createdAt ? new Date(role.createdAt).toLocaleDateString() : ""}
                           </div>
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="max-w-[200px]">
-                          <p className="text-sm text-gray-600 line-clamp-2">{role.description}</p>
+                        <div className="flex flex-wrap gap-1">
+                          {(role.permissions ?? []).slice(0, 2).map((perm, idx) => (
+                            <Badge key={perm.id ?? idx} variant="outline" className="text-xs">
+                              {perm.nom}
+                            </Badge>
+                          ))}
+                          {(role.permissions ?? []).length > 2 && (
+                            <Badge variant="outline" className="text-xs">
+                              +{(role.permissions ?? []).length - 2}
+                            </Badge>
+                          )}
                         </div>
                       </TableCell>
-                      <TableCell>
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2">
-                            <Key className="h-3 w-3 text-gray-400" />
-                            <span className="text-sm font-medium">{role.permissions.length} permissions</span>
-                          </div>
-                          <div className="flex flex-wrap gap-1">
-                            {role.permissions.slice(0, 2).map((perm, idx) => (
-                              <Badge key={idx} variant="outline" className="text-xs">
-                                {perm}
-                              </Badge>
-                            ))}
-                            {role.permissions.length > 2 && (
-                              <Badge variant="outline" className="text-xs">
-                                +{role.permissions.length - 2}
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
+                      {/* <TableCell>
                         <div className="flex items-center gap-2">
                           <Users className="h-3 w-3 text-gray-400" />
-                          <span className="font-medium text-gray-900">{role.employesCount}</span>
+                          <span className="font-medium text-gray-900">{role.employesCount || 0}</span>
                           <span className="text-sm text-gray-500">employés</span>
                         </div>
-                      </TableCell>
-                      <TableCell>{getStatusBadge(role.statut)}</TableCell>
+                      </TableCell> */}
                       <TableCell>
                         <div className="flex items-center justify-center gap-2">
                           <Button
                             variant="outline"
                             size="sm"
                             className="h-8 w-8 p-0 border-green-200 text-green-600 hover:bg-green-50 hover:text-green-700"
+                            title="Voir"
                           >
                             <Eye className="h-3 w-3" />
                           </Button>
@@ -315,6 +345,7 @@ export default function RolesPage() {
                             variant="outline"
                             size="sm"
                             className="h-8 w-8 p-0 border-blue-200 text-blue-600 hover:bg-blue-50 hover:text-blue-700"
+                            title="Modifier"
                             onClick={() => handleEdit(role)}
                           >
                             <Edit className="h-3 w-3" />
@@ -323,7 +354,8 @@ export default function RolesPage() {
                             variant="outline"
                             size="sm"
                             className="h-8 w-8 p-0 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
-                            onClick={() => handleDelete(role.id)}
+                            title="Supprimer"
+                            onClick={() => handleDelete(role.id!)}
                           >
                             <Trash2 className="h-3 w-3" />
                           </Button>
@@ -333,6 +365,7 @@ export default function RolesPage() {
                                 variant="outline"
                                 size="sm"
                                 className="h-8 w-8 p-0 border-gray-200 text-gray-600 hover:bg-gray-50"
+                                title="Plus d'actions"
                               >
                                 <MoreHorizontal className="h-3 w-3" />
                               </Button>
@@ -355,7 +388,7 @@ export default function RolesPage() {
           </CardContent>
         </Card>
 
-        {/* Edit Dialog */}
+        {/* Dialog de modification */}
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
           <DialogContent className="sm:max-w-[600px]">
             <DialogHeader>
@@ -364,12 +397,17 @@ export default function RolesPage() {
                 Modifiez les informations et permissions du rôle {selectedRole?.nom}.
               </DialogDescription>
             </DialogHeader>
-            <RoleForm role={selectedRole} onClose={() => setIsEditDialogOpen(false)} />
+            <RoleForm role={selectedRole} onClose={() => setIsEditDialogOpen(false)} onSubmit={handleUpdateRole} />
             <DialogFooter>
               <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
                 Annuler
               </Button>
-              <Button className="bg-teal-600 hover:bg-teal-700" onClick={() => setIsEditDialogOpen(false)}>
+              <Button
+                className="bg-teal-600 hover:bg-teal-700"
+                type="submit"
+                form="editRoleForm"
+                onClick={() => {}}
+              >
                 Sauvegarder
               </Button>
             </DialogFooter>

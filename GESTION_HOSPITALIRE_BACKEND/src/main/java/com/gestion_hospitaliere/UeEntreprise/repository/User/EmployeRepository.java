@@ -15,6 +15,7 @@ public interface EmployeRepository extends JpaRepository<Employe, Long> {
 
     // Utilisée par ConsultationService et EmployeService pour trouver un employé par son numéro d'ordre
     Optional<Employe> findByNumOrdre(String numOrdre);
+     Optional<Employe> findByPersonneEmail(String email);
 }
 
 

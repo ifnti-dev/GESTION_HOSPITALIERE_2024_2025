@@ -70,6 +70,7 @@ export default function MedecinConsultationsPage() {
   const handleDeleteConsultation = async () => {
     if (!consultationToDelete) return
 
+    console.log("Tentative de suppression de la consultation avec l'ID:", consultationToDelete.id);
     try {
       await deleteConsultation(consultationToDelete.id)
       setConsultations(consultations.filter(c => c.id !== consultationToDelete.id))
@@ -77,11 +78,13 @@ export default function MedecinConsultationsPage() {
       setIsSuccessDialogOpen(true)
       
       toast({
-        title: "Succès",
+        title: "Succès de la suppression",
         description: "La consultation a été supprimée avec succès.",
         variant: "default",
       })
+      console.log("Suppression réussie. Consultations restantes:", consultations.filter(c => c.id !== consultationToDelete.id).length);
     } catch (err) {
+      console.error("Erreur lors de la suppression de la consultation:", err);
       toast({
         title: "Erreur",
         description: "Une erreur est survenue lors de la suppression.",
@@ -372,11 +375,16 @@ export default function MedecinConsultationsPage() {
                             size="sm" 
                             variant="outline" 
                             className="h-8 text-white border-red-600 bg-red-600 hover:bg-red-700"
-                            onClick={() => {
-                              setConsultationToDelete(consultation)
-                              setIsDeleteDialogOpen(true)
+                            onClick={(e) => {
+                              e.stopPropagation(); // Empêche la propagation de l'événement de clic si la ligne est cliquable
+                              console.log("Bouton de suppression cliqué pour l'ID:", consultation.id);
+                              setConsultationToDelete(consultation);
+                              setIsDeleteDialogOpen(true);
+                              console.log("isDeleteDialogOpen défini sur true. consultationToDelete:", consultation.id);
                             }}
                           >
+                            {/* Ajout d'un gestionnaire de clic pour le bouton "Créer Consultation" */}
+                            {/* TODO: Implémenter la logique de création de consultation */}
                             <Trash className="h-4 w-4 mr-1" />
                             
                           </Button>
@@ -391,7 +399,9 @@ export default function MedecinConsultationsPage() {
         </Card>
 
         {/* Delete Confirmation Dialog */}
-        <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <Dialog open={isDeleteDialogOpen} onOpenChange={(open) => {
+          console.log("isDeleteDialogOpen changed to:", open);
+          setIsDeleteDialogOpen(open);}}>
           <DialogContent>
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2 text-red-600">
@@ -399,7 +409,7 @@ export default function MedecinConsultationsPage() {
                 Confirmer la suppression
               </DialogTitle>
               <DialogDescription>
-                Êtes-vous sûr de vouloir supprimer la consultation de {consultationToDelete?.personne?.prenom} {consultationToDelete?.personne?.nom} ?
+                Êtes-vous sûr de vouloir supprimer la consultation de {consultationToDelete?.personne?.prenom || 'ce patient'} {consultationToDelete?.personne?.nom || ''} ?
                 <br />
                 <span className="font-medium">Cette action est irréversible.</span>
               </DialogDescription>

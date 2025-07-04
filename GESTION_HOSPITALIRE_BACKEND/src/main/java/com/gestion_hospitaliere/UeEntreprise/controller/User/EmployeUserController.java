@@ -16,7 +16,7 @@ import com.gestion_hospitaliere.UeEntreprise.service.User.EmployeService;
 
 @RestController
 @RequestMapping("api/employe")
-public class EmployeController {
+public class EmployeUserController {
 
     @Autowired
     private EmployeService employeService;

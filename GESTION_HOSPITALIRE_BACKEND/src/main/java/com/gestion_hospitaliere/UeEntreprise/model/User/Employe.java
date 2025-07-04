@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.gestion_hospitaliere.UeEntreprise.model.Appointments.RendezVous;
 import com.gestion_hospitaliere.UeEntreprise.model.Payments.Facture;
 import com.gestion_hospitaliere.UeEntreprise.model.Pregnancy.Accouchement;
 import com.gestion_hospitaliere.UeEntreprise.model.Pregnancy.SuiviGrossesse;
@@ -24,7 +23,6 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
-import jakarta.persistence.UniqueConstraint;
 
 
 @Entity
@@ -33,13 +31,8 @@ public class Employe{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+
 	
-	public Long getId() {
-		return id;
-	}
-	public void setId(Long id) {
-		this.id = id;
-	}
 	@ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "personne_roles",
@@ -50,9 +43,8 @@ public class Employe{
 	
 	@OneToOne
     @JoinColumn(name = "personne_id")
-	@JsonIgnore
-
     private Personne personne;
+
 	
 	@OneToMany(mappedBy = "employe", cascade = CascadeType.ALL)
 	@JsonIgnore  // Ignore dans le JSON
@@ -73,6 +65,14 @@ public class Employe{
 	@Column(unique = true)
 	private String numOrdre;
 
+
+
+	public Long getId() {
+		return id;
+	}
+	public void setId(Long id) {
+		this.id = id;
+	}
 
 	public List<Accouchement> getAccouchements() {
 		return accouchements;
