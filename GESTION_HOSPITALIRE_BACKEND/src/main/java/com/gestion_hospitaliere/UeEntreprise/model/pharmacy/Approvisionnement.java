@@ -1,6 +1,7 @@
 package com.gestion_hospitaliere.UeEntreprise.model.pharmacy;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -13,6 +14,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
 
 @Entity
 public class Approvisionnement {
@@ -20,7 +22,7 @@ public class Approvisionnement {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private LocalDate dateAppro;
+    private LocalDateTime dateAppro;
     private String fournisseur;
 
     @ManyToOne
@@ -31,6 +33,11 @@ public class Approvisionnement {
     @OneToMany(mappedBy = "approvisionnement")
     @JsonIgnore
     private List<LigneApprovisionnement> lignesApprovisionnement;
+    
+    @PrePersist
+    protected void onCreate() {
+        this.dateAppro = LocalDateTime.now(); // Initialisation automatique
+    }
 
 	public Long getId() {
 		return id;
@@ -40,11 +47,11 @@ public class Approvisionnement {
 		this.id = id;
 	}
 
-	public LocalDate getDateAppro() {
+	public LocalDateTime getDateAppro() {
 		return dateAppro;
 	}
 
-	public void setDateAppro(LocalDate dateAppro) {
+	public void setDateAppro(LocalDateTime dateAppro) {
 		this.dateAppro = dateAppro;
 	}
 

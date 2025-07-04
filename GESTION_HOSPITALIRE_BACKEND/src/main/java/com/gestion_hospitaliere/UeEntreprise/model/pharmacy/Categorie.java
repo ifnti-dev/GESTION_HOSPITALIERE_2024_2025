@@ -3,10 +3,15 @@ package com.gestion_hospitaliere.UeEntreprise.model.pharmacy;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import jakarta.persistence.GeneratedValue;
 
 
@@ -17,11 +22,16 @@ public class Categorie {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
 	
+	@Column(unique = true, nullable = false)
+	@NotBlank(message="Le nom de la catégorie ne peut pas être vide")
+	@Size(min=2, message="Le nom de la catégorie doit comporter au moins 2 caractères")
 	private String nom;
+	
 	private String description;
 	
 	
 	@OneToMany(mappedBy="categorie")
+	@JsonIgnore
 	private List<Medicament> medicaments;
 
 

@@ -37,13 +37,13 @@ public class LigneCommande {
 		this.id = id;
 	}
 
-// 	public Integer getQuantite() {
-// 		return quantite;
-// 	}
+ 	public Integer getQuantite() {
+ 		return quantite;
+ 	}
 
-// 	public void setQuantite(Integer quantite) {
-// 		this.quantite = quantite;
-// 	}
+ 	public void setQuantite(Integer quantite) {
+ 		this.quantite = quantite;
+ 	}
 
 	public Integer getPrixUnitaire() {
 		return prixUnitaire;
@@ -61,13 +61,7 @@ public class LigneCommande {
 		this.commande = commande;
 	}
 
-// 	public Medicament getMedicament() {
-// 		return medicament;
-// 	}
 
-// 	public void setMedicament(Medicament medicament) {
-// 		this.medicament = medicament;
-// 	}
     
     
     

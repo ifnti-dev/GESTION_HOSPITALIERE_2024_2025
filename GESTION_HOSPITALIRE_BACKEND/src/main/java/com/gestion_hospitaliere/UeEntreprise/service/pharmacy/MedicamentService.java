@@ -35,10 +35,6 @@ public class MedicamentService {
         return medicamentRepository.findByNomContaining(nom);
     }
 
-    public List<Medicament> getMedicamentsLowStock(Integer seuil) {
-        return medicamentRepository.findByStockTotalLessThan(seuil);
-    }
-
     public List<Medicament> getByCategorieId(Long categorieId) {
         return medicamentRepository.findByCategorieId(categorieId);
     }

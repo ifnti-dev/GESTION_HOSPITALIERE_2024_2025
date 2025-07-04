@@ -3,6 +3,7 @@ package com.gestion_hospitaliere.UeEntreprise.controller.pharmacy;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,8 +37,14 @@ public class LigneApprovisionnementController {
     }
 
     @PostMapping
-    public LigneApprovisionnement createLigneApprovisionnement(@RequestBody LigneApprovisionnement ligneApprovisionnement) {
-        return ligneApprovisionnementService.saveLigneApprovisionnement(ligneApprovisionnement);
+    public ResponseEntity<?> createLigneApprovisionnement(@RequestBody LigneApprovisionnement ligneApprovisionnement) {
+        try {
+            return ResponseEntity.ok(ligneApprovisionnementService.saveLigneApprovisionnement(ligneApprovisionnement));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Erreur lors de la création: " + e.getMessage());
+        }
     }
 
     @PutMapping("/{id}")
@@ -47,8 +54,13 @@ public class LigneApprovisionnementController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteLigneApprovisionnement(@PathVariable Long id) {
-        ligneApprovisionnementService.deleteLigneApprovisionnement(id);
+    public ResponseEntity<?> deleteLigneApprovisionnement(@PathVariable Long id) {
+        try {
+            ligneApprovisionnementService.deleteLigneApprovisionnement(id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Erreur lors de la suppression: " + e.getMessage());
+        }
     }
 
     @GetMapping("/by-approvisionnement/{approvisionnementId}")
