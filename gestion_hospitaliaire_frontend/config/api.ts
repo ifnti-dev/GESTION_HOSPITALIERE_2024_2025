@@ -46,6 +46,35 @@ export const API_ENDPOINTS = {
       BY_MEDICAMENT: "/api/medicament-references/medicament",
       BY_REFERENCE: "/api/medicament-references/reference",
     },
+    APPROVISIONNEMENTS: "/api/approvisionnements",
+    APPROVISIONNEMENTS_AVEC_LIGNES: "/api/approvisionnements/avec-lignes",
+    APPROVISIONNEMENTS_SEARCH: {
+      BY_DATE: "/api/approvisionnements/by-date",
+      BY_FOURNISSEUR: "/api/approvisionnements/by-fournisseur",
+      BY_EMPLOYE: "/api/approvisionnements/by-employe",
+    },
+
+    // Lignes d'approvisionnement
+    LIGNES_APPROVISIONNEMENT: "/api/lignes-approvisionnement",
+    LIGNES_APPROVISIONNEMENT_SEARCH: {
+      BY_APPROVISIONNEMENT: "/api/lignes-approvisionnement/by-approvisionnement",
+      EXPIRATION_BEFORE: "/api/lignes-approvisionnement/expiration-before",
+    },
+      // NOUVEAUX ENDPOINTS - Commandes
+    COMMANDES: "/api/commandes",
+    COMMANDES_SEARCH: {
+      BY_DATE: "/api/commandes/by-date",
+      BY_PERSONNE: "/api/commandes/by-personne",
+      BY_MONTANT: "/api/commandes/by-montant",
+    },
+
+    // Lignes de commande
+    LIGNES_COMMANDE: "/api/lignes-commande",
+    LIGNES_COMMANDE_SEARCH: {
+      BY_COMMANDE: "/api/lignes-commande/by-commande",
+      BY_MEDICAMENT: "/api/lignes-commande/by-medicament",
+      BY_PRIX: "/api/lignes-commande/by-prix",
+    },
 
   },
 

@@ -31,6 +31,7 @@ import {
   BookOpen,
   ShoppingCart,
   TrendingUp,
+  AlertTriangle,
 } from "lucide-react"
 import { PharmacienSidebar } from "@/components/sidebars/pharmacien-sidebar"
 import {
@@ -51,6 +52,8 @@ export default function ProduitsPage() {
   const [selectedReferenceId, setSelectedReferenceId] = useState<string>("all")
   const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] = useState(false)
   const [produitToDelete, setProduitToDelete] = useState<MedicamentReference | null>(null)
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false)
+  const [selectedProduit, setSelectedProduit] = useState<MedicamentReference | null>(null)
 
   const { medicamentReferences, loading, error, refetch } = useMedicamentReferences()
   const { medicaments } = useMedicaments()
@@ -134,6 +137,25 @@ export default function ProduitsPage() {
   const handleDeleteConfirmation = (produit: MedicamentReference) => {
     setProduitToDelete(produit)
     setIsDeleteConfirmationOpen(true)
+  }
+
+  const confirmDelete = async () => {
+    if (!produitToDelete?.id) return
+
+    try {
+      await deleteMedicamentReference(produitToDelete.id)
+      setIsDeleteConfirmationOpen(false)
+      setProduitToDelete(null)
+      refetch()
+      toast.success("Produit supprimé avec succès!")
+    } catch (err: any) {
+      toast.error(`Erreur lors de la suppression du produit: ${err?.message || "Inconnue"}`)
+    }
+  }
+
+  const handleViewDetails = (produit: MedicamentReference) => {
+    setSelectedProduit(produit)
+    setIsDetailDialogOpen(true)
   }
 
   const handleDelete = async () => {
@@ -254,7 +276,7 @@ export default function ProduitsPage() {
                     <SelectTrigger className="w-48 border-purple-200 focus:border-purple-500 focus:ring-purple-500">
                       <SelectValue placeholder="Médicament" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-white">
                       <SelectItem value="all">Tous les médicaments</SelectItem>
                       {medicaments?.map((med) => (
                         <SelectItem key={med.id} value={med.id?.toString() || ""}>
@@ -267,7 +289,7 @@ export default function ProduitsPage() {
                     <SelectTrigger className="w-48 border-purple-200 focus:border-purple-500 focus:ring-purple-500">
                       <SelectValue placeholder="Référence" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-white">
                       <SelectItem value="all">Toutes les références</SelectItem>
                       {references?.map((ref) => (
                         <SelectItem key={ref.id} value={ref.id?.toString() || ""}>
@@ -356,29 +378,29 @@ export default function ProduitsPage() {
                           </TableCell>
                           <TableCell className="py-4">{getQuantiteStatus(produit.quantite)}</TableCell>
                           <TableCell className="text-right py-4">
-                            <div className="flex items-center justify-end gap-2">
+                            <div className="flex items-center justify-end gap-1">
                               <Button
                                 size="sm"
-                                variant="outline"
-                                className="h-8 px-3 bg-green-50 border-green-200 text-green-700 hover:bg-green-100 hover:border-green-300 transition-all duration-200"
+                                variant="ghost"
+                                onClick={() => handleViewDetails(produit)}
+                                className="h-8 w-8 p-0 hover:bg-green-100 hover:text-green-700 transition-all duration-200"
+                                title="Voir les détails"
                               >
-                                <Eye className="h-3 w-3 mr-1" />
-                                Voir
+                                <Eye className="h-4 w-4" />
                               </Button>
                               <Button
                                 size="sm"
-                                variant="outline"
+                                variant="ghost"
                                 onClick={() => handleEdit(produit)}
-                                className="h-8 px-3 bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100 hover:border-blue-300 transition-all duration-200"
+                                className="h-8 w-8 p-0 hover:bg-blue-100 hover:text-blue-700 transition-all duration-200"
                               >
                                 <Edit className="h-3 w-3 mr-1" />
-                                Modifier
                               </Button>
                               <Button
                                 size="sm"
-                                variant="outline"
+                                variant="ghost"
                                 onClick={() => handleDeleteConfirmation(produit)}
-                                className="h-8 px-3 bg-red-50 border-red-200 text-red-700 hover:bg-red-100 hover:border-red-300 transition-all duration-200"
+                                className="h-8 w-8 p-0 hover:bg-red-100 hover:text-red-700 transition-all duration-200"
                                 disabled={mutationLoading}
                               >
                                 {mutationLoading ? (
@@ -386,7 +408,6 @@ export default function ProduitsPage() {
                                 ) : (
                                   <>
                                     <Trash2 className="h-3 w-3 mr-1" />
-                                    Supprimer
                                   </>
                                 )}
                               </Button>
@@ -431,24 +452,121 @@ export default function ProduitsPage() {
         <Dialog open={isDeleteConfirmationOpen} onOpenChange={setIsDeleteConfirmationOpen}>
           <DialogContent className="sm:max-w-[400px]">
             <DialogHeader>
-              <DialogTitle>Confirmation de Suppression</DialogTitle>
+              <DialogTitle className="flex items-center gap-2 text-red-600">
+                <AlertTriangle className="h-5 w-5" />
+                Confirmer la suppression
+              </DialogTitle>
               <DialogDescription>
-                Êtes-vous sûr de vouloir supprimer ce produit final ? Cette action est irréversible.
+                Êtes-vous sûr de vouloir supprimer ce produit final ?
+                <br />
+                <span className="text-red-600 font-medium">Cette action est irréversible.</span>
               </DialogDescription>
             </DialogHeader>
-            <DialogFooter>
-              <Button variant="secondary" onClick={() => setIsDeleteConfirmationOpen(false)}>
+            <DialogFooter className="gap-2">
+              <Button variant="outline" onClick={() => setIsDeleteConfirmationOpen(false)} disabled={mutationLoading}>
                 Annuler
               </Button>
-              <Button variant="destructive" onClick={handleDelete} disabled={mutationLoading}>
+              <Button
+                variant="destructive"
+                onClick={confirmDelete}
+                disabled={mutationLoading}
+                className="bg-red-600 hover:bg-red-700"
+              >
                 {mutationLoading ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                     Suppression...
                   </>
                 ) : (
-                  "Supprimer"
+                  <>
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Supprimer
+                  </>
                 )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Details Dialog */}
+        <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
+          <DialogContent className="sm:max-w-[700px]">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-purple-600">
+                <Package2 className="h-5 w-5" />
+                Détails du produit final
+              </DialogTitle>
+            </DialogHeader>
+            {selectedProduit && (
+              <div className="space-y-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-gray-500">ID</Label>
+                    <p className="text-lg font-semibold">#{selectedProduit.id}</p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-gray-500">Quantité</Label>
+                    <div className="bg-purple-50 p-3 rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <TrendingUp className="h-5 w-5 text-purple-600" />
+                        <span className="text-2xl font-bold text-purple-800">{selectedProduit.quantite}</span>
+                        <span className="text-purple-600">unités</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-gray-500">Médicament</Label>
+                    <div className="bg-teal-50 p-4 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-gradient-to-br from-teal-100 to-cyan-100 rounded-lg flex items-center justify-center">
+                          <Pill className="h-5 w-5 text-teal-600" />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-teal-800">{selectedProduit.medicament?.nom}</p>
+                          <p className="text-sm text-teal-600">{selectedProduit.medicament?.categorie?.nom}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-gray-500">Référence</Label>
+                    <div className="bg-blue-50 p-4 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-lg flex items-center justify-center">
+                          <BookOpen className="h-5 w-5 text-blue-600" />
+                        </div>
+                        <div>
+                          <p className="font-semibold font-mono text-blue-800">{selectedProduit.reference?.nom}</p>
+                          <p className="text-sm text-blue-600">{selectedProduit.reference?.description}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-gray-500">Statut</Label>
+                  <div className="pt-2">{getQuantiteStatus(selectedProduit.quantite)}</div>
+                </div>
+              </div>
+            )}
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsDetailDialogOpen(false)}>
+                Fermer
+              </Button>
+              <Button
+                onClick={() => {
+                  setIsDetailDialogOpen(false)
+                  if (selectedProduit) handleEdit(selectedProduit)
+                }}
+                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+              >
+                <Edit className="h-4 w-4 mr-2" />
+                Modifier
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -502,10 +620,10 @@ const ProduitForm: React.FC<ProduitFormProps> = ({ produit, medicaments, referen
         <div className="grid gap-2">
           <Label htmlFor="medicament">Médicament *</Label>
           <Select value={medicamentId} onValueChange={setMedicamentId} required>
-            <SelectTrigger className="border-purple-200 focus:border-purple-500 focus:ring-purple-500">
+            <SelectTrigger className="border-purple-200 focus:border-purple-500 focus:ring-purple-500 bg-white">
               <SelectValue placeholder="Sélectionner un médicament" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white">
               {medicaments.map((med) => (
                 <SelectItem key={med.id} value={med.id?.toString() || ""}>
                   <div className="flex flex-col">
@@ -520,10 +638,10 @@ const ProduitForm: React.FC<ProduitFormProps> = ({ produit, medicaments, referen
         <div className="grid gap-2">
           <Label htmlFor="reference">Référence *</Label>
           <Select value={referenceId} onValueChange={setReferenceId} required>
-            <SelectTrigger className="border-purple-200 focus:border-purple-500 focus:ring-purple-500">
+            <SelectTrigger className="border-purple-200 focus:border-purple-500 focus:ring-purple-500 bg-white">
               <SelectValue placeholder="Sélectionner une référence" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white">
               {references.map((ref) => (
                 <SelectItem key={ref.id} value={ref.id?.toString() || ""}>
                   <div className="flex flex-col">

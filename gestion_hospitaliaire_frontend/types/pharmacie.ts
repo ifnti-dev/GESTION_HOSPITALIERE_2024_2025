@@ -41,18 +41,56 @@ export interface MedicamentReference {
   lignesApprovisionnement?: LigneApprovisionnement[] // Relation OneToMany
 }
 
-// Types pour les lignes d'approvisionnement (pour plus tard)
-export interface LigneApprovisionnement {
-  id?: number
-  quantite: number
-  prixUnitaireAchat: number
-  dateReception: string
-  dateExpiration: string
-  numeroLot: string
-  prixUnitaireVente: number
-  medicamentReference?: MedicamentReference
-  medicamentReferenceId?: number
+
+// Types pour les approvisionnements - MISE À JOUR selon les entités Java
+export interface Approvisionnement {
+  id?: number // Long en Java
+  dateAppro: string // LocalDateTime en Java -> string ISO en TypeScript
+  fournisseur: string
+  employe?: Employe // Relation ManyToOne
+  employeId?: number // Pour les formulaires
+  lignesApprovisionnement?: LigneApprovisionnement[] // Relation OneToMany
 }
+
+// Types pour les lignes d'approvisionnement - MISE À JOUR selon les entités Java
+export interface LigneApprovisionnement {
+  id?: number // Long en Java
+  quantite: number // Integer
+  prixUnitaireAchat: number // Integer (en centimes)
+  prixUnitaireVente: number // Integer (en centimes)
+  dateReception: string // LocalDate
+  dateExpiration: string // LocalDate
+  numeroLot: string // Unique, généré automatiquement si vide
+  approvisionnement?: Approvisionnement // Relation ManyToOne
+  // approvisionnementId?: number // Pour les formulaires
+  approvisionnementId?: number // Pour les formulaires - IMPORTANT
+  medicamentReference?: MedicamentReference // Relation ManyToOne
+  // medicamentReferenceId?: number // Pour les formulaires
+   medicamentReferenceId?: number // Pour les formulaires - IMPORTANT
+}
+
+
+
+// NOUVEAUX TYPES - Commandes selon les entités Java
+export interface Commande {
+  id?: number // Long en Java
+  dateCommande: string // LocalDate en Java -> string ISO en TypeScript
+  montantTotal: string // String en Java
+  personne?: Personne // Relation ManyToOne
+  personneId?: number // Pour les formulaires
+  lignesCommande?: LigneCommande[] // Relation OneToMany
+}
+
+export interface LigneCommande {
+  id?: number // Long en Java
+  quantite: number // Integer
+  prixUnitaire: number // Integer (en centimes)
+  commande?: Commande // Relation ManyToOne
+  commandeId?: number // Pour les formulaires
+  medicament?: Medicament // Relation ManyToOne
+  medicamentId?: number // Pour les formulaires
+}
+
 
 // Types pour les requêtes de recherche
 export interface CategorieSearchParams {
@@ -76,6 +114,18 @@ export interface MedicamentReferenceSearchParams {
   referenceId?: number
 }
 
+export interface CommandeSearchParams {
+  dateCommande?: string
+  personneId?: number
+  montantMin?: string
+}
+
+export interface LigneCommandeSearchParams {
+  commandeId?: number
+  medicamentId?: number
+  prixMin?: number
+}
+
 // Types API Response (pour Spring Boot)
 export interface ApiResponse<T> {
   data?: T
@@ -91,6 +141,8 @@ export interface SearchFilters {
   sortBy?: string
   sortOrder?: "asc" | "desc"
 }
+
+
 
 // Autres types existants...
 export interface Personne extends BaseEntity {

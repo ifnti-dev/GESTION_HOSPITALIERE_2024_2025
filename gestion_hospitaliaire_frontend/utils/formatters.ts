@@ -1,97 +1,129 @@
 // Formatage des dates
-export const formatDate = (date: string | Date): string => {
-  const d = new Date(date)
-  return d.toLocaleDateString("fr-FR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  })
+export const formatDate = (dateString: string | undefined): string => {
+  if (!dateString) return "Non défini"
+
+  try {
+    const date = new Date(dateString)
+    return date.toLocaleDateString("fr-FR", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    })
+  } catch {
+    return "Date invalide"
+  }
 }
 
-export const formatDateTime = (date: string | Date): string => {
-  const d = new Date(date)
-  return d.toLocaleString("fr-FR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  })
+export const formatDateTime = (dateString: string | undefined): string => {
+  if (!dateString) return "Non défini"
+
+  try {
+    const date = new Date(dateString)
+    return date.toLocaleDateString("fr-FR", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    })
+  } catch {
+    return "Date invalide"
+  }
 }
 
-export const formatTime = (time: string): string => {
-  return time.slice(0, 5) // HH:MM
-}
+// Formatage des prix (conversion centimes -> euros)
+export const formatPrice = (priceInCents: number | undefined): string => {
+  if (priceInCents === undefined || priceInCents === null) return "0,00 €"
 
-// Formatage des montants
-export const formatCurrency = (amount: number): string => {
-  return new Intl.NumberFormat("fr-FR", {
+  const euros = priceInCents / 100
+  return euros.toLocaleString("fr-FR", {
     style: "currency",
     currency: "EUR",
-  }).format(amount)
+    minimumFractionDigits: 2,
+  })
 }
 
-// Formatage des numéros
-export const formatPhoneNumber = (phone: string): string => {
-  const cleaned = phone.replace(/\D/g, "")
-  const match = cleaned.match(/^(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})$/)
-  if (match) {
-    return `${match[1]} ${match[2]} ${match[3]} ${match[4]} ${match[5]}`
+// Formatage des nombres
+export const formatNumber = (num: number | undefined): string => {
+  if (num === undefined || num === null) return "0"
+
+  return num.toLocaleString("fr-FR")
+}
+
+// Formatage des pourcentages
+export const formatPercentage = (value: number | undefined, total: number): string => {
+  if (!value || !total) return "0%"
+
+  const percentage = (value / total) * 100
+  return `${percentage.toFixed(1)}%`
+}
+
+// Formatage du statut
+export const formatStatus = (status: string): string => {
+  const statusMap: Record<string, string> = {
+    Actif: "Actif",
+    Inactif: "Inactif",
+    "En attente": "En attente",
+    Suspendu: "Suspendu",
+    Archivé: "Archivé",
   }
+
+  return statusMap[status] || status
+}
+
+// Formatage des noms complets
+export const formatFullName = (prenom?: string, nom?: string): string => {
+  if (!prenom && !nom) return "Non défini"
+  if (!prenom) return nom || ""
+  if (!nom) return prenom || ""
+
+  return `${prenom} ${nom}`
+}
+
+// Formatage des adresses email
+export const formatEmail = (email?: string): string => {
+  if (!email) return "Non défini"
+  return email.toLowerCase()
+}
+
+// Formatage des numéros de téléphone
+export const formatPhone = (phone?: string): string => {
+  if (!phone) return "Non défini"
+
+  // Supprime tous les caractères non numériques
+  const cleaned = phone.replace(/\D/g, "")
+
+  // Formate selon le standard français
+  if (cleaned.length === 10) {
+    return cleaned.replace(/(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1 $2 $3 $4 $5")
+  }
+
   return phone
 }
 
-export const formatSSN = (ssn: string): string => {
-  const cleaned = ssn.replace(/\D/g, "")
-  const match = cleaned.match(/^(\d{1})(\d{2})(\d{2})(\d{2})(\d{3})(\d{3})(\d{2})$/)
-  if (match) {
-    return `${match[1]} ${match[2]} ${match[3]} ${match[4]} ${match[5]} ${match[6]} ${match[7]}`
-  }
-  return ssn
-}
-
-// Calculs d'âge
-export const calculateAge = (birthDate: string | Date): number => {
-  const today = new Date()
-  const birth = new Date(birthDate)
-  let age = today.getFullYear() - birth.getFullYear()
-  const monthDiff = today.getMonth() - birth.getMonth()
-
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-    age--
+// Formatage des durées
+export const formatDuration = (minutes: number): string => {
+  if (minutes < 60) {
+    return `${minutes} min`
   }
 
-  return age
+  const hours = Math.floor(minutes / 60)
+  const remainingMinutes = minutes % 60
+
+  if (remainingMinutes === 0) {
+    return `${hours}h`
+  }
+
+  return `${hours}h ${remainingMinutes}min`
 }
 
-// Calculs de grossesse
-export const calculateWeeksOfPregnancy = (lastMenstrualPeriod: string | Date): number => {
-  const today = new Date()
-  const lmp = new Date(lastMenstrualPeriod)
-  const diffTime = Math.abs(today.getTime() - lmp.getTime())
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-  return Math.floor(diffDays / 7)
-}
+// Formatage des tailles de fichier
+export const formatFileSize = (bytes: number): string => {
+  if (bytes === 0) return "0 B"
 
-export const calculateDueDate = (lastMenstrualPeriod: string | Date): Date => {
-  const lmp = new Date(lastMenstrualPeriod)
-  const dueDate = new Date(lmp)
-  dueDate.setDate(dueDate.getDate() + 280) // 40 semaines
-  return dueDate
-}
+  const k = 1024
+  const sizes = ["B", "KB", "MB", "GB"]
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
 
-// Validation des données
-export const isValidEmail = (email: string): boolean => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  return emailRegex.test(email)
-}
-
-export const isValidPhoneNumber = (phone: string): boolean => {
-  const phoneRegex = /^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/
-  return phoneRegex.test(phone)
-}
-
-export const isValidSSN = (ssn: string): boolean => {
-  const ssnRegex = /^[1-2]\d{2}(0[1-9]|1[0-2])\d{2}\d{3}\d{3}\d{2}$/
-  return ssnRegex.test(ssn.replace(/\s/g, ""))
+  return `${Number.parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`
 }
