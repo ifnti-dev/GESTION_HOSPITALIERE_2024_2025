@@ -1,4 +1,5 @@
 "use client"
+
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -30,12 +31,14 @@ import {
   MessageSquare,
   Calendar,
   ChevronDown,
+  Shield,
+  Phone,
+  MapPin,
+  Mail,
 } from "lucide-react"
+import { useAuth } from "@/contexts/AuthContext"
 
 interface TopBarProps {
-  userRole?: string
-  userName?: string
-  userAvatar?: string
   sidebarOpen: boolean
   setSidebarOpen: (open: boolean) => void
   isMobile: boolean
@@ -50,14 +53,8 @@ interface Notification {
   read: boolean
 }
 
-export function TopBar({
-  userRole = "Directeur",
-  userName = "Dr. Jean Dupont",
-  userAvatar,
-  sidebarOpen,
-  setSidebarOpen,
-  isMobile,
-}: TopBarProps) {
+export function TopBar({ sidebarOpen, setSidebarOpen, isMobile }: TopBarProps) {
+  const { user, userProfile, logout, isLoading } = useAuth()
   const [searchQuery, setSearchQuery] = useState("")
   const [isDarkMode, setIsDarkMode] = useState(false)
   const [notifications, setNotifications] = useState<Notification[]>([
@@ -97,10 +94,50 @@ export function TopBar({
 
   const unreadCount = notifications.filter((n) => !n.read).length
 
+  // Extraction des informations utilisateur avec gestion des cas null/undefined
+  const getUserInfo = () => {
+    // Priorité au userProfile, puis au user.profile
+    const profile = userProfile || user?.profile
+
+    if (!profile) {
+      return {
+        nom: "Utilisateur",
+        prenom: "",
+        email: "",
+        role: "Utilisateur",
+        // specialite: "",
+        // numOrdre: "",
+        // telephone: "",
+        // adresse: "",
+        // dateNaissance: "",
+        // statut: "Inconnu",
+      }
+    }
+
+    return {
+      nom: profile.nom || "Utilisateur",
+      prenom: profile.prenom || "",
+      email: profile.email || "",
+      role: profile.employe?.roles?.[0]?.nom || "Utilisateur",
+      // specialite: profile.employe?.specialite || "",
+      // numOrdre: profile.employe?.numOrdre || "",
+      // telephone: profile.telephone || "",
+      // adresse: profile.adresse || "",
+      // dateNaissance: profile.dateNaissance || "",
+      // statut: "Actif", // Par défaut si connecté
+    }
+  }
+
+  const userInfo = getUserInfo()
+  const fullName = `${userInfo.prenom} ${userInfo.nom}`.trim() || "Utilisateur"
+
   // Couleurs thématiques selon le rôle
-  const getRoleTheme = () => {
-    switch (userRole) {
-      case "Médecin":
+  const getRoleTheme = (role: string) => {
+    const normalizedRole = role.toLowerCase()
+
+    switch (normalizedRole) {
+      case "médecin":
+      case "medecin":
         return {
           gradient: "from-blue-500 to-blue-600",
           bgGradient: "from-blue-50 to-blue-100",
@@ -109,7 +146,8 @@ export function TopBar({
           hoverBg: "hover:bg-blue-50",
           badgeColor: "bg-blue-500",
         }
-      case "Infirmier":
+      case "infirmier":
+      case "infirmière":
         return {
           gradient: "from-emerald-500 to-emerald-600",
           bgGradient: "from-emerald-50 to-emerald-100",
@@ -118,7 +156,8 @@ export function TopBar({
           hoverBg: "hover:bg-emerald-50",
           badgeColor: "bg-emerald-500",
         }
-      case "Sage-femme":
+      case "sage-femme":
+      case "sage_femme":
         return {
           gradient: "from-rose-500 to-rose-600",
           bgGradient: "from-rose-50 to-rose-100",
@@ -127,7 +166,8 @@ export function TopBar({
           hoverBg: "hover:bg-rose-50",
           badgeColor: "bg-rose-500",
         }
-      case "Pharmacien":
+      case "pharmacien":
+      case "pharmacienne":
         return {
           gradient: "from-teal-500 to-teal-600",
           bgGradient: "from-teal-50 to-teal-100",
@@ -136,7 +176,8 @@ export function TopBar({
           hoverBg: "hover:bg-teal-50",
           badgeColor: "bg-teal-500",
         }
-      case "Caissier":
+      case "caissier":
+      case "caissière":
         return {
           gradient: "from-amber-500 to-amber-600",
           bgGradient: "from-amber-50 to-amber-100",
@@ -145,7 +186,16 @@ export function TopBar({
           hoverBg: "hover:bg-amber-50",
           badgeColor: "bg-amber-500",
         }
-      case "Directeur":
+      case "directeur":
+      case "directrice":
+        return {
+          gradient: "from-purple-500 to-purple-600",
+          bgGradient: "from-purple-50 to-purple-100",
+          textColor: "text-purple-700",
+          borderColor: "border-purple-200",
+          hoverBg: "hover:bg-purple-50",
+          badgeColor: "bg-purple-500",
+        }
       default:
         return {
           gradient: "from-slate-600 to-slate-700",
@@ -158,7 +208,7 @@ export function TopBar({
     }
   }
 
-  const theme = getRoleTheme()
+  const theme = getRoleTheme(userInfo.role)
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
@@ -188,6 +238,50 @@ export function TopBar({
     hour: "2-digit",
     minute: "2-digit",
   })
+
+  const handleLogout = async () => {
+    try {
+      await logout()
+    } catch (error) {
+      console.error("Erreur lors de la déconnexion:", error)
+    }
+  }
+
+  const getInitials = (nom: string, prenom: string) => {
+    const n = nom || "U"
+    const p = prenom || "T"
+    return `${p.charAt(0)}${n.charAt(0)}`.toUpperCase()
+  }
+
+  const formatDate = (dateString: string) => {
+    if (!dateString) return "Non spécifié"
+    try {
+      return new Date(dateString).toLocaleDateString("fr-FR")
+    } catch {
+      return "Date invalide"
+    }
+  }
+
+  // Affichage de chargement
+  if (isLoading) {
+    return (
+      <header className="sticky top-0 z-40 w-full">
+        <div className="absolute inset-0 bg-white/80 backdrop-blur-xl border-b border-gray-200/50 shadow-lg"></div>
+        <div className="relative px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="w-8 h-8 bg-gray-200 rounded-lg animate-pulse"></div>
+              <div className="w-24 h-6 bg-gray-200 rounded animate-pulse"></div>
+            </div>
+            <div className="flex items-center space-x-4">
+              <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse"></div>
+              <div className="w-32 h-8 bg-gray-200 rounded-lg animate-pulse"></div>
+            </div>
+          </div>
+        </div>
+      </header>
+    )
+  }
 
   return (
     <header className="sticky top-0 z-40 w-full">
@@ -225,13 +319,39 @@ export function TopBar({
                 className={`bg-gradient-to-r ${theme.gradient} text-white shadow-lg px-4 py-2 text-sm font-bold border-0 hover:shadow-xl transition-all duration-300`}
               >
                 <Activity className="h-3 w-3 mr-2" />
-                {userRole}
+                {userInfo.role}
               </Badge>
+
+              {/* {userInfo.specialite && (
+                <Badge variant="outline" className="text-gray-700 border-gray-200 bg-gray-50 px-3 py-1">
+                  <Shield className="h-3 w-3 mr-1" />
+                  {userInfo.specialite}
+                </Badge>
+              )}
+
+              {userInfo.numOrdre && (
+                <Badge variant="outline" className="text-gray-600 border-gray-200 bg-gray-50 px-2 py-1 text-xs">
+                  N° {userInfo.numOrdre}
+                </Badge>
+              )}
+
               <div className="h-6 w-px bg-gray-300"></div>
-              <Badge variant="outline" className="text-green-700 border-green-200 bg-green-50 px-3 py-1">
-                <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
-                En ligne
-              </Badge>
+
+              <Badge
+                variant="outline"
+                className={`px-3 py-1 ${
+                  userInfo.statut === "Actif"
+                    ? "text-green-700 border-green-200 bg-green-50"
+                    : "text-orange-700 border-orange-200 bg-orange-50"
+                }`}
+              >
+                <div
+                  className={`w-2 h-2 rounded-full mr-2 animate-pulse ${
+                    userInfo.statut === "Actif" ? "bg-green-500" : "bg-orange-500"
+                  }`}
+                ></div>
+                {userInfo.statut}
+              </Badge> */}
             </div>
           </div>
 
@@ -367,60 +487,114 @@ export function TopBar({
                 >
                   <div className="relative">
                     <Avatar className="h-9 w-9 ring-2 ring-white shadow-lg">
-                      <AvatarImage src={userAvatar || "/images/user.png"} />
+                      <AvatarImage src="/images/user.png" />
                       <AvatarFallback className={`bg-gradient-to-r ${theme.gradient} text-white font-bold text-sm`}>
-                        {userName
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")
-                          .toUpperCase()}
+                        {getInitials(userInfo.nom, userInfo.prenom)}
                       </AvatarFallback>
                     </Avatar>
-                    <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-white shadow-sm"></div>
+                    <div
+                      // className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white shadow-sm ${
+                      //   userInfo.statut === "Actif" ? "bg-green-500" : "bg-orange-500"
+                      // }`}
+                    ></div>
                   </div>
                   <div className="hidden sm:flex flex-col items-start">
                     <span className="text-sm font-semibold text-gray-900 group-hover:text-gray-700 transition-colors">
-                      {userName}
+                      {fullName}
                     </span>
-                    <span className={`text-xs ${theme.textColor} font-medium`}>{userRole}</span>
+                    <span className={`text-xs ${theme.textColor} font-medium`}>{userInfo.role}</span>
                   </div>
                   <ChevronDown className="h-4 w-4 text-gray-400 group-hover:text-gray-600 transition-colors" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-64 shadow-2xl border-0 bg-white/95 backdrop-blur-xl">
+              <DropdownMenuContent align="end" className="w-80 shadow-2xl border-0 bg-white/95 backdrop-blur-xl">
                 <DropdownMenuLabel className="p-4">
                   <div className="flex items-center space-x-3">
                     <Avatar className="h-12 w-12 ring-2 ring-gray-200">
-                      <AvatarImage src={userAvatar || "/images/user.png"} />
+                      <AvatarImage src="/images/user.png" />
                       <AvatarFallback className={`bg-gradient-to-r ${theme.gradient} text-white font-bold`}>
-                        {userName
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")
-                          .toUpperCase()}
+                        {getInitials(userInfo.nom, userInfo.prenom)}
                       </AvatarFallback>
                     </Avatar>
-                    <div>
-                      <p className="font-semibold text-gray-900">{userName}</p>
-                      <p className={`text-sm ${theme.textColor} font-medium`}>{userRole}</p>
+                    <div className="flex-1">
+                      <p className="font-semibold text-gray-900">{fullName}</p>
+                      <div className="flex items-center space-x-2 mt-1">
+                        <Badge className={`text-xs ${theme.badgeColor} text-white`}>{userInfo.role}</Badge>
+                        {/* {userInfo.statut && (
+                          <Badge variant="outline" className="text-xs">
+                            {userInfo.statut}
+                          </Badge>
+                        )} */}
+                      </div>
+
+                      {/* Informations détaillées */}
+                      <div className="mt-3 space-y-2 text-xs text-gray-600">
+                        {userInfo.email && (
+                          <div className="flex items-center space-x-2">
+                            <Mail className="h-3 w-3" />
+                            <span>{userInfo.email}</span>
+                          </div>
+                        )}
+
+                        {/* {userInfo.specialite && (
+                          <div className="flex items-center space-x-2">
+                            <Shield className="h-3 w-3" />
+                            <span>Spécialité: {userInfo.specialite}</span>
+                          </div>
+                        )}
+
+                        {userInfo.numOrdre && (
+                          <div className="flex items-center space-x-2">
+                            <User className="h-3 w-3" />
+                            <span>N° Ordre: {userInfo.numOrdre}</span>
+                          </div>
+                        )}
+
+                        {userInfo.telephone && (
+                          <div className="flex items-center space-x-2">
+                            <Phone className="h-3 w-3" />
+                            <span>{userInfo.telephone}</span>
+                          </div>
+                        )}
+
+                        {userInfo.adresse && (
+                          <div className="flex items-center space-x-2">
+                            <MapPin className="h-3 w-3" />
+                            <span>{userInfo.adresse}</span>
+                          </div>
+                        )}
+
+                        {userInfo.dateNaissance && (
+                          <div className="flex items-center space-x-2">
+                            <Calendar className="h-3 w-3" />
+                            <span>Né(e) le: {formatDate(userInfo.dateNaissance)}</span>
+                          </div>
+                        )} */}
+                      </div>
                     </div>
                   </div>
                 </DropdownMenuLabel>
+
                 <DropdownMenuSeparator />
+
                 <DropdownMenuItem className={`${theme.hoverBg} transition-colors`}>
                   <User className="mr-3 h-4 w-4" />
                   Mon Profil
                 </DropdownMenuItem>
+
                 <DropdownMenuItem className={`${theme.hoverBg} transition-colors`}>
                   <Settings className="mr-3 h-4 w-4" />
                   Paramètres
                 </DropdownMenuItem>
+
                 <DropdownMenuItem className={`${theme.hoverBg} transition-colors`}>
                   <Bell className="mr-3 h-4 w-4" />
                   Notifications
                 </DropdownMenuItem>
+
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-red-600 hover:bg-red-50 transition-colors">
+
+                <DropdownMenuItem className="text-red-600 hover:bg-red-50 transition-colors" onClick={handleLogout}>
                   <LogOut className="mr-3 h-4 w-4" />
                   Déconnexion
                 </DropdownMenuItem>

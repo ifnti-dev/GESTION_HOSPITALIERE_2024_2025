@@ -58,6 +58,28 @@ export function useLignesCommande(commandeId?: number) {
     }
   }, [])
 
+  const createFifoLigne = useCallback(async (commandeId: number, medicamentReferenceId: number, quantite: number) => {
+    setLoading(true)
+    setError(null)
+
+    try {
+      console.log("Création FIFO d'une ligne de commande:", { commandeId, medicamentReferenceId, quantite })
+      const newLigne = await ligneCommandeService.createFifoLigneCommande(commandeId, medicamentReferenceId, quantite)
+      console.log("Ligne FIFO créée:", newLigne)
+
+      // Mise à jour de l'état local
+      setLignes((prev) => [...prev, newLigne])
+
+      return newLigne
+    } catch (err) {
+      console.error("Erreur lors de la création FIFO de la ligne:", err)
+      setError(err instanceof Error ? err.message : "Erreur lors de la création FIFO de la ligne")
+      throw err
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
   const updateLigne = useCallback(async (id: number, ligneData: Partial<LigneCommande>) => {
     setLoading(true)
     setError(null)
@@ -110,6 +132,7 @@ export function useLignesCommande(commandeId?: number) {
     loading,
     error,
     createLigne,
+    createFifoLigne,
     updateLigne,
     deleteLigne,
     refetch,

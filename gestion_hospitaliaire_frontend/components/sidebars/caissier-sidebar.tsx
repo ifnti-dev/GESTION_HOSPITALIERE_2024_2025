@@ -30,7 +30,7 @@ import {
   RefreshCw,
 } from "lucide-react"
 import Link from "next/link"
-import { TopBar } from "../top-bar"
+// import { TopBar } from "../top-bar"
 
 interface CaissierSidebarProps {
   children: React.ReactNode
@@ -260,13 +260,13 @@ export function CaissierSidebar({ children }: CaissierSidebarProps) {
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* TopBar */}
-        <TopBar
+        {/* <TopBar
           userRole="Caissier"
           userName="Julie Bernard"
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}
           isMobile={isMobile}
-        />
+        /> */}
 
         {/* Page Content */}
         <main className="flex-1 overflow-auto p-6 bg-gray-50">{children}</main>

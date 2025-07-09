@@ -1,45 +1,16 @@
+import type React from "react"
 import type { Metadata } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
+import { Inter } from "next/font/google"
 import "./globals.css"
+import { ThemeProvider } from "@/components/theme-provider"
+import { Toaster } from "@/components/ui/toaster"
+import { AuthProvider } from "@/contexts/AuthContext"
 
-// Import des polices
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-})
+const inter = Inter({ subsets: ["latin"] })
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-})
-
-// Métadonnées pour l'onglet, les favicons, etc.
 export const metadata: Metadata = {
-  title: "HospitalCare - Système de Gestion Hospitalière",
-  description:
-    "Plateforme complète de gestion hospitalière pour optimiser les soins et centraliser les données médicales.",
-  icons: {
-    icon: [
-      {
-        url: "/projeticon.png",
-        sizes: "32x32",
-        type: "image/png",
-      },
-      {
-        url: "/projeticon.png",
-        sizes: "16x16",
-        type: "image/png",
-      },
-    ],
-    apple: [
-      {
-        url: "/projeticon.png",
-        sizes: "180x180",
-        type: "image/png",
-      },
-    ],
-    shortcut: "/projeticon.png",
-  },
+  title: "Gestion Hospitalière",
+  description: "Système de gestion hospitalière moderne",
 }
 
 export default function RootLayout({
@@ -48,8 +19,15 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="fr" className={`${geistSans.variable} ${geistMono.variable}`}>
-      <body className="antialiased">{children}</body>
+    <html lang="fr" suppressHydrationWarning>
+      <body className={inter.className}>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+          <AuthProvider>
+            {children}
+            <Toaster />
+          </AuthProvider>
+        </ThemeProvider>
+      </body>
     </html>
   )
 }
