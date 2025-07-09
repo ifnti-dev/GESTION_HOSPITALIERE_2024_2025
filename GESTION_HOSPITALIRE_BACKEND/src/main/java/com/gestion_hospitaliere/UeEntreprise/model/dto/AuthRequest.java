@@ -1,10 +1,24 @@
 package com.gestion_hospitaliere.UeEntreprise.model.dto;
 
-public class AuthRequest {
-    private String email;
-    private String motDePasse;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-    // Getters & setters
+public class AuthRequest {
+    
+    @JsonProperty("email")
+    private String email;
+    
+    @JsonProperty("password")
+    private String password;
+
+    // Constructeurs
+    public AuthRequest() {}
+
+    public AuthRequest(String email, String password) {
+        this.email = email;
+        this.password = password;
+    }
+
+    // Getters et Setters
     public String getEmail() {
         return email;
     }
@@ -13,11 +27,19 @@ public class AuthRequest {
         this.email = email;
     }
 
-    public String getMotDePasse() {
-        return motDePasse;
+    public String getPassword() {
+        return password;
     }
 
-    public void setMotDePasse(String motDePasse) {
-        this.motDePasse = motDePasse;
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    @Override
+    public String toString() {
+        return "AuthRequest{" +
+                "email='" + email + '\'' +
+                ", password='[PROTECTED]'" +
+                '}';
     }
 }

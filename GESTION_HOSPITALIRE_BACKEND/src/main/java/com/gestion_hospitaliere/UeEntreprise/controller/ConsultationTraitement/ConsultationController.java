@@ -36,30 +36,30 @@ public class ConsultationController {
     }
 
     // // Créer une nouvelle consultation
-   @PostMapping
-public ResponseEntity<?> createConsultation(@RequestBody Consultation consultation) {
-    try {
-        Consultation savedConsultation = consultationService.saveConsultation(consultation);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedConsultation);
-    } catch (IllegalArgumentException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404 avec message lisible
-    } catch (Exception e) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur interne : " + e.getMessage());
-    }
-}
+//    @PostMapping
+// public ResponseEntity<?> createConsultation(@RequestBody Consultation consultation) {
+//     try {
+//         Consultation savedConsultation = consultationService.saveConsultation(consultation);
+//         return ResponseEntity.status(HttpStatus.CREATED).body(savedConsultation);
+//     } catch (IllegalArgumentException e) {
+//         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404 avec message lisible
+//     } catch (Exception e) {
+//         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur interne : " + e.getMessage());
+//     }
+// }
 
 
 
-    // Mettre à jour une consultation existante
-    @PutMapping("/{id}")
-    public ResponseEntity<Consultation> updateConsultation(@PathVariable Long id, @RequestBody Consultation consultationDetails) {
-        try {
-            Consultation updatedConsultation = consultationService.updateConsultation(id, consultationDetails);
-            return ResponseEntity.ok(updatedConsultation);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
-    }
+//     // Mettre à jour une consultation existante
+//     @PutMapping("/{id}")
+//     public ResponseEntity<Consultation> updateConsultation(@PathVariable Long id, @RequestBody Consultation consultationDetails) {
+//         try {
+//             Consultation updatedConsultation = consultationService.updateConsultation(id, consultationDetails);
+//             return ResponseEntity.ok(updatedConsultation);
+//         } catch (RuntimeException e) {
+//             return ResponseEntity.notFound().build();
+//         }
+//     }
 
     // Supprimer une consultation
     @DeleteMapping("/{id}")

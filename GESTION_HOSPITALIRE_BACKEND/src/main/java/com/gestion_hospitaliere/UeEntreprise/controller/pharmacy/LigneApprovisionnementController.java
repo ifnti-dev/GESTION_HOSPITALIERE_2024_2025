@@ -73,8 +73,8 @@ public class LigneApprovisionnementController {
 //        return ligneApprovisionnementService.getByMedicamentId(medicamentId);
 //    }
 
-    @GetMapping("/expiration-before")
-    public List<LigneApprovisionnement> getByDateExpirationBefore(@RequestParam LocalDate date) {
-        return ligneApprovisionnementService.getByDateExpirationBefore(date);
-    }
+    // @GetMapping("/expiration-before")
+    // public List<LigneApprovisionnement> getByDateExpirationBefore(@RequestParam LocalDate date) {
+    //     return ligneApprovisionnementService.getByDateExpirationBefore(date);
+    // }
 }

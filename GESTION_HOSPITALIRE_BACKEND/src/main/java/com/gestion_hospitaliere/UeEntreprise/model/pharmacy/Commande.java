@@ -1,6 +1,5 @@
 package com.gestion_hospitaliere.UeEntreprise.model.pharmacy;
 
-
 import java.time.LocalDate;
 import java.util.List;
 
@@ -13,6 +12,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.FetchType;
 
 import com.gestion_hospitaliere.UeEntreprise.model.User.Personne;
 
@@ -27,52 +28,106 @@ public class Commande {
 
     @ManyToOne
     @JoinColumn(name = "personne_id")
-    @JsonIgnore
     private Personne personne;
 
-    @OneToMany(mappedBy = "commande")
-    @JsonIgnore
+    @OneToMany(mappedBy = "commande", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<LigneCommande> lignesCommande;
 
-	public Long getId() {
-		return id;
-	}
+    // Constructeurs
+    public Commande() {}
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public Commande(LocalDate dateCommande, String montantTotal, Personne personne) {
+        this.dateCommande = dateCommande;
+        this.montantTotal = montantTotal;
+        this.personne = personne;
+    }
 
-	public LocalDate getDateCommande() {
-		return dateCommande;
-	}
+    // Getters et Setters
+    public Long getId() {
+        return id;
+    }
 
-	public void setDateCommande(LocalDate dateCommande) {
-		this.dateCommande = dateCommande;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public String getMontantTotal() {
-		return montantTotal;
-	}
+    public LocalDate getDateCommande() {
+        return dateCommande;
+    }
 
-	public void setMontantTotal(String montantTotal) {
-		this.montantTotal = montantTotal;
-	}
+    public void setDateCommande(LocalDate dateCommande) {
+        this.dateCommande = dateCommande;
+    }
 
-	public Personne getPersonne() {
-		return personne;
-	}
+    public String getMontantTotal() {
+        return montantTotal;
+    }
 
-	public void setPersonne(Personne personne) {
-		this.personne = personne;
-	}
+    public void setMontantTotal(String montantTotal) {
+        this.montantTotal = montantTotal;
+    }
 
-	public List<LigneCommande> getLignesCommande() {
-		return lignesCommande;
-	}
+    // Méthode utilitaire pour définir le montant total à partir d'un double
+    public void setMontantTotal(double montantTotal) {
+        this.montantTotal = String.valueOf(montantTotal);
+    }
 
-	public void setLignesCommande(List<LigneCommande> lignesCommande) {
-		this.lignesCommande = lignesCommande;
-	}
-    
-    
+    // Méthode pour obtenir le montant total en double
+    public double getMontantTotalAsDouble() {
+        try {
+            return montantTotal != null ? Double.parseDouble(montantTotal) : 0.0;
+        } catch (NumberFormatException e) {
+            return 0.0;
+        }
+    }
+
+    public Personne getPersonne() {
+        return personne;
+    }
+
+    public void setPersonne(Personne personne) {
+        this.personne = personne;
+    }
+
+    public List<LigneCommande> getLignesCommande() {
+        return lignesCommande;
+    }
+
+    public void setLignesCommande(List<LigneCommande> lignesCommande) {
+        this.lignesCommande = lignesCommande;
+    }
+
+    // Méthodes utilitaires
+    public void calculerMontantTotal() {
+        if (lignesCommande != null && !lignesCommande.isEmpty()) {
+            double total = lignesCommande.stream()
+                .mapToDouble(ligne -> ligne.getQuantite() * ligne.getPrixUnitaire())
+                .sum();
+            this.montantTotal = String.valueOf(total);
+        } else {
+            this.montantTotal = "0.0";
+        }
+    }
+
+    public int getNombreLignes() {
+        return lignesCommande != null ? lignesCommande.size() : 0;
+    }
+
+    public boolean isValid() {
+        return dateCommande != null && 
+               personne != null && 
+               lignesCommande != null && 
+               !lignesCommande.isEmpty();
+    }
+
+    @Override
+    public String toString() {
+        return "Commande{" +
+                "id=" + id +
+                ", dateCommande=" + dateCommande +
+                ", montantTotal='" + montantTotal + '\'' +
+                ", personne=" + (personne != null ? personne.getNom() : "null") +
+                ", nombreLignes=" + getNombreLignes() +
+                '}';
+    }
 }
