@@ -262,7 +262,9 @@ export default function SageFemmeConsultationsPrenatalesPage() {
   }
 
   return (
-    <DashboardLayout userRole="Sage-femme">
+    // <DashboardLayout userRole="Sage-femme">
+        <DashboardLayout >
+
       <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">

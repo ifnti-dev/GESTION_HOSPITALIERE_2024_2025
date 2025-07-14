@@ -159,7 +159,6 @@ export const API_ENDPOINTS = {
     },
   },
 
-  // Utilisateurs
   UTILISATEUR: {
     // PersonneController endpoints
     PERSONNES: "/api/personne",
@@ -212,37 +211,28 @@ export const API_ENDPOINTS = {
     REFRESH: "/api/auth/refresh",
   },
 
+
+  //Consultation
+  CONSULTATIONS_TRAITEMENTS:{
+  CONSULTATIONS: "/api/consultations",
+  PRESCRIPTIONS: "/api/prescriptions",
+  SUIVIETATS: "/api/suiviEtats",
+  }
+,
+  HOSPITALISATIONS: {
+    HOSPITALISATIONS: "/api/hospitalisations",
+  },
+    
+        CONSULTATION_PRENATALE: "/api/consultations-prenatales"
+  }
+
   // Consultation
-  CONSULTATIONS_TRAITEMENTS: {
-    CONSULTATIONS: "/api/consultations",
-    PRESCRIPTIONS: "/api/prescriptions",
-    SUIVIETATS: "/api/suivietats",
-  },
-      CONSULTATION_PRENATALE: "/api/consultations-prenatales"
-  ,
-
-  // Dossiers
-  DOSSIER: {
-    DOSSIER_MEDICAL: "/api/dossiers-medical",
-    DOSSIER_MEDICAL_SEARCH: {
-      ALL: "/api/dossiers-medical",
-      BY_PATIENT: "/api/dossiers-medical/search/patient",
-      BY_DATE: "/api/dossiers-medical/search/date",
-
-
-    },
-    DOSSIER_MEDICAL_DETAILS: "/api/dossiers-medical/details",
-    DOSSIER_GROSSES: "/api/dossiers-grossesse",
-    DOSSIER_GROSSES_SEARCH: {
-      BY_PATIENT: "/api/dossiers-grossesse/search/patient",
-      BY_DATE: "/api/dossiers-grossesse/search/date",
-    },
-  },
-}
+  
 
 // Fonctions utilitaires
 export const buildApiUrl = (endpoint: string, params?: Record<string, string | number>) => {
   let url = `${API_CONFIG.BASE_URL}${endpoint}`
+
 
   if (params) {
     const searchParams = new URLSearchParams()

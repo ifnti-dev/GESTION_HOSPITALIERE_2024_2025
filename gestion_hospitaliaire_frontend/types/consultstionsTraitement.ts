@@ -14,31 +14,53 @@ export interface Consultation extends BaseEntity {
   symptomes: string
   diagnostic: string
   personne?: Personne // Relation ManyToOne
-  personneId?: number
   employe?: Employe // Relation ManyToOne
-  employeId?: number
   prescriptions?: Prescription[] // Relation OneToMany
 }
 
-// Prescription de médicaments
+export interface CreateConsultation   {
+  date: string 
+  symptomes: string
+  diagnostic: string
+  personne: {
+    id: number
+  }
+  employe: {
+    id: number
+  } 
+  prescriptions?: Prescription[]
+   createdAt?: string
+  updatedAt?: string
+
+}
 export interface Prescription extends BaseEntity {
-  quantite: number
-  posologie: string
-  duree: number
-  consultation?: Consultation // Relation ManyToOne
-  consultationId?: number
-  medicament?: Medicament // Relation ManyToOne
-  medicamentId?: number
+  date: string | Date;
+  instructions: string;
+  quantite: number;
+  posologie: string;
+  duree: number;
+  consultation?: Consultation;
+  consultationId?: number;
+  patient?: Personne;  
+  patientId?: number;
+  medicaments?: MedicamentPrescrit[];
 }
 
-// Suivi de l’état du patient
-export interface SuiviEtat extends BaseEntity {
-  date: string
-  temperature: number
-  tension: number
-  observations: string
-  personne?: Personne // Relation ManyToOne
-  personneId?: number
+
+export interface CreatePrescription {
+
+  quantite: number;
+  posologie: string;
+  duree: number;
+  consultation: {
+    id: number;
+  };
+  medicament: {
+    id: number;
+  };
+  medicaments?: MedicamentPrescrit[];
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 
@@ -78,4 +100,72 @@ export type CreateConsultationPayload = Omit<ConsultationPrenatale, 'id' | 'nomP
 
 
 export type UpdateConsultationPayload = Omit<ConsultationPrenatale, 'nomPatiente'>;
+export interface MedicamentPrescrit {
+  id?: number;
+  medicament: Medicament;
+  medicamentId: number;
+  dosage: string;
+  quantite: number;
+  posologie: string;
+}
+
+// export interface MedicamentPrescrit {
+//   id?: number;
+//   medicament: Medicament;
+//   medicamentId: number;
+//   dosage: string;
+//   quantite: number;
+//   posologie: string;
+// }
+
+// Suivi de l’état du patient// @/types/suivieEtat.ts
+
+export interface SuivieEtat {
+  id: number;
+  date: string;
+  tension: string;
+  temperature: number;
+  frequenceCardiaque: number;
+  frequenceRespiratoire: number;
+  personne: { id: number; nom: string };
+  employe: { id: number; nom: string };
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateSuivieEtat {
+  date: string;
+  tension: string;
+  temperature: number;
+  frequenceCardiaque: number;
+  frequenceRespiratoire: number;
+  personne?: { id: number };
+  employe?: { id: number };
+}
+
+export interface Hospitalisation {
+  id: number
+  date_entree: string
+  date_sortie?: string
+  lit: number
+  patient?: Personne
+  service?: {
+    id: number
+    nom: string
+  }
+  createdAt?: string
+  updatedAt?: string
+}
+
+export interface CreateHospitalisation {
+  date_entree: string
+  date_sortie?: string
+  lit: number
+  patient: {
+    id: number
+  }
+  service: {
+    id: number
+  }
+}
 

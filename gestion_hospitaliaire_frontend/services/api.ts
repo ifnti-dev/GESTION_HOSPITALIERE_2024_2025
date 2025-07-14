@@ -1,33 +1,10 @@
 import { API_CONFIG, API_HEADERS, CORS_CONFIG } from "@/config/api"
 
-// Gestion des erreurs Spring Boot
-export class ApiError extends Error {
-  constructor(
-    message: string,
-    public status: number,
-    public code?: string,
-    public timestamp?: string,
-    public path?: string,
-  ) {
-    super(message)
-    this.name = "ApiError"
-  }
-}
-
-// Interface pour les réponses d'erreur Spring Boot
-interface SpringBootErrorResponse {
-  timestamp: string
-  status: number
-  statusText: string
-}
-
-// Interface générique pour les réponses API
 interface ApiResponse<T = any> {
   data: T
   status: number
   statusText: string
 }
-
 
 class ApiClient {
   private baseURL: string

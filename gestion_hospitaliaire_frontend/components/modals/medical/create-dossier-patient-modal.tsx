@@ -30,9 +30,22 @@ import {
 import { Check, ChevronsUpDown } from "lucide-react" // Keep these imports
 // import { getPersonnes } from "@/services/utilisateur/personne.service" // Removed: patients are now passed as a prop
 import { cn } from "@/lib/utils" // Assurez-vous que ce chemin est correct et que cn est exporté
+<<<<<<< HEAD:gestion_hospitaliaire_frontend/components/modals/medical/create-dossier-patient-modal.tsx
 import type { Personne } from "@/types/utilisateur" // Assurez-vous que ce chemin est correct
 import { toast } from "sonner"
 import type { CreateDossierMedicalPayload, DossierMedical } from "@/types/medical" // Assurez-vous que ce chemin est correct
+=======
+import { Patient } from "@/types/pharmacie"
+
+export interface DossierFormData {
+  patientId: string
+  antecedents: string
+  allergies: string
+  traitementsEnCours: string
+  tension: number
+  groupeSanguin: string
+}
+>>>>>>> 738f0b9f087657a01c1b98f31628b563e5c24d16:gestion_hospitaliaire_frontend/components/modals/create-dossier-patient-modal.tsx
 
 interface CreateDossierPatientModalProps {
   isOpen: boolean
@@ -132,11 +145,19 @@ export function CreateDossierPatientModal({
       allergies,
       traitementsEnCours,
       tension: tensionValue,
+<<<<<<< HEAD:gestion_hospitaliaire_frontend/components/modals/medical/create-dossier-patient-modal.tsx
       groupeSanguin: groupeSanguin as string,
     }
 
     onSubmit(payload, isEditMode ? initialData.id : undefined)
     onOpenChange(false) // Parent component will close the modal
+=======
+      groupeSanguin,
+    })
+       onOpenChange(false) // Ferme la modale après soumission
+    resetForm() // Assure la réinitialisation pour la prochaine ouverture
+   
+>>>>>>> 738f0b9f087657a01c1b98f31628b563e5c24d16:gestion_hospitaliaire_frontend/components/modals/create-dossier-patient-modal.tsx
   }
 
   return (
@@ -164,9 +185,15 @@ export function CreateDossierPatientModal({
                   id="patient-combobox"
                 >
                   {selectedPatientId
+<<<<<<< HEAD:gestion_hospitaliaire_frontend/components/modals/medical/create-dossier-patient-modal.tsx
                     ? patients.find((p) => p.id?.toString() === selectedPatientId)?.prenom +
                       " " +
                       patients.find((p) => p.id?.toString() === selectedPatientId)?.nom
+=======
+                    ? patients.find((patient) => String(patient.id) === String(selectedPatientId))?.prenom +
+                      " " +
+                      patients.find((patient) => String(patient.id) === String(selectedPatientId))?.nom
+>>>>>>> 738f0b9f087657a01c1b98f31628b563e5c24d16:gestion_hospitaliaire_frontend/components/modals/create-dossier-patient-modal.tsx
                     : "Sélectionner un patient..."}
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
@@ -189,7 +216,11 @@ export function CreateDossierPatientModal({
                           <Check
                             className={cn(
                               "mr-2 h-4 w-4",
+<<<<<<< HEAD:gestion_hospitaliaire_frontend/components/modals/medical/create-dossier-patient-modal.tsx
                               String(selectedPatientId) === String(patient.id) ? "opacity-100" : "opacity-0"
+=======
+                              selectedPatientId === String(patient.id) ? "opacity-100" : "opacity-0"
+>>>>>>> 738f0b9f087657a01c1b98f31628b563e5c24d16:gestion_hospitaliaire_frontend/components/modals/create-dossier-patient-modal.tsx
                             )}
                           />
                           {patient.prenom} {patient.nom} ({patient.dateNaissance})
