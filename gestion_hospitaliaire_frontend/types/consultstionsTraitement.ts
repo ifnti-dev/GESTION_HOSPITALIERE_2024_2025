@@ -63,6 +63,43 @@ export interface CreatePrescription {
   updatedAt?: string;
 }
 
+
+
+
+export type ConsultationPrenatale = {
+  id: number;
+  patiente: Personne;
+  dateConsultation: string; // Format "YYYY-MM-DD"
+  semaineAmenorrhee: number;
+  poids: number;
+  tensionArterielle: string;
+  hauteurUterine: number | null;
+  bruitsCardiaquesFoetaux: string | null;
+  observations: string | null;
+  prochainRdv: string | null; // Format "YYYY-MM-DD"
+  alerte: string | null;
+};
+
+
+export type CreateConsultationPrenatalePayload = {
+  patiente:{
+    id: number;
+   };
+  dateConsultation: string; // Format "YYYY-MM-DD"
+  semaineAmenorrhee: number;
+  poids: number;
+  tensionArterielle: string;
+  hauteurUterine?: number | null;
+  bruitsCardiaquesFoetaux?: string | null;
+  observations?: string | null;
+  prochainRdv?: string | null; // Format "YYYY-MM-DD"
+  alerte?: string | null;
+};
+
+export type CreateConsultationPayload = Omit<ConsultationPrenatale, 'id' | 'nomPatiente'>;
+
+
+export type UpdateConsultationPayload = Omit<ConsultationPrenatale, 'nomPatiente'>;
 export interface MedicamentPrescrit {
   id?: number;
   medicament: Medicament;

@@ -26,6 +26,7 @@ import {
   User,
   ChevronRight,
   AlertCircle,
+  ChevronDown,
 } from "lucide-react"
 import Link from "next/link"
 import { TopBar } from "../top-bar"
@@ -37,6 +38,7 @@ interface MedecinSidebarProps {
 export function MedecinSidebar({ children }: MedecinSidebarProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [isMobile, setIsMobile] = useState(false)
+  const [openMenu, setOpenMenu] = useState<string | null>(null)
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -68,8 +70,17 @@ export function MedecinSidebar({ children }: MedecinSidebarProps) {
     {
       title: "Dossiers Médicaux",
       icon: <FileText className="h-5 w-5" />,
-      href: "/dashboard/medecin/dossiers",
       gradient: "from-indigo-500 to-blue-500",
+      subItems: [
+        {
+          title: "Dossiers Médicaux",
+          href: "/dashboard/medecin/dossiers/medical",
+        },
+        {
+          title: "Dossiers Grossesse",
+          href: "/dashboard/medecin/dossiers/grossesse",
+        },
+      ],
     },
     {
       title: "Consultations",
@@ -181,36 +192,80 @@ export function MedecinSidebar({ children }: MedecinSidebarProps) {
             </h3>
             <nav className="space-y-2">
               {menuItems.map((item, index) => (
-                <Link
-                  key={index}
-                  href={item.href}
-                  onClick={closeSidebar}
-                  className="group relative flex items-center justify-between p-4 rounded-xl
-                           hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-50
-                           hover:shadow-lg hover:shadow-blue-100/50
-                           transition-all duration-300 ease-out
-                           border border-transparent hover:border-blue-100
-                           transform hover:scale-[1.02] hover:-translate-y-0.5"
-                >
-                  <div className="flex items-center space-x-4">
-                    <div
-                      className={`p-2 rounded-lg bg-gradient-to-r ${item.gradient} shadow-lg group-hover:shadow-xl transition-all duration-300`}
+                item.subItems ? (
+                  <div key={index}>
+                    <button
+                      onClick={() => setOpenMenu(openMenu === item.title ? null : item.title)}
+                      className="w-full group relative flex items-center justify-between p-4 rounded-xl
+                                 hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-50
+                                 hover:shadow-lg hover:shadow-blue-100/50
+                                 transition-all duration-300 ease-out
+                                 border border-transparent hover:border-blue-100
+                                 transform hover:scale-[1.02] hover:-translate-y-0.5"
                     >
-                      <div className="text-white drop-shadow">{item.icon}</div>
-                    </div>
-                    <span className="font-semibold text-gray-700 group-hover:text-blue-700 transition-colors">
-                      {item.title}
-                    </span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    {item.badge && (
-                      <Badge className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg px-3 py-1 text-xs font-bold">
-                        {item.badge}
-                      </Badge>
+                      <div className="flex items-center space-x-4">
+                        <div
+                          className={`p-2 rounded-lg bg-gradient-to-r ${item.gradient} shadow-lg group-hover:shadow-xl transition-all duration-300`}
+                        >
+                          <div className="text-white drop-shadow">{item.icon}</div>
+                        </div>
+                        <span className="font-semibold text-gray-700 group-hover:text-blue-700 transition-colors">
+                          {item.title}
+                        </span>
+                      </div>
+                      <ChevronDown
+                        className={`h-5 w-5 text-blue-400 transition-transform duration-300 ${
+                          openMenu === item.title ? "rotate-180" : ""
+                        }`}
+                      />
+                    </button>
+                    {openMenu === item.title && (
+                      <div className="pl-12 mt-1 space-y-1">
+                        {item.subItems.map((subItem) => (
+                          <Link
+                            key={subItem.href}
+                            href={subItem.href}
+                            onClick={closeSidebar}
+                            className="flex items-center p-3 text-sm font-medium text-gray-600 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-colors"
+                          >
+                            {subItem.title}
+                          </Link>
+                        ))}
+                      </div>
                     )}
-                    <ChevronRight className="h-4 w-4 text-blue-400 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-1" />
                   </div>
-                </Link>
+                ) : (
+                  <Link
+                    key={index}
+                    href={item.href}
+                    onClick={closeSidebar}
+                    className="group relative flex items-center justify-between p-4 rounded-xl
+                             hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-50
+                             hover:shadow-lg hover:shadow-blue-100/50
+                             transition-all duration-300 ease-out
+                             border border-transparent hover:border-blue-100
+                             transform hover:scale-[1.02] hover:-translate-y-0.5"
+                  >
+                    <div className="flex items-center space-x-4">
+                      <div
+                        className={`p-2 rounded-lg bg-gradient-to-r ${item.gradient} shadow-lg group-hover:shadow-xl transition-all duration-300`}
+                      >
+                        <div className="text-white drop-shadow">{item.icon}</div>
+                      </div>
+                      <span className="font-semibold text-gray-700 group-hover:text-blue-700 transition-colors">
+                        {item.title}
+                      </span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      {item.badge && (
+                        <Badge className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg px-3 py-1 text-xs font-bold">
+                          {item.badge}
+                        </Badge>
+                      )}
+                      <ChevronRight className="h-4 w-4 text-blue-400 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-1" />
+                    </div>
+                  </Link>
+                )
               ))}
             </nav>
           </div>

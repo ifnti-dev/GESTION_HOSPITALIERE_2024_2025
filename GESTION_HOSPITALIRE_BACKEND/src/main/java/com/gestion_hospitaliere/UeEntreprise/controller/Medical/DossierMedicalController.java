@@ -2,8 +2,8 @@ package com.gestion_hospitaliere.UeEntreprise.controller.Medical;
 
 import java.util.List;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -51,7 +51,8 @@ public class DossierMedicalController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<DossierMedical> updateDossier(@PathVariable Long id, @RequestBody DossierMedical dossierDetails) {
+    public ResponseEntity<DossierMedical> updateDossier(@PathVariable Long id,
+            @RequestBody DossierMedical dossierDetails) {
         try {
             DossierMedical updated = dossierMedicalService.updateDossier(id, dossierDetails);
             return ResponseEntity.ok(updated);
@@ -61,12 +62,13 @@ public class DossierMedicalController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteDossier(@PathVariable Long id) {
+    public ResponseEntity<String> deleteDossier(@PathVariable Long id) {
         if (dossierMedicalService.getDossierById(id).isPresent()) {
             dossierMedicalService.deleteDossier(id);
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.ok("✅ Dossier médical supprimé avec succès.");
         } else {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("❌ Dossier non trouvé.");
         }
     }
+
 }

@@ -1,114 +1,186 @@
 "use client"
 
-import { DashboardLayout } from "@/components/dashboard-layout"
+import {DashboardLayout} from "../../../../../components/dashboard-layout"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
 import { FileText, Search, Filter, Eye, Edit, Trash2, FilePlus, Activity, AlertCircle, Clock } from "lucide-react"
-import { useState } from "react"
+import { useState, useEffect, useMemo } from "react"
+import { CreateDossierPatientModal } from "@/components/modals/medical/create-dossier-patient-modal"
+import { ViewDossierPatientModal } from "@/components/modals/medical/view-dossier-patient-modal"
+import { ConfirmationModal } from "@/components/modals/confirmation-modal"
+import { dossierMedicalService } from "@/services/medical/dossier-medical.service"
+import { getPersonnesPasMedical } from "@/services/utilisateur/personne.service"
+
+
+import type { CreateDossierMedicalPayload, DossierMedical } from "@/types/medical" // Assurez-vous que ce chemin est correct
+
+import { Personne } from "@/types/utilisateur"
+import { toast } from "sonner"
 
 export default function MedecinDossiersPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [dossiers, setDossiers] = useState<DossierMedical[]>([])
+  const [patientsSansDossier, setPatientsSansDossier] = useState<Personne[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  // Données simulées des dossiers médicaux
-  const dossiers = [
-    {
-      id: 1,
-      numeroDossier: "DM-2024-001",
-      patient: {
-        nom: "Dubois",
-        prenom: "Marie",
-        dateNaissance: "1985-03-15",
-        numeroSecu: "1850315123456",
-      },
-      dateCreation: "2024-01-10",
-      derniereMiseAJour: "2024-01-20",
-      status: "actif",
-      nombreConsultations: 12,
-      nombrePrescriptions: 8,
-      nombreExamens: 5,
-      antecedents: ["Hypertension", "Diabète Type 2"],
-      allergies: ["Pénicilline", "Arachides"],
-      traitements: ["Metformine 500mg", "Lisinopril 10mg"],
-      observations: "Patient suivi régulièrement pour diabète et hypertension",
-      medecin: "Dr. Jean Dupont",
-      urgence: false,
-    },
-    {
-      id: 2,
-      numeroDossier: "DM-2024-002",
-      patient: {
-        nom: "Martin",
-        prenom: "Jean",
-        dateNaissance: "1970-08-22",
-        numeroSecu: "1700822987654",
-      },
-      dateCreation: "2024-01-05",
-      derniereMiseAJour: "2024-01-22",
-      status: "actif",
-      nombreConsultations: 8,
-      nombrePrescriptions: 6,
-      nombreExamens: 3,
-      antecedents: ["Asthme", "Cholestérol"],
-      allergies: ["Aspirine"],
-      traitements: ["Ventoline", "Atorvastatine 20mg"],
-      observations: "Asthme bien contrôlé, surveillance du cholestérol",
-      medecin: "Dr. Jean Dupont",
-      urgence: true,
-    },
-    {
-      id: 3,
-      numeroDossier: "DM-2023-156",
-      patient: {
-        nom: "Laurent",
-        prenom: "Sophie",
-        dateNaissance: "1992-12-05",
-        numeroSecu: "2921205147258",
-      },
-      dateCreation: "2023-06-15",
-      derniereMiseAJour: "2023-11-20",
-      status: "archivé",
-      nombreConsultations: 4,
-      nombrePrescriptions: 2,
-      nombreExamens: 1,
-      antecedents: ["Migraine"],
-      allergies: [],
-      traitements: [],
-      observations: "Migraines occasionnelles, traitement symptomatique",
-      medecin: "Dr. Jean Dupont",
-      urgence: false,
-    },
-  ]
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false)
+  const [dossierToView, setDossierToView] = useState<DossierMedical | null>(null)
+  const [dossierToEdit, setDossierToEdit] = useState<DossierMedical | null>(null)
+  const [editingDossierId, setEditingDossierId] = useState<number | null>(null)
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false)
+  const [dossierToDeleteId, setDossierToDeleteId] = useState<number | null>(null)
+
+  const fetchDossiers = async () => {
+    try {
+      const data = await dossierMedicalService.getAllDossiers()
+      setDossiers(data)
+    } catch (err) {
+      toast.error("Erreur lors de la récupération des dossiers.")
+      console.error(err)
+    }
+  }
+  const fetchPatientsSansDossier = async () => {
+    try {
+      const data = await getPersonnesPasMedical()
+      setPatientsSansDossier(data)
+    } catch (err) {
+      toast.error("Erreur lors de la récupération des patients.")
+      console.error(err)
+    }
+  }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true)
+      setError(null)
+      try {
+        // Using Promise.all to fetch in parallel
+        const [dossiersData, patientsData] = await Promise.all([
+          dossierMedicalService.getAllDossiers(),
+          getPersonnesPasMedical(),
+        ]) 
+        setDossiers(dossiersData)
+        setPatientsSansDossier(patientsData)
+      } catch (err) {
+        setError("Erreur lors de la récupération des données.")
+        console.error(err)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    fetchData()
+  }, [])
+
+  const handleViewDossier = (dossier: DossierMedical) => {
+    setDossierToView(dossier)
+    setIsViewModalOpen(true)
+  }
+
+  const handleOpenAddModal = () => {
+    setDossierToEdit(null)
+    setIsModalOpen(true)
+  }
+
+  const handleOpenEditModal = async (dossier: DossierMedical) => {
+    if (!dossier.id) return
+    setEditingDossierId(dossier.id)
+    try {
+      // Utiliser le service pour récupérer les données complètes et à jour
+      const fullDossierData = await dossierMedicalService.getDossierById(dossier.id)
+      console.log(fullDossierData);
+      
+      setDossierToEdit(fullDossierData)
+      setIsModalOpen(true)
+    } catch (error) {
+      toast.error("Impossible de charger les données du dossier pour la modification.")
+      console.error("Error fetching dossier for edit:", error)
+    } finally {
+      setEditingDossierId(null)
+    }
+  }
+
+  const handleModalSubmit = async (formData: CreateDossierMedicalPayload, id?: number) => {
+    try {
+      if (id) {
+        await dossierMedicalService.updateDossier(id, formData)
+        toast.success("Dossier médical mis à jour avec succès !")
+      } else {
+        await dossierMedicalService.createDossier(formData)
+        toast.success("Dossier médical créé avec succès !")
+        // Refetch patients only on creation as a new one is now used
+        fetchPatientsSansDossier()
+      }
+      setIsModalOpen(false)
+      fetchDossiers() // Always refetch dossiers list
+    } catch (error) {
+      const action = id ? "de la mise à jour" : "de la création"
+      toast.error(`Erreur lors ${action} du dossier.`)
+      console.error(error)
+    }
+  }
+
+  const requestDeleteDossier = (dossierId: number | undefined) => {
+    if (dossierId === undefined) {
+      toast.error("ID du dossier non valide pour la suppression.");
+      return;
+    }
+    setDossierToDeleteId(dossierId)
+    setIsDeleteConfirmOpen(true)
+  }
+
+  const handleConfirmDelete = async () => {
+    if (dossierToDeleteId === null) return
+    
+    try {
+      await dossierMedicalService.deleteDossier(dossierToDeleteId);
+      // Met à jour la liste des dossiers localement pour une mise à jour instantanée de l'UI
+      setDossiers((prevDossiers) => prevDossiers.filter((d) => d.id !== dossierToDeleteId));
+      toast.success("Dossier médical supprimé avec succès !");
+      // Rafraîchit la liste des patients pour que celui dont le dossier a été supprimé soit à nouveau disponible
+      fetchPatientsSansDossier();
+    } catch (error) {
+      toast.error("Erreur lors de la suppression du dossier.");
+      console.error(error);
+    } finally {
+      setDossierToDeleteId(null)
+    }
+  };
+
+  const patientsForModal = useMemo(() => {
+    // En mode édition, nous devons afficher le patient actuel dans la liste,
+    // en plus des patients qui n'ont pas encore de dossier.
+    if (dossierToEdit && dossierToEdit.personne) {
+      const allPatients = [...patientsSansDossier]
+      // Ajoute le patient en cours de modification à la liste s'il n'y est pas déjà
+      if (!patientsSansDossier.some(p => p.id === dossierToEdit.personne.id)) {
+        allPatients.unshift(dossierToEdit.personne)
+      }
+      return allPatients
+    }
+    // En mode création, n'afficher que les patients sans dossier.
+    return patientsSansDossier
+  }, [dossierToEdit, patientsSansDossier])
 
   const filteredDossiers = dossiers.filter((dossier) => {
+    const searchTermLower = searchTerm.toLowerCase()
     const matchesSearch =
-      dossier.numeroDossier.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      dossier.patient.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      dossier.patient.prenom.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      dossier.patient.numeroSecu.includes(searchTerm)
+      dossier.id?.toString().includes(searchTermLower) ||
+      dossier.personne?.nom?.toLowerCase().includes(searchTermLower) ||
+      dossier.personne?.prenom?.toLowerCase().includes(searchTermLower)
 
-    const matchesStatus = statusFilter === "all" || dossier.status === statusFilter
+    const matchesStatus = statusFilter === "all" //|| dossier.status === statusFilter
 
     return matchesSearch && matchesStatus
   })
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status?: string) => {
     switch (status) {
       case "actif":
         return <Badge className="bg-green-100 text-green-800 border-green-200">Actif</Badge>
@@ -119,6 +191,23 @@ export default function MedecinDossiersPage() {
       default:
         return <Badge variant="outline">{status}</Badge>
     }
+  }
+
+  if (isLoading) {
+    return (
+      <DashboardLayout userRole="Médecin">
+        <div className="flex h-full items-center justify-center">
+          <div className="flex flex-col items-center gap-2">
+            <Activity className="h-12 w-12 animate-spin text-indigo-500" />
+            <span className="text-lg text-gray-600">Chargement des données...</span>
+          </div>
+        </div>
+      </DashboardLayout>
+    )
+  }
+
+  if (error) {
+    return <DashboardLayout userRole="Médecin"><div className="text-red-500 text-center">{error}</div></DashboardLayout>
   }
 
   return (
@@ -135,53 +224,34 @@ export default function MedecinDossiersPage() {
             </h1>
             <p className="text-gray-600 mt-2">Gérez les dossiers médicaux de vos patients</p>
           </div>
-          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 shadow-lg">
-                <FilePlus className="h-4 w-4 mr-2" />
-                Nouveau Dossier
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl">
-              <DialogHeader>
-                <DialogTitle>Créer un Nouveau Dossier Médical</DialogTitle>
-                <DialogDescription>Créez un nouveau dossier médical pour un patient</DialogDescription>
-              </DialogHeader>
-              <div className="grid grid-cols-2 gap-4 py-4">
-                <div className="space-y-2 col-span-2">
-                  <Label htmlFor="patient">Patient</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sélectionner un patient" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1">Marie Dubois - 1850315123456</SelectItem>
-                      <SelectItem value="2">Jean Martin - 1700822987654</SelectItem>
-                      <SelectItem value="3">Sophie Laurent - 2921205147258</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2 col-span-2">
-                  <Label htmlFor="antecedents">Antécédents Médicaux</Label>
-                  <Textarea id="antecedents" placeholder="Antécédents médicaux du patient" />
-                </div>
-                <div className="space-y-2 col-span-2">
-                  <Label htmlFor="allergies">Allergies</Label>
-                  <Textarea id="allergies" placeholder="Allergies connues du patient" />
-                </div>
-                <div className="space-y-2 col-span-2">
-                  <Label htmlFor="observations">Observations Initiales</Label>
-                  <Textarea id="observations" placeholder="Observations et notes initiales" />
-                </div>
-              </div>
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
-                  Annuler
-                </Button>
-                <Button className="bg-gradient-to-r from-indigo-600 to-blue-600">Créer Dossier</Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+          <div>
+            <Button
+              onClick={handleOpenAddModal}
+              className="bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 shadow-lg"
+            >
+              <FilePlus className="h-4 w-4 mr-2" />
+              Nouveau Dossier
+            </Button>
+            <CreateDossierPatientModal
+              isOpen={isModalOpen}
+              onOpenChange={setIsModalOpen}
+              onSubmit={handleModalSubmit}
+              patients={patientsForModal}
+              initialData={dossierToEdit}
+            />
+            <ViewDossierPatientModal
+              isOpen={isViewModalOpen}
+              onOpenChange={setIsViewModalOpen}
+              dossier={dossierToView}
+            />
+            <ConfirmationModal
+              isOpen={isDeleteConfirmOpen}
+              onOpenChange={setIsDeleteConfirmOpen}
+              onConfirm={handleConfirmDelete}
+              title="Confirmation de suppression"
+              description="Êtes-vous sûr de vouloir supprimer ce dossier ? Cette action est irréversible."
+            />
+          </div>
         </div>
 
         {/* Stats Cards */}
@@ -309,24 +379,24 @@ export default function MedecinDossiersPage() {
                       <TableCell>
                         <div className="space-y-1">
                           <div className="font-semibold text-gray-900 flex items-center gap-2">
-                            {dossier.urgence && <AlertCircle className="h-4 w-4 text-red-500" />}
-                            {dossier.numeroDossier}
+                            {/* {dossier.urgence && <AlertCircle className="h-4 w-4 text-red-500" />} */}
+                            DM-{dossier.id}
                           </div>
                           <div className="text-sm text-gray-600">
-                            Créé le {new Date(dossier.dateCreation).toLocaleDateString("fr-FR")}
+                            Créé le {new Date(dossier.createdAt!).toLocaleDateString("fr-FR")}
                           </div>
-                          <div className="text-xs text-gray-500">Par {dossier.medecin}</div>
+                          {/* <div className="text-xs text-gray-500">Par {dossier.medecin}</div> */}
                         </div>
                       </TableCell>
                       <TableCell>
                         <div className="space-y-1">
                           <div className="font-medium text-gray-900">
-                            {dossier.patient.prenom} {dossier.patient.nom}
+                            {dossier.personne?.prenom || "Patient"} {dossier.personne?.nom || "Inconnu"}
                           </div>
                           <div className="text-sm text-gray-600">
-                            Né(e) le {new Date(dossier.patient.dateNaissance).toLocaleDateString("fr-FR")}
+                            Né(e) le {dossier.personne?.dateNaissance ? new Date(dossier.personne.dateNaissance).toLocaleDateString("fr-FR") : "N/A"}
                           </div>
-                          <div className="text-xs text-gray-500">N° SS: {dossier.patient.numeroSecu}</div>
+                          <div className="text-xs text-gray-500">ID Patient: {dossier.personne?.id || "N/A"}</div>
                         </div>
                       </TableCell>
                       <TableCell>
@@ -334,15 +404,15 @@ export default function MedecinDossiersPage() {
                           <div className="text-sm">
                             <span className="font-medium">Antécédents:</span>
                             {dossier.antecedents.length > 0 ? (
-                              <div className="flex flex-wrap gap-1 mt-1">
-                                {dossier.antecedents.slice(0, 2).map((antecedent, idx) => (
+                              <div className="flex max-w-xs flex-wrap gap-1 mt-1">
+                                {dossier.antecedents.split(",").slice(0, 2).map((antecedent, idx) => (
                                   <Badge key={idx} className="bg-orange-100 text-orange-800 border-orange-200 text-xs">
                                     {antecedent}
                                   </Badge>
                                 ))}
-                                {dossier.antecedents.length > 2 && (
+                                {dossier.antecedents.split(",").length > 2 && (
                                   <Badge variant="outline" className="text-xs">
-                                    +{dossier.antecedents.length - 2}
+                                    +{dossier.antecedents.split(",").length - 2}
                                   </Badge>
                                 )}
                               </div>
@@ -353,15 +423,15 @@ export default function MedecinDossiersPage() {
                           <div className="text-sm">
                             <span className="font-medium">Allergies:</span>
                             {dossier.allergies.length > 0 ? (
-                              <div className="flex flex-wrap gap-1 mt-1">
-                                {dossier.allergies.slice(0, 2).map((allergie, idx) => (
+                              <div className="flex max-w-xs flex-wrap gap-1 mt-1">
+                                {dossier.allergies.split(",").slice(0, 2).map((allergie, idx) => (
                                   <Badge key={idx} variant="destructive" className="text-xs">
                                     {allergie}
                                   </Badge>
                                 ))}
-                                {dossier.allergies.length > 2 && (
+                                {dossier.allergies.split(",").length > 2 && (
                                   <Badge variant="outline" className="text-xs">
-                                    +{dossier.allergies.length - 2}
+                                    +{dossier.allergies.split(",").length - 2}
                                   </Badge>
                                 )}
                               </div>
@@ -373,46 +443,51 @@ export default function MedecinDossiersPage() {
                       </TableCell>
                       <TableCell>
                         <div className="space-y-1">
-                          <div className="text-sm">
-                            <span className="font-medium">{dossier.nombreConsultations}</span> consultations
-                          </div>
-                          <div className="text-sm">
-                            <span className="font-medium">{dossier.nombrePrescriptions}</span> prescriptions
-                          </div>
-                          <div className="text-sm">
-                            <span className="font-medium">{dossier.nombreExamens}</span> examens
-                          </div>
+                          <div className="text-sm">Tension: <span className="font-medium">{dossier.tension}</span></div>
+                          <div className="text-sm">Groupe Sanguin: <Badge variant="secondary">{dossier.groupeSanguin}</Badge></div>
                         </div>
                       </TableCell>
                       <TableCell>
                         <div className="space-y-2">
-                          {getStatusBadge(dossier.status)}
-                          {dossier.urgence && (
-                            <Badge variant="destructive" className="block w-fit">
-                              <AlertCircle className="h-3 w-3 mr-1" />
-                              Urgent
-                            </Badge>
-                          )}
+                          {/* Placeholder for status */}
+                          {getStatusBadge("actif")}
                         </div>
                       </TableCell>
                       <TableCell>
                         <div className="text-sm text-gray-600">
-                          {new Date(dossier.derniereMiseAJour).toLocaleDateString("fr-FR")}
+                          {new Date(dossier.updatedAt!).toLocaleDateString("fr-FR")}
                         </div>
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white">
+                          <Button
+                            size="sm"
+                            className="bg-green-600 hover:bg-green-700 text-white"
+                            onClick={() => handleViewDossier(dossier)}
+                          >
                             <Eye className="h-3 w-3 mr-1" />
                             Consulter
                           </Button>
-                          <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
-                            <Edit className="h-3 w-3 mr-1" />
+                          <Button
+                            size="sm"
+                            className="bg-blue-600 hover:bg-blue-700 text-white"
+                            onClick={() => handleOpenEditModal(dossier)}
+                            disabled={editingDossierId === dossier.id}
+                          >
+                            {editingDossierId === dossier.id ? (
+                              <Activity className="h-3 w-3 mr-1 animate-spin" />
+                            ) : (
+                              <Edit className="h-3 w-3 mr-1" />
+                            )}
                             Modifier
                           </Button>
-                          <Button size="sm" variant="destructive">
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => requestDeleteDossier(dossier.id)}
+                          >
                             <Trash2 className="h-3 w-3 mr-1" />
-                            Archiver
+                            Supprimer
                           </Button>
                         </div>
                       </TableCell>

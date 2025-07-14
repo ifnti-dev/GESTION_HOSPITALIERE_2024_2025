@@ -166,6 +166,9 @@ export const API_ENDPOINTS = {
 
     // EmployeController endpoints
     EMPLOYES: "/api/employe",
+    PAS_MEDICALE: "/api/personne/pas-dossier-medical",
+    PAS_GROSSES: "/api/personne/pas-dossier-grossesse",
+
     EMPLOYES_BY_ID: (id: number) => `/api/employe/${id}`,
     EMPLOYES_SEARCH: {
       BY_SPECIALITE: "/api/employe/search/specialite",
@@ -220,31 +223,11 @@ export const API_ENDPOINTS = {
     HOSPITALISATIONS: "/api/hospitalisations",
   },
     
-  
+        CONSULTATION_PRENATALE: "/api/consultations-prenatales"
   }
 
   // Consultation
-  CONSULTATIONS_TRAITEMENTS: {
-    CONSULTATIONS: "/api/consultations",
-    PRESCRIPTIONS: "/api/prescriptions",
-    SUIVIETATS: "/api/suivietats",
-  },
-
-  // Dossiers
-  DOSSIER: {
-    DOSSIER_MEDICAL: "/api/dossier-medical",
-    DOSSIER_MEDICAL_SEARCH: {
-      BY_PATIENT: "/api/dossier-medical/search/patient",
-      BY_DATE: "/api/dossier-medical/search/date",
-    },
-    DOSSIER_MEDICAL_DETAILS: "/api/dossier-medical/details",
-    DOSSIER_GROSSES: "/api/dossier-grossesses",
-    DOSSIER_GROSSES_SEARCH: {
-      BY_PATIENT: "/api/dossier-grossesses/search/patient",
-      BY_DATE: "/api/dossier-grossesses/search/date",
-    },
-  },
-}
+  
 
 // Fonctions utilitaires
 export const buildApiUrl = (endpoint: string, params?: Record<string, string | number>) => {

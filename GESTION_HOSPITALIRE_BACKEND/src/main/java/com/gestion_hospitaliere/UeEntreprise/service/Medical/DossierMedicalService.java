@@ -87,12 +87,12 @@ public class DossierMedicalService {
         DossierMedical dossier = dossierMedicalRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Dossier non trouvé"));
 
-        // Détacher le dossier du Patient (côté propriétaire ET inverse)
-        // Patient patient = dossier.getPersonne();
-        // if (patient != null) {
-        // patient.setDossierMedical(null); // Côté inverse (Patient)
-        // dossier.setPersonne(null); // Côté propriétaire (DossierMedical)
-        // }
+        //Détacher le dossier du Patient (côté propriétaire ET inverse)
+        Personne patient = dossier.getPersonne();
+        if (patient != null) {
+        patient.setDossierMedical(null); // Côté inverse (Patient)
+        dossier.setPersonne(null); // Côté propriétaire (DossierMedical)
+        }
 
         dossierMedicalRepository.delete(dossier); // Suppression unique
     }
