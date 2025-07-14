@@ -49,7 +49,6 @@ export const API_ENDPOINTS = {
 
   },
 
-  
   // Utilisateur
   UTILISATEUR: {
     EMPLOYES: "/api/employe",
@@ -72,11 +71,14 @@ export const API_ENDPOINTS = {
   CONSULTATIONS_TRAITEMENTS:{
   CONSULTATIONS: "/api/consultations",
   PRESCRIPTIONS: "/api/prescriptions",
-  SUIVIETATS: "/api/suivietats",
+  SUIVIETATS: "/api/suiviEtats",
   }
-
+,
+  HOSPITALISATIONS: {
+    HOSPITALISATIONS: "/api/hospitalisations",
+  },
     
-
+  
   }
 
 

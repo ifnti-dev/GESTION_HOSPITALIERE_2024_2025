@@ -85,24 +85,25 @@ export function MedecinSidebar({ children }: MedecinSidebarProps) {
       badge: "5",
       gradient: "from-blue-600 to-cyan-600",
     },
-    {
-      title: "Examens",
-      icon: <Activity className="h-5 w-5" />,
-      href: "/dashboard/medecin/examens",
-      gradient: "from-cyan-500 to-blue-600",
+     {
+      title: "Suivi état",
+      icon: <FileText className="h-5 w-5" />,
+      href: "/dashboard/medecin/suivieEtats",
+      gradient: "from-indigo-500 to-cyan-500",
     },
+    // {
+    //   title: "Examens",
+    //   icon: <Activity className="h-5 w-5" />,
+    //   href: "/dashboard/medecin/examens",
+    //   gradient: "from-cyan-500 to-blue-600",
+    // },
     {
       title: "Hospitalisations",
       icon: <UserCheck className="h-5 w-5" />,
       href: "/dashboard/medecin/hospitalisations",
       gradient: "from-blue-500 to-indigo-600",
     },
-    {
-      title: "Antécédents",
-      icon: <FileText className="h-5 w-5" />,
-      href: "/dashboard/medecin/antecedents",
-      gradient: "from-indigo-500 to-cyan-500",
-    },
+   
     {
       title: "Allergies",
       icon: <AlertCircle className="h-5 w-5" />,

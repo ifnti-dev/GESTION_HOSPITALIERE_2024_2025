@@ -1,4 +1,4 @@
-// Types de base
+
 export interface BaseEntity {
   id: number // Long en Java = number en TypeScript
   createdAt?: string

@@ -1,4 +1,3 @@
-// lib/apiClient.ts
 import { API_CONFIG, API_HEADERS, CORS_CONFIG } from "@/config/api"
 
 export async function apiFetch<T>(

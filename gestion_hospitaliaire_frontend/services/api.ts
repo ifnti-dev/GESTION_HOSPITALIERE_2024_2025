@@ -23,7 +23,6 @@ interface SpringBootErrorResponse {
   path: string
 }
 
-// Client API adapté pour Spring Boot
 class SpringBootApiClient {
   private baseURL: string
   private timeout: number
@@ -36,7 +35,7 @@ class SpringBootApiClient {
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const url = `${this.baseURL}${endpoint}`
 
-    console.log(`🌐 API Request: ${options.method || "GET"} ${url}`)
+    console.log(`API Request: ${options.method || "GET"} ${url}`)
 
     const config: RequestInit = {
       ...CORS_CONFIG,
@@ -47,7 +46,6 @@ class SpringBootApiClient {
       },
     }
 
-    // Ajouter le token JWT pour Spring Security
     const token = this.getAuthToken()
     if (token) {
       config.headers = {
@@ -109,14 +107,13 @@ class SpringBootApiClient {
         errorData.path,
       )
     } catch (parseError) {
-      // Si l'erreur n'est pas au format JSON Spring Boot
       throw new ApiError(`Erreur ${response.status}: ${response.statusText}`, response.status)
     }
   }
 
   private getAuthToken(): string | null {
     if (typeof window !== "undefined") {
-      return localStorage.getItem("jwt_token") // JWT token pour Spring Security
+      return localStorage.getItem("jwt_token") 
     }
     return null
   }
