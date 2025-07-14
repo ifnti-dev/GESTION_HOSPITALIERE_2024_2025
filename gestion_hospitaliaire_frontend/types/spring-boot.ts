@@ -1,70 +1,63 @@
-// Types spécifiques pour Spring Boot
+// Types pour les réponses Spring Boot
+export interface SpringBootPage<T> {
+  content: T[]
+  pageable: {
+    sort: {
+      empty: boolean
+      sorted: boolean
+      unsorted: boolean
+    }
+    offset: number
+    pageSize: number
+    pageNumber: number
+    paged: boolean
+    unpaged: boolean
+  }
+  last: boolean
+  totalPages: number
+  totalElements: number
+  size: number
+  number: number
+  sort: {
+    empty: boolean
+    sorted: boolean
+    unsorted: boolean
+  }
+  first: boolean
+  numberOfElements: number
+  empty: boolean
+}
 
-// Réponse d'authentification Spring Security
+// Types pour l'authentification
 export interface SpringBootAuthResponse {
   token: string
-  type: string // "Bearer"
   refreshToken?: string
-  expiresIn: number
-  user: {
-    id: string
-    username: string
+  type?: string
+  id?: number
+  username?: string
+  email?: string
+  roles?: Array<{
+    id: number
+    nom: string
+  }>
+  personne?: {
+    id: number
+    nom: string
+    prenom: string
     email: string
-    roles: string[]
-    authorities: string[]
+    adresse?: string
+    telephone?: string
+    sexe?: string
+    dateNaissance?: string
+    situationMatrimoniale?: string
   }
 }
 
-// Réponse d'erreur Spring Boot
-export interface SpringBootErrorResponse {
+// Types pour les erreurs Spring Boot
+export interface SpringBootError {
   timestamp: string
   status: number
   error: string
   message: string
   path: string
-  trace?: string
-}
-
-// Réponse de validation Spring Boot
-export interface SpringBootValidationError {
-  timestamp: string
-  status: 400
-  error: "Bad Request"
-  message: "Validation failed"
-  path: string
-  subErrors: Array<{
-    object: string
-    field: string
-    rejectedValue: any
-    message: string
-  }>
-}
-
-// Page Spring Boot (réponse paginée)
-export interface SpringBootPage<T> {
-  content: T[]
-  pageable: {
-    sort: { sorted: boolean; unsorted: boolean }
-    pageNumber: number
-    pageSize: number
-    offset: number
-    paged: boolean
-    unpaged: boolean
-  }
-  totalElements: number
-  totalPages: number
-  last: boolean
-  first: boolean
-  numberOfElements: number
-  size: number
-  number: number
-  sort: { sorted: boolean; unsorted: boolean }
-  empty: boolean
-}
-
-// Paramètres de pagination Spring Boot
-export interface SpringBootPageRequest {
-  page?: number // 0-based
-  size?: number
-  sort?: string[] // ["field,direction"]
 }

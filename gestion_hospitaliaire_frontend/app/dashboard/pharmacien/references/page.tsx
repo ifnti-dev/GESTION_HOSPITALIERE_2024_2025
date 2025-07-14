@@ -16,7 +16,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { BookOpen, Plus, Search, Edit, Trash2, Package, Filter, Eye, Link, Loader2 } from "lucide-react"
+import { BookOpen, Plus, Search, Edit, Trash2, Package, Filter, Eye, Link, Loader2, AlertCircle } from "lucide-react"
 import { PharmacienSidebar } from "@/components/sidebars/pharmacien-sidebar"
 import { useReferences, useReferenceSearch, useReferenceMutations } from "@/hooks/pharmacie/useReferences"
 import type { Reference } from "@/types/pharmacie"
@@ -30,6 +30,8 @@ export default function ReferencesPage() {
   const [editingReference, setEditingReference] = useState<Reference | null>(null)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [referenceToDelete, setReferenceToDelete] = useState<Reference | null>(null)
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false)
+  const [selectedReference, setSelectedReference] = useState<Reference | null>(null)
 
   const { references, loading, error, refetch } = useReferences()
   const { search, references: searchResults, loading: searchLoading } = useReferenceSearch()
@@ -97,6 +99,25 @@ export default function ReferencesPage() {
   const handleDeleteConfirmation = (reference: Reference) => {
     setReferenceToDelete(reference)
     setIsDeleteDialogOpen(true)
+  }
+
+  const confirmDelete = async () => {
+    if (!referenceToDelete?.id) return
+
+    try {
+      await deleteReference(referenceToDelete.id)
+      setIsDeleteDialogOpen(false)
+      setReferenceToDelete(null)
+      refetch()
+      toast.success("Référence supprimée avec succès!")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Erreur lors de la suppression")
+    }
+  }
+
+  const handleViewDetails = (reference: Reference) => {
+    setSelectedReference(reference)
+    setIsDetailDialogOpen(true)
   }
 
   const totalReferences = references?.length || 0
@@ -245,32 +266,31 @@ export default function ReferencesPage() {
                             </Badge>
                           </TableCell>
                           <TableCell className="text-right py-4">
-                            <div className="flex items-center justify-end gap-2">
+                            <div className="flex items-center justify-end gap-1">
                               <Button
                                 size="sm"
-                                variant="outline"
-                                className="h-8 px-3 bg-green-50 border-green-200 text-green-700 hover:bg-green-100 hover:border-green-300 transition-all duration-200"
+                                variant="ghost"
+                                onClick={() => handleViewDetails(reference)}
+                                className="h-8 w-8 p-0 hover:bg-green-100 hover:text-green-700 transition-all duration-200"
+                                title="Voir les détails"
                               >
-                                <Eye className="h-3 w-3 mr-1" />
-                                Voir
+                                <Eye className="h-4 w-4" />
                               </Button>
                               <Button
                                 size="sm"
-                                variant="outline"
+                                variant="ghost"
                                 onClick={() => handleEdit(reference)}
-                                className="h-8 px-3 bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100 hover:border-blue-300 transition-all duration-200"
+                                className="h-8 w-8 p-0 hover:bg-blue-100 hover:text-blue-700 transition-all duration-200"
                               >
                                 <Edit className="h-3 w-3 mr-1" />
-                                Modifier
                               </Button>
                               <Button
                                 size="sm"
-                                variant="outline"
+                                variant="ghost"
                                 onClick={() => handleDeleteConfirmation(reference)}
-                                className="h-8 px-3 bg-red-50 border-red-200 text-red-700 hover:bg-red-100 hover:border-red-300 transition-all duration-200"
+                                className="h-8 w-8 p-0 hover:bg-red-100 hover:text-red-700 transition-all duration-200"
                               >
                                 <Trash2 className="h-3 w-3 mr-1" />
-                                Supprimer
                               </Button>
                             </div>
                           </TableCell>
@@ -311,24 +331,25 @@ export default function ReferencesPage() {
         <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
           <DialogContent className="sm:max-w-[400px]">
             <DialogHeader>
-              <DialogTitle>Supprimer la Référence</DialogTitle>
+              <DialogTitle className="flex items-center gap-2 text-red-600">
+                <AlertCircle className="h-5 w-5" />
+                Confirmer la suppression
+              </DialogTitle>
               <DialogDescription>
-                Êtes-vous sûr de vouloir supprimer la référence "{referenceToDelete?.nom}" ? Cette action est
-                irréversible.
+                Êtes-vous sûr de vouloir supprimer la référence <strong>"{referenceToDelete?.nom}"</strong> ?
+                <br />
+                <span className="text-red-600 font-medium">Cette action est irréversible.</span>
               </DialogDescription>
             </DialogHeader>
-            <DialogFooter>
-              <Button variant="secondary" onClick={() => setIsDeleteDialogOpen(false)}>
+            <DialogFooter className="gap-2">
+              <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)} disabled={mutationLoading}>
                 Annuler
               </Button>
               <Button
                 variant="destructive"
-                onClick={() => {
-                  if (referenceToDelete?.id) {
-                    handleDelete(referenceToDelete.id)
-                  }
-                }}
+                onClick={confirmDelete}
                 disabled={mutationLoading}
+                className="bg-red-600 hover:bg-red-700"
               >
                 {mutationLoading ? (
                   <>
@@ -336,8 +357,70 @@ export default function ReferencesPage() {
                     Suppression...
                   </>
                 ) : (
-                  "Supprimer"
+                  <>
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Supprimer
+                  </>
                 )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Details Dialog */}
+        <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
+          <DialogContent className="sm:max-w-[600px]">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-teal-600">
+                <BookOpen className="h-5 w-5" />
+                Détails de la référence
+              </DialogTitle>
+            </DialogHeader>
+            {selectedReference && (
+              <div className="space-y-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-gray-500">ID</Label>
+                    <p className="text-lg font-semibold">#{selectedReference.id}</p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-gray-500">Nom</Label>
+                    <p className="text-lg font-semibold font-mono">{selectedReference.nom}</p>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-gray-500">Description</Label>
+                  <p className="text-gray-700 bg-gray-50 p-3 rounded-lg">{selectedReference.description}</p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-gray-500">Associations</Label>
+                  <div className="bg-teal-50 p-4 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <Link className="h-5 w-5 text-teal-600" />
+                      <span className="text-2xl font-bold text-teal-800">
+                        {selectedReference.medicamentReferences?.length || 0}
+                      </span>
+                      <span className="text-teal-600">associations avec des médicaments</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsDetailDialogOpen(false)}>
+                Fermer
+              </Button>
+              <Button
+                onClick={() => {
+                  setIsDetailDialogOpen(false)
+                  if (selectedReference) handleEdit(selectedReference)
+                }}
+                className="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700"
+              >
+                <Edit className="h-4 w-4 mr-2" />
+                Modifier
               </Button>
             </DialogFooter>
           </DialogContent>

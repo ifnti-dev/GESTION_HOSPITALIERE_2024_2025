@@ -10,7 +10,6 @@ import com.gestion_hospitaliere.UeEntreprise.model.pharmacy.Medicament;
 @Repository
 public interface MedicamentRepository extends JpaRepository<Medicament, Long> {
     List<Medicament> findByNomContaining(String nom);
-    List<Medicament> findByStockTotalLessThan(Integer seuil);
     List<Medicament> findByCategorieId(Long categorieId);
     List<Medicament> findByDescriptionContaining(String keyword);
 }

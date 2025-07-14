@@ -3,7 +3,9 @@ package com.gestion_hospitaliere.UeEntreprise.model.pharmacy;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -23,7 +25,9 @@ public class MedicamentReference {
 
     @ManyToOne
     @JoinColumn(name="medicament_id")
-    @JsonIgnore
+    @JsonIgnoreProperties({"medicamentReferences", "categorie"})
+//    @JsonIgnore
+//    @JsonBackReference
     private Medicament medicament;
 
     @ManyToOne
@@ -32,7 +36,7 @@ public class MedicamentReference {
     private Reference reference;
 
     @OneToMany(mappedBy = "medicamentReference")
-//    @JsonIgnore
+    @JsonIgnore
     private List<LigneApprovisionnement> lignesApprovisionnement;
 
 	public Long getId() {

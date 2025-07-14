@@ -55,10 +55,7 @@ public class MedicamentController {
         return medicamentService.searchByNomContaining(nom);
     }
 
-    @GetMapping("/low-stock")
-    public List<Medicament> getMedicamentsLowStock(@RequestParam Integer seuil) {
-        return medicamentService.getMedicamentsLowStock(seuil);
-    }
+
 
     @GetMapping("/by-categorie/{categorieId}")
     public List<Medicament> getByCategorieId(@PathVariable Long categorieId) {

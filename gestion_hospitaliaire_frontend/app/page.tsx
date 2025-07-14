@@ -1,3 +1,9 @@
+"use client"
+
+import { useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { useAuth } from "@/contexts/AuthContext"
+import { Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -19,6 +25,27 @@ import Link from "next/link"
 import Image from "next/image"
 
 export default function HomePage() {
+  const { isAuthenticated, isLoading } = useAuth()
+  const router = useRouter()
+
+  useEffect(() => {
+    // Rediriger seulement les utilisateurs authentifiés vers le dashboard
+    if (!isLoading && isAuthenticated) {
+      router.push("/dashboard")
+    }
+  }, [isAuthenticated, isLoading, router])
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-slate-50">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
+          <p className="text-gray-600">Chargement...</p>
+        </div>
+      </div>
+    )
+  }
+
   const features = [
     {
       icon: <Stethoscope className="h-8 w-8 text-blue-600" />,
@@ -77,7 +104,7 @@ export default function HomePage() {
               </Link>
             </div>
 
-            <Link href="/dashboard">
+            <Link href="/login">
               <Button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium shadow-lg hover:shadow-xl transition-all duration-200">
                 <Shield className="h-4 w-4 mr-2" />
                 Connexion
@@ -105,7 +132,7 @@ export default function HomePage() {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link href="/dashboard">
+                <Link href="/login">
                   <Button
                     size="lg"
                     className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-medium shadow-lg hover:shadow-xl transition-all duration-200"
@@ -117,7 +144,7 @@ export default function HomePage() {
                 <Button
                   variant="outline"
                   size="lg"
-                  className="border-2 border-blue-200 text-blue-700 hover:bg-blue-50 px-8 py-4 rounded-lg font-medium"
+                  className="border-2 border-blue-200 text-blue-700 hover:bg-blue-50 px-8 py-4 rounded-lg font-medium bg-transparent"
                 >
                   Documentation
                 </Button>
@@ -138,7 +165,7 @@ export default function HomePage() {
             <div className="relative">
               <div className="bg-gradient-to-br from-blue-100 to-green-100 rounded-2xl p-8 shadow-2xl">
                 <Image
-                  src="/images/hospitl.png?height=400&width=500"
+                  src="/placeholder.svg?height=400&width=500"
                   alt="Dashboard Preview"
                   width={500}
                   height={400}

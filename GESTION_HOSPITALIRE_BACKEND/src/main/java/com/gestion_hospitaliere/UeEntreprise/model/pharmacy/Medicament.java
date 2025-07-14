@@ -3,6 +3,7 @@ package com.gestion_hospitaliere.UeEntreprise.model.pharmacy;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -20,17 +21,18 @@ public class Medicament {
 	
 	private String nom;
 	private String description;
-	private Integer stockTotal;
+
 	
 	
 	@ManyToOne
 	@JoinColumn(name="categorie_id")
-	@JsonIgnore
+//	@JsonIgnore
 	private Categorie categorie;
 	
 	
 	@OneToMany(mappedBy="medicament")
-//	@JsonIgnore
+//    @JsonManagedReference
+	@JsonIgnore
 	private List<MedicamentReference> medicamentsReference;
 
 
@@ -58,13 +60,6 @@ public class Medicament {
 		this.description = description;
 	}
 
-	public Integer getStockTotal() {
-		return stockTotal;
-	}
-
-	public void setStockTotal(Integer stockTotal) {
-		this.stockTotal = stockTotal;
-	}
 
 	public Categorie getCategorie() {
 		return categorie;
@@ -83,12 +78,4 @@ public class Medicament {
 	}
 
 
-	
-	
-	
-	
-	
-	
-	
-	
 }
