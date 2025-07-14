@@ -55,7 +55,13 @@ public class PersonneService {
             throw new IllegalArgumentException("Le numéro de téléphone est requis.");
         }
         
-       
+        
+        if (personne.getPassword() != null && !personne.getPassword().isEmpty()) {
+            String hashedPassword = passwordEncoder.encode(personne.getPassword());
+            personne.setPassword(hashedPassword);
+        } else {
+            throw new IllegalArgumentException("Le mot de passe est requis.");
+        }
 
         // Vérification que le téléphone ne contient que des chiffres
         Pattern phonePattern = Pattern.compile("^[0-9]+$");
