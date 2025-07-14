@@ -1,44 +1,60 @@
-import { apiFetch } from "@/lib/apiClient";
-import { Consultation } from "@/types/consultstionsTraitement";
+import { apiClient } from "@/services/api";
+import { Consultation,CreateConsultation } from "@/types/consultstionsTraitement";
 import { API_ENDPOINTS } from "@/config/api";
 
-// 1. **Récupérer toutes les consultations**
 export async function getConsultations(): Promise<Consultation[]> {
-  return apiFetch<Consultation[]>(API_ENDPOINTS.CONSULTATIONS_TRAITEMENTS.CONSULTATIONS);
+  try {
+    const response = await apiClient.get<Consultation[]>(API_ENDPOINTS.CONSULTATIONS_TRAITEMENTS.CONSULTATIONS);
+    return response;
+  } catch (error) {
+    console.error("Erreur API - getConsultations:", error);
+    throw new Error("Impossible de charger les consultations. Vérifiez la connexion au serveur.");
+  }
 }
 
-// 2. **Ajouter une nouvelle consultation**
-export async function addConsultation(newConsultation: Consultation): Promise<Consultation> {
-  const response = await apiFetch<Consultation>(API_ENDPOINTS.CONSULTATIONS_TRAITEMENTS.CONSULTATIONS, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(newConsultation),
-  });
+export async function addConsultation(
+  newConsultation: Omit<CreateConsultation, 'id' | 'createdAt' | 'updatedAt'>
+): Promise<Consultation> {
+  try {
+    // Construction propre du payload sans les objets nested
+    const payload = {
+      date: new Date(newConsultation.date).toISOString(),
+      symptomes: newConsultation.symptomes,
+      diagnostic: newConsultation.diagnostic,
+      personne: {
+        id: newConsultation.personne?.id
+      },
+      employe: {
+        id: newConsultation.employe?.id
+      }
+      
+    };
 
-  return response;
+    console.log(payload);
+
+    const response = await apiClient.post<Consultation>(
+      API_ENDPOINTS.CONSULTATIONS_TRAITEMENTS.CONSULTATIONS, payload
+    );
+
+    return response;
+  } catch (error) {
+    console.error("Erreur API - addConsultation:", error);
+    throw new Error("Échec de la création de la consultation. Vérifiez les données et réessayez.");
+  }
 }
+
 
 // 3. **Mettre à jour une consultation existante**
-export async function updateConsultation(updatedConsultation: Consultation): Promise<Consultation> {
-  const response = await apiFetch<Consultation>(
+export async function updateConsultation(updatedConsultation: Consultation): Promise<void> {
+  await apiClient.put<void>(
     `${API_ENDPOINTS.CONSULTATIONS_TRAITEMENTS.CONSULTATIONS}/${updatedConsultation.id}`,
-    {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(updatedConsultation),
-    }
+    updatedConsultation
   );
-
-  return response;
 }
 
 // 4. **Supprimer une consultation**
 export async function deleteConsultation(consultationId: number): Promise<void> {
-  await apiFetch<void>(`${API_ENDPOINTS.CONSULTATIONS_TRAITEMENTS.CONSULTATIONS}/${consultationId}`, {
-    method: "DELETE",
-  });
+  await apiClient.delete<void>(
+    `${API_ENDPOINTS.CONSULTATIONS_TRAITEMENTS.CONSULTATIONS}/${consultationId}`
+  );
 }

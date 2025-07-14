@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/command"
 import { Check, ChevronsUpDown } from "lucide-react"
 import { cn } from "@/lib/utils" // Assurez-vous que ce chemin est correct et que cn est exporté
-import type { Patient } from "@/types" // Assurez-vous que ce chemin est correct
+import { Patient } from "@/types/pharmacie"
 
 export interface DossierFormData {
   patientId: string
@@ -107,12 +107,9 @@ export function CreateDossierPatientModal({
       tension: tensionValue,
       groupeSanguin,
     })
-    // Optionnel: réinitialiser le formulaire ici si la modale reste ouverte après soumission
-    // ou si le parent ne gère pas la réinitialisation en fermant/réouvrant.
-    // Pour l'instant, on suppose que le parent ferme la modale, ce qui déclenchera le useEffect ou une nouvelle initialisation.
-    onOpenChange(false) // Ferme la modale après soumission
+       onOpenChange(false) // Ferme la modale après soumission
     resetForm() // Assure la réinitialisation pour la prochaine ouverture
-    // La fermeture de la modale et le reset sont gérés par le parent ou via onOpenChange
+   
   }
 
   return (
@@ -137,9 +134,9 @@ export function CreateDossierPatientModal({
                   id="patient-combobox"
                 >
                   {selectedPatientId
-                    ? patients.find((patient) => patient.id === selectedPatientId)?.prenom +
+                    ? patients.find((patient) => String(patient.id) === String(selectedPatientId))?.prenom +
                       " " +
-                      patients.find((patient) => patient.id === selectedPatientId)?.nom
+                      patients.find((patient) => String(patient.id) === String(selectedPatientId))?.nom
                     : "Sélectionner un patient..."}
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
@@ -155,14 +152,14 @@ export function CreateDossierPatientModal({
                           key={patient.id}
                           value={`${patient.prenom} ${patient.nom} ${patient.id} ${patient.numeroSecuriteSociale}`}
                           onSelect={() => {
-                            setSelectedPatientId(patient.id)
+                            setSelectedPatientId(String(patient.id))
                             setIsPatientComboboxOpen(false)
                           }}
                         >
                           <Check
                             className={cn(
                               "mr-2 h-4 w-4",
-                              selectedPatientId === patient.id ? "opacity-100" : "opacity-0"
+                              selectedPatientId === String(patient.id) ? "opacity-100" : "opacity-0"
                             )}
                           />
                           {patient.prenom} {patient.nom} ({patient.numeroSecuriteSociale})

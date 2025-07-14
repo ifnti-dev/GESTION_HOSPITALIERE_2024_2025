@@ -6,7 +6,11 @@ interface ApiResponse<T = any> {
   statusText: string
 }
 
+
+class SpringBootApiClient {
+
 class ApiClient {
+
   private baseURL: string
 
   constructor() {
@@ -16,8 +20,11 @@ class ApiClient {
   private async request<T = any>(endpoint: string, options: RequestInit = {}): Promise<ApiResponse<T>> {
     const url = `${this.baseURL}${endpoint}`
 
+    console.log(`API Request: ${options.method || "GET"} ${url}`)
+
     // Récupérer le token depuis localStorage
     const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null
+
 
     const config: RequestInit = {
       ...CORS_CONFIG,
@@ -28,6 +35,15 @@ class ApiClient {
         ...options.headers,
       },
     }
+
+    const token = this.getAuthToken()
+    if (token) {
+      config.headers = {
+        ...config.headers,
+        Authorization: `Bearer ${token}`,
+      }
+    }
+
 
     try {
       console.log(`🚀 API Request: ${options.method || "GET"} ${url}`)
@@ -73,6 +89,29 @@ class ApiClient {
           data = responseText as unknown as T
         }
       }
+
+      throw new ApiError("Erreur de connexion au serveur Spring Boot", 0)
+    }
+  }
+
+  private async handleSpringBootError(response: Response): Promise<never> {
+    try {
+      const errorData: SpringBootErrorResponse = await response.json()
+      throw new ApiError(
+        errorData.message || "Une erreur est survenue",
+        errorData.status,
+        errorData.error,
+        errorData.timestamp,
+        errorData.path,
+      )
+    } catch (parseError) {
+      throw new ApiError(`Erreur ${response.status}: ${response.statusText}`, response.status)
+    }
+  }
+
+  private getAuthToken(): string | null {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("jwt_token") 
 
       console.log("✅ Response Data:", Array.isArray(data) ? `Array[${(data as any).length}]` : typeof data)
 
