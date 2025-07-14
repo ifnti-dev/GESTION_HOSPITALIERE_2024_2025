@@ -1,47 +1,37 @@
 import { API_CONFIG, API_HEADERS, CORS_CONFIG } from "@/config/api"
 
-// Gestion des erreurs Spring Boot
-export class ApiError extends Error {
-  constructor(
-    message: string,
-    public status: number,
-    public code?: string,
-    public timestamp?: string,
-    public path?: string,
-  ) {
-    super(message)
-    this.name = "ApiError"
-  }
+interface ApiResponse<T = any> {
+  data: T
+  status: number
+  statusText: string
 }
 
-// Interface pour les réponses d'erreur Spring Boot
-interface SpringBootErrorResponse {
-  timestamp: string
-  status: number
-  error: string
-  message: string
-  path: string
-}
 
 class SpringBootApiClient {
+
+class ApiClient {
+
   private baseURL: string
-  private timeout: number
 
   constructor() {
     this.baseURL = API_CONFIG.BASE_URL
-    this.timeout = API_CONFIG.TIMEOUT
   }
 
-  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+  private async request<T = any>(endpoint: string, options: RequestInit = {}): Promise<ApiResponse<T>> {
     const url = `${this.baseURL}${endpoint}`
 
     console.log(`API Request: ${options.method || "GET"} ${url}`)
+
+    // Récupérer le token depuis localStorage
+    const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null
+
 
     const config: RequestInit = {
       ...CORS_CONFIG,
       ...options,
       headers: {
         ...API_HEADERS,
+        ...(token && { Authorization: `Bearer ${token}` }),
         ...options.headers,
       },
     }
@@ -54,42 +44,50 @@ class SpringBootApiClient {
       }
     }
 
+
     try {
-      const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), this.timeout)
+      console.log(`🚀 API Request: ${options.method || "GET"} ${url}`)
+      if (options.body) {
+        console.log("📤 Request Body:", options.body)
+      }
+      if (token) {
+        console.log(`🔑 Token utilisé: ${token.substring(0, 20)}...`)
+      }
 
-      const response = await fetch(url, {
-        ...config,
-        signal: controller.signal,
-      })
+      const response = await fetch(url, config)
+      console.log(`📥 API Response: ${response.status} ${response.statusText}`)
 
-      clearTimeout(timeoutId)
-
-      console.log(`📡 API Response: ${response.status} ${response.statusText}`)
+      // Lire le contenu une seule fois
+      const responseText = await response.text()
+      console.log(`📄 Response Text Length: ${responseText.length}`)
 
       if (!response.ok) {
-        await this.handleSpringBootError(response)
+        let errorText = `HTTP ${response.status}`
+
+        if (responseText) {
+          try {
+            const errorData = JSON.parse(responseText)
+            errorText = errorData.error || errorData.message || errorText
+          } catch {
+            errorText = responseText || errorText
+          }
+        }
+
+        console.error(`❌ Erreur API: ${response.status} - ${errorText}`)
+        throw new Error(`HTTP ${response.status}: ${errorText}`)
       }
 
-      // Spring Boot peut retourner du texte vide pour certaines opérations (DELETE)
-      const contentType = response.headers.get("content-type")
-      if (contentType && contentType.includes("application/json")) {
-        const data = await response.json()
-        console.log(`✅ API Data:`, data)
-        return data
-      }
-
-      // Pour les réponses vides (comme DELETE)
-      return {} as T
-    } catch (error) {
-      console.error(`❌ API Error:`, error)
-
-      if (error instanceof ApiError) {
-        throw error
-      }
-
-      if (error instanceof Error && error.name === "AbortError") {
-        throw new ApiError("Timeout de la requête", 408)
+      // Parser le JSON si possible
+      let data: T
+      if (!responseText || responseText.trim() === "") {
+        data = {} as T
+      } else {
+        try {
+          data = JSON.parse(responseText)
+        } catch (jsonError) {
+          console.warn("⚠️ Erreur parsing JSON, retour texte brut")
+          data = responseText as unknown as T
+        }
       }
 
       throw new ApiError("Erreur de connexion au serveur Spring Boot", 0)
@@ -114,101 +112,45 @@ class SpringBootApiClient {
   private getAuthToken(): string | null {
     if (typeof window !== "undefined") {
       return localStorage.getItem("jwt_token") 
+
+      console.log("✅ Response Data:", Array.isArray(data) ? `Array[${(data as any).length}]` : typeof data)
+
+      return {
+        data,
+        status: response.status,
+        statusText: response.statusText,
+      }
+    } catch (error) {
+      console.error(`💥 Erreur lors de la requête API vers ${url}:`, error)
+      throw error
     }
-    return null
   }
 
-  // Méthodes HTTP adaptées pour Spring Boot
-  async get<T>(endpoint: string, params?: Record<string, any>): Promise<T> {
-    const searchParams = new URLSearchParams()
-    if (params) {
-      Object.entries(params).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          searchParams.append(key, String(value))
-        }
-      })
-    }
-
-    const url = searchParams.toString() ? `${endpoint}?${searchParams}` : endpoint
-    return this.request<T>(url, { method: "GET" })
+  async get<T = any>(endpoint: string): Promise<T> {
+    const response = await this.request<T>(endpoint, { method: "GET" })
+    return response.data
   }
 
-  async post<T>(endpoint: string, data?: any): Promise<T> {
-    return this.request<T>(endpoint, {
+  async post<T = any>(endpoint: string, data?: any): Promise<T> {
+    const response = await this.request<T>(endpoint, {
       method: "POST",
       body: data ? JSON.stringify(data) : undefined,
     })
+    return response.data
   }
 
-  async put<T>(endpoint: string, data?: any): Promise<T> {
-    return this.request<T>(endpoint, {
+  async put<T = any>(endpoint: string, data?: any): Promise<T> {
+    const response = await this.request<T>(endpoint, {
       method: "PUT",
       body: data ? JSON.stringify(data) : undefined,
     })
+    return response.data
   }
 
-  async patch<T>(endpoint: string, data?: any): Promise<T> {
-    return this.request<T>(endpoint, {
-      method: "PATCH",
-      body: data ? JSON.stringify(data) : undefined,
-    })
-  }
-
-  async delete<T>(endpoint: string): Promise<T> {
-    return this.request<T>(endpoint, { method: "DELETE" })
+  async delete<T = any>(endpoint: string): Promise<T> {
+    const response = await this.request<T>(endpoint, { method: "DELETE" })
+    return response.data
   }
 }
 
-// Instance singleton du client API
-export const apiClient = new SpringBootApiClient()
-
-// Utilitaires pour les réponses Spring Boot
-export function handleSpringBootResponse<T>(response: T): T {
-  return response
-}
-
-// Gestion des réponses paginées Spring Boot (Page<T>)
-export interface SpringBootPage<T> {
-  content: T[]
-  pageable: {
-    sort: {
-      sorted: boolean
-      unsorted: boolean
-    }
-    pageNumber: number
-    pageSize: number
-    offset: number
-    paged: boolean
-    unpaged: boolean
-  }
-  totalElements: number
-  totalPages: number
-  last: boolean
-  first: boolean
-  numberOfElements: number
-  size: number
-  number: number
-  sort: {
-    sorted: boolean
-    unsorted: boolean
-  }
-  empty: boolean
-}
-
-export interface PaginatedResponse<T> {
-  data: T[]
-  total: number
-  page: number
-  limit: number
-  totalPages: number
-}
-
-export const handleSpringBootPage = <T>(page: SpringBootPage<T>): PaginatedResponse<T> => {
-  return {
-    data: page.content,
-    total: page.totalElements,
-    page: page.number,
-    limit: page.size,
-    totalPages: page.totalPages,
-  }
-}
+export const apiClient = new ApiClient()

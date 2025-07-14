@@ -1,4 +1,4 @@
-package com.gestion_hospitaliere.UeEntreprise.service. UserDetailsService;
+package com.gestion_hospitaliere.UeEntreprise.service.UserDetailsService;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -10,14 +10,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.gestion_hospitaliere.UeEntreprise.model.User.Employe;
-import com.gestion_hospitaliere.UeEntreprise.model.User.Personne;
 import com.gestion_hospitaliere.UeEntreprise.repository.User.EmployeRepository;
 
-
-
 @Service
+@Transactional
 public class CustomUserDetailsService implements UserDetailsService {
 
     @Autowired
@@ -25,16 +24,19 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Employe employe = employeRepository.findByPersonneEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Employé non trouvé"));
+        Employe employe = employeRepository.findByPersonneEmailWithRoles(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Employé non trouvé avec l'email: " + email));
 
         Set<GrantedAuthority> authorities = new HashSet<>();
 
+        // Charger les rôles et permissions
         employe.getRoles().forEach(role -> {
             authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getNom()));
-            role.getPermissions().forEach(perm ->
-                authorities.add(new SimpleGrantedAuthority(perm.getNom()))
-            );
+            
+            // Charger les permissions du rôle
+            role.getPermissions().forEach(permission -> {
+                authorities.add(new SimpleGrantedAuthority(permission.getNom()));
+            });
         });
 
         return new org.springframework.security.core.userdetails.User(

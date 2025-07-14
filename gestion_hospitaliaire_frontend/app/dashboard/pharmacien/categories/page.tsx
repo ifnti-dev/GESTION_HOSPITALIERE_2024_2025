@@ -18,7 +18,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Tags, Plus, Search, Edit, Trash2, Package, Filter, Loader2, AlertCircle } from "lucide-react"
+import { Tags, Plus, Search, Edit, Trash2, Package, Filter, Loader2, AlertCircle, Eye } from "lucide-react"
 import { PharmacienSidebar } from "@/components/sidebars/pharmacien-sidebar"
 import { useCategories, useCategorieMutations, useCategorieSearch } from "@/hooks/pharmacie/useCategories"
 import { toast } from "sonner"
@@ -29,6 +29,10 @@ export default function CategoriesPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingCategory, setEditingCategory] = useState<Categorie | null>(null)
   const [formData, setFormData] = useState({ nom: "", description: "" })
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [categoryToDelete, setCategoryToDelete] = useState<{ id: number; nom: string } | null>(null)
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false)
+  const [selectedCategory, setSelectedCategory] = useState<Categorie | null>(null)
 
   // Hooks pour l'API
   const { categories: allCategories, loading: loadingAll, error: errorAll, refetch } = useCategories()
@@ -94,17 +98,27 @@ export default function CategoriesPage() {
   }
 
   const handleDelete = async (id: number, nom: string) => {
-    if (!confirm(`Êtes-vous sûr de vouloir supprimer la catégorie "${nom}" ?`)) {
-      return
-    }
+    setCategoryToDelete({ id, nom })
+    setIsDeleteDialogOpen(true)
+  }
+
+  const confirmDelete = async () => {
+    if (!categoryToDelete) return
 
     try {
-      await deleteCategorie(id)
+      await deleteCategorie(categoryToDelete.id)
       toast.success("Catégorie supprimée avec succès")
-      refetch() // Recharger la liste
+      refetch()
+      setIsDeleteDialogOpen(false)
+      setCategoryToDelete(null)
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Erreur lors de la suppression")
     }
+  }
+
+  const handleViewDetails = (category: Categorie) => {
+    setSelectedCategory(category)
+    setIsDetailDialogOpen(true)
   }
 
   // Calcul des statistiques
@@ -269,26 +283,35 @@ export default function CategoriesPage() {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right py-4">
-                          <div className="flex items-center justify-end gap-2">
+                          <div className="flex items-center justify-end gap-1">
                             <Button
                               size="sm"
-                              variant="outline"
-                              onClick={() => handleEdit(category)}
-                              disabled={mutationLoading}
-                              className="h-8 px-3 bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100 hover:border-blue-300 transition-all duration-200"
+                              variant="ghost"
+                              onClick={() => handleViewDetails(category)}
+                              className="h-8 w-8 p-0 hover:bg-green-100 hover:text-green-700 transition-all duration-200"
+                              title="Voir les détails"
                             >
-                              <Edit className="h-3 w-3 mr-1" />
-                              Modifier
+                              <Eye className="h-4 w-4" />
                             </Button>
                             <Button
                               size="sm"
-                              variant="outline"
+                              variant="ghost"
+                              onClick={() => handleEdit(category)}
+                              disabled={mutationLoading}
+                              className="h-8 w-8 p-0 hover:bg-blue-100 hover:text-blue-700 transition-all duration-200"
+                              title="Modifier la catégorie"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
                               onClick={() => handleDelete(category.id!, category.nom)}
                               disabled={mutationLoading}
-                              className="h-8 px-3 bg-red-50 border-red-200 text-red-700 hover:bg-red-100 hover:border-red-300 transition-all duration-200"
+                              className="h-8 w-8 p-0 hover:bg-red-100 hover:text-red-700 transition-all duration-200"
+                              title="Supprimer la catégorie"
                             >
-                              <Trash2 className="h-3 w-3 mr-1" />
-                              Supprimer
+                              <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>
                         </TableCell>
@@ -360,6 +383,105 @@ export default function CategoriesPage() {
                 </Button>
               </DialogFooter>
             </form>
+          </DialogContent>
+        </Dialog>
+
+        {/* Delete Confirmation Dialog */}
+        <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+          <DialogContent className="sm:max-w-[400px]">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-red-600">
+                <AlertCircle className="h-5 w-5" />
+                Confirmer la suppression
+              </DialogTitle>
+              <DialogDescription>
+                Êtes-vous sûr de vouloir supprimer la catégorie <strong>"{categoryToDelete?.nom}"</strong> ?
+                <br />
+                <span className="text-red-600 font-medium">Cette action est irréversible.</span>
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="gap-2">
+              <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)} disabled={mutationLoading}>
+                Annuler
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={confirmDelete}
+                disabled={mutationLoading}
+                className="bg-red-600 hover:bg-red-700"
+              >
+                {mutationLoading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Suppression...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Supprimer
+                  </>
+                )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Details Dialog */}
+        <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
+          <DialogContent className="sm:max-w-[600px]">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-teal-600">
+                <Tags className="h-5 w-5" />
+                Détails de la catégorie
+              </DialogTitle>
+            </DialogHeader>
+            {selectedCategory && (
+              <div className="space-y-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-gray-500">ID</Label>
+                    <p className="text-lg font-semibold">#{selectedCategory.id}</p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-gray-500">Nom</Label>
+                    <p className="text-lg font-semibold">{selectedCategory.nom}</p>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-gray-500">Description</Label>
+                  <p className="text-gray-700 bg-gray-50 p-3 rounded-lg">{selectedCategory.description}</p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-gray-500">Médicaments associés</Label>
+                  <div className="bg-teal-50 p-4 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <Package className="h-5 w-5 text-teal-600" />
+                      <span className="text-2xl font-bold text-teal-800">
+                        {selectedCategory.medicaments?.length || 0}
+                      </span>
+                      <span className="text-teal-600">médicaments</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsDetailDialogOpen(false)}>
+                Fermer
+              </Button>
+              <Button
+                onClick={() => {
+                  setIsDetailDialogOpen(false)
+                  if (selectedCategory) handleEdit(selectedCategory)
+                }}
+                className="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700"
+              >
+                <Edit className="h-4 w-4 mr-2" />
+                Modifier
+              </Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>

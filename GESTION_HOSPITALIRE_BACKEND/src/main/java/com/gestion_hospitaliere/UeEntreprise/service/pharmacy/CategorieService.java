@@ -2,6 +2,7 @@ package com.gestion_hospitaliere.UeEntreprise.service.pharmacy;
 
 import java.util.List;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import com.gestion_hospitaliere.UeEntreprise.repository.pharmacy.CategorieRepository;
@@ -24,7 +25,11 @@ public class CategorieService {
     }
 
     public Categorie saveCategorie(Categorie categorie) {
-        return categorieRepository.save(categorie);
+    	try {	
+    		return categorieRepository.save(categorie);
+    	}catch(DataIntegrityViolationException e) {
+    		throw new IllegalArgumentException("Une catégorie avec ce nom existe déjà");
+    	}
     }
 
     public void deleteCategorie(Long id) {

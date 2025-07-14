@@ -33,6 +33,8 @@ export default function MedicamentsPage() {
   const [selectedCategorieId, setSelectedCategorieId] = useState<string>("all")
   const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] = useState(false)
   const [medicamentToDelete, setMedicamentToDelete] = useState<Medicament | null>(null)
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false)
+  const [selectedMedicament, setSelectedMedicament] = useState<Medicament | null>(null)
 
   const { medicaments, loading, error, refetch } = useMedicaments()
   const { categories, loading: categoriesLoading } = useCategories()
@@ -101,6 +103,25 @@ export default function MedicamentsPage() {
   const handleDeleteConfirmation = (medicament: Medicament) => {
     setMedicamentToDelete(medicament)
     setIsDeleteConfirmationOpen(true)
+  }
+
+  const confirmDelete = async () => {
+    if (!medicamentToDelete?.id) return
+
+    try {
+      await deleteMedicament(medicamentToDelete.id)
+      setIsDeleteConfirmationOpen(false)
+      setMedicamentToDelete(null)
+      refetch()
+      toast.success("Médicament supprimé avec succès!")
+    } catch (err: any) {
+      toast.error(`Erreur lors de la suppression du médicament: ${err?.message || "Inconnue"}`)
+    }
+  }
+
+  const handleViewDetails = (medicament: Medicament) => {
+    setSelectedMedicament(medicament)
+    setIsDetailDialogOpen(true)
   }
 
   const handleDelete = async () => {
@@ -300,29 +321,29 @@ export default function MedicamentsPage() {
                           </TableCell>
                           <TableCell className="py-4">{getStockStatus(medicament.stockTotal)}</TableCell>
                           <TableCell className="text-right py-4">
-                            <div className="flex items-center justify-end gap-2">
+                            <div className="flex items-center justify-end gap-1">
                               <Button
                                 size="sm"
-                                variant="outline"
-                                className="h-8 px-3 bg-green-50 border-green-200 text-green-700 hover:bg-green-100 hover:border-green-300 transition-all duration-200"
+                                variant="ghost"
+                                onClick={() => handleViewDetails(medicament)}
+                                className="h-8 w-8 p-0 hover:bg-green-100 hover:text-green-700 transition-all duration-200"
+                                title="Voir les détails"
                               >
-                                <Eye className="h-3 w-3 mr-1" />
-                                Voir
+                                <Eye className="h-4 w-4" />
                               </Button>
                               <Button
                                 size="sm"
-                                variant="outline"
+                                variant="ghost"
                                 onClick={() => handleEdit(medicament)}
-                                className="h-8 px-3 bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100 hover:border-blue-300 transition-all duration-200"
+                                className="h-8 w-8 p-0 hover:bg-blue-100 hover:text-blue-700 transition-all duration-200"
                               >
                                 <Edit className="h-3 w-3 mr-1" />
-                                Modifier
                               </Button>
                               <Button
                                 size="sm"
-                                variant="outline"
+                                variant="ghost"
                                 onClick={() => handleDeleteConfirmation(medicament)}
-                                className="h-8 px-3 bg-red-50 border-red-200 text-red-700 hover:bg-red-100 hover:border-red-300 transition-all duration-200"
+                                className="h-8 w-8 p-0 hover:bg-red-100 hover:text-red-700 transition-all duration-200"
                                 disabled={mutationLoading}
                               >
                                 {mutationLoading ? (
@@ -330,7 +351,6 @@ export default function MedicamentsPage() {
                                 ) : (
                                   <>
                                     <Trash2 className="h-3 w-3 mr-1" />
-                                    Supprimer
                                   </>
                                 )}
                               </Button>
@@ -374,25 +394,110 @@ export default function MedicamentsPage() {
         <Dialog open={isDeleteConfirmationOpen} onOpenChange={setIsDeleteConfirmationOpen}>
           <DialogContent className="sm:max-w-[400px]">
             <DialogHeader>
-              <DialogTitle>Confirmation de Suppression</DialogTitle>
+              <DialogTitle className="flex items-center gap-2 text-red-600">
+                <AlertTriangle className="h-5 w-5" />
+                Confirmer la suppression
+              </DialogTitle>
               <DialogDescription>
-                Êtes-vous sûr de vouloir supprimer le médicament "{medicamentToDelete?.nom}
-                "? Cette action est irréversible.
+                Êtes-vous sûr de vouloir supprimer le médicament <strong>"{medicamentToDelete?.nom}"</strong> ?
+                <br />
+                <span className="text-red-600 font-medium">Cette action est irréversible.</span>
               </DialogDescription>
             </DialogHeader>
-            <DialogFooter>
-              <Button variant="secondary" onClick={() => setIsDeleteConfirmationOpen(false)}>
+            <DialogFooter className="gap-2">
+              <Button variant="outline" onClick={() => setIsDeleteConfirmationOpen(false)} disabled={mutationLoading}>
                 Annuler
               </Button>
-              <Button variant="destructive" onClick={handleDelete} disabled={mutationLoading}>
+              <Button
+                variant="destructive"
+                onClick={confirmDelete}
+                disabled={mutationLoading}
+                className="bg-red-600 hover:bg-red-700"
+              >
                 {mutationLoading ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                     Suppression...
                   </>
                 ) : (
-                  "Supprimer"
+                  <>
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Supprimer
+                  </>
                 )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Details Dialog */}
+        <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
+          <DialogContent className="sm:max-w-[700px]">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-teal-600">
+                <Pill className="h-5 w-5" />
+                Détails du médicament
+              </DialogTitle>
+            </DialogHeader>
+            {selectedMedicament && (
+              <div className="space-y-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-gray-500">ID</Label>
+                    <p className="text-lg font-semibold">#{selectedMedicament.id}</p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-gray-500">Nom</Label>
+                    <p className="text-lg font-semibold">{selectedMedicament.nom}</p>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-gray-500">Catégorie</Label>
+                  <Badge
+                    variant="outline"
+                    className="bg-cyan-50 text-cyan-700 border-cyan-200 font-medium text-base px-3 py-1"
+                  >
+                    {selectedMedicament.categorie?.nom || "Non catégorisé"}
+                  </Badge>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-gray-500">Description</Label>
+                  <p className="text-gray-700 bg-gray-50 p-3 rounded-lg">{selectedMedicament.description}</p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-gray-500">Stock Total</Label>
+                    <div className="bg-teal-50 p-4 rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <Package className="h-5 w-5 text-teal-600" />
+                        <span className="text-2xl font-bold text-teal-800">{selectedMedicament.stockTotal}</span>
+                        <span className="text-teal-600">unités</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-gray-500">Statut</Label>
+                    <div className="pt-2">{getStockStatus(selectedMedicament.stockTotal)}</div>
+                  </div>
+                </div>
+              </div>
+            )}
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsDetailDialogOpen(false)}>
+                Fermer
+              </Button>
+              <Button
+                onClick={() => {
+                  setIsDetailDialogOpen(false)
+                  if (selectedMedicament) handleEdit(selectedMedicament)
+                }}
+                className="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700"
+              >
+                <Edit className="h-4 w-4 mr-2" />
+                Modifier
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -456,10 +561,10 @@ const MedicamentForm: React.FC<MedicamentFormProps> = ({ medicament, categories,
         <div className="grid gap-2">
           <Label htmlFor="categorie">Catégorie *</Label>
           <Select value={categorieId} onValueChange={setCategorieId} required>
-            <SelectTrigger className="border-teal-200 focus:border-teal-500 focus:ring-teal-500">
+            <SelectTrigger className="border-teal-200 focus:border-teal-500 focus:ring-teal-500 bg-white">
               <SelectValue placeholder="Sélectionner une catégorie" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white">
               {categories.map((cat) => (
                 <SelectItem key={cat.id} value={cat.id?.toString() || ""}>
                   {cat.nom}
