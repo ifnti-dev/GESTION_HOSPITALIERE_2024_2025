@@ -3,8 +3,7 @@ import { apiClient } from "../api" // Importation de apiClient
 import { DossierMedical, CreateDossierMedicalPayload } from "@/types/medical" // Chemin corrigé
 import { Personne } from "@/types/utilisateur"
 
-// Type pour la création d'un dossier médical (correspond au DTO attendu par le backend)
-const DOSSIER_MEDICAL_API_URL = `${API_CONFIG.BASE_URL}${API_ENDPOINTS.DOSSIER.DOSSIER_MEDICAL}`
+const DOSSIER_MEDICAL_API_URL = API_ENDPOINTS.DOSSIER.DOSSIER_MEDICAL
 
 export const dossierMedicalService = {
   /**
@@ -12,7 +11,7 @@ export const dossierMedicalService = {
    * @returns Une promesse qui résout en un tableau de DossierMedical.
   */
   getAllDossiers: async (): Promise<DossierMedical[]> => {
-    const allDossiersUrl = `${API_CONFIG.BASE_URL}${API_ENDPOINTS.DOSSIER.DOSSIER_MEDICAL_SEARCH}`
+    const allDossiersUrl = API_ENDPOINTS.DOSSIER.DOSSIER_MEDICAL_SEARCH.ALL
     console.log("🔍 Fetching all medical records...")
     return apiClient.get<DossierMedical[]>(allDossiersUrl)
   },
@@ -70,8 +69,20 @@ export const dossierMedicalService = {
   deleteDossier: async (id: number): Promise<void> => {
     console.log(`🗑️ Deleting medical record ${id}`)
     try {
-      await apiClient.delete<void>(`${DOSSIER_MEDICAL_API_URL}/${id}`)
-      console.log("✅ Medical record deleted successfully")
+      // Remplacement de apiClient.delete par un appel fetch direct pour mieux gérer les réponses sans contenu (204 No Content)
+      const response = await fetch(`${API_CONFIG.BASE_URL}${DOSSIER_MEDICAL_API_URL}/${id}`, {
+        method: 'DELETE',
+        headers: API_HEADERS,
+      });
+
+      if (!response.ok) {
+        // Gère les réponses qui ne sont pas des succès (ex: 404, 500)
+        const errorText = await response.text().catch(() => `Erreur serveur: ${response.status}`);
+        throw new Error(errorText);
+      }
+
+      // Une réponse 204 No Content est un succès mais n'a pas de corps, ce qui causait l'erreur JSON.parse.
+      console.log("✅ Medical record deleted successfully");
     } catch (error) {
       console.error(`❌ Error deleting medical record ${id}:`, error)
       throw error
@@ -83,7 +94,7 @@ export const dossierMedicalService = {
    * @returns Une promesse qui résout en un tableau de Personne.
   */
   getAllPatients: async (): Promise<Personne[]> => {
-    const PATIENTS_API_URL = `${API_CONFIG.BASE_URL}${API_ENDPOINTS.UTILISATEUR.PERSONNES}`
+    const PATIENTS_API_URL = API_ENDPOINTS.UTILISATEUR.PERSONNES
     console.log("🔍 Fetching all patients...")
     try {
       const patients = await apiClient.get<Personne[]>(PATIENTS_API_URL)

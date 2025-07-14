@@ -53,6 +53,8 @@ export const API_ENDPOINTS = {
   // Utilisateur
   UTILISATEUR: {
     EMPLOYES: "/api/employe",
+    PAS_MEDICALE: "/api/personne/pas-dossier-medical",
+    PAS_GROSSES: "/api/personne/pas-dossier-grossesse",
     ROLES: "/api/roles",
     PERMISSIONS: "/api/permissions",
     PERSONNES : "/api/personne",
@@ -74,19 +76,22 @@ export const API_ENDPOINTS = {
   PRESCRIPTIONS: "/api/prescriptions",
   SUIVIETATS: "/api/suivietats",
   },
+      CONSULTATION_PRENATALE: "/api/consultations-prenatales"
+  ,
 
   DOSSIER: {
-    DOSSIER_MEDICAL: "/api/dossier-medical",
+    DOSSIER_MEDICAL: "/api/dossiers-medical",
     DOSSIER_MEDICAL_SEARCH: {
-      BY_PATIENT: "/api/dossier-medical/search/patient",
-      BY_DATE: "/api/dossier-medical/search/date",
-      
+      ALL: "/api/dossiers-medical",
+      BY_PATIENT: "/api/dossiers-medical/search/patient",
+      BY_DATE: "/api/dossiers-medical/search/date",
+
     },
-    DOSSIER_MEDICAL_DETAILS: "/api/dossier-medical/details",
-    DOSSIER_GROSSES: "/api/dossier-grossesses",
+    DOSSIER_MEDICAL_DETAILS: "/api/dossiers-medical/details",
+    DOSSIER_GROSSES: "/api/dossiers-grossesse",
     DOSSIER_GROSSES_SEARCH: {
-      BY_PATIENT: "/api/dossier-grossesses/search/patient",
-      BY_DATE: "/api/dossier-grossesses/search/date",
+      BY_PATIENT: "/api/dossiers-grossesse/search/patient",
+      BY_DATE: "/api/dossiers-grossesse/search/date",
     },
   },
 

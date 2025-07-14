@@ -9,7 +9,7 @@ export class ApiError extends Error {
     public timestamp?: string,
     public path?: string,
   ) {
-    super(message)
+    super(message) 
     this.name = "ApiError"
   }
 }

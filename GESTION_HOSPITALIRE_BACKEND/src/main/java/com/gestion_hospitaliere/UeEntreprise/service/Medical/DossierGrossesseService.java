@@ -87,25 +87,34 @@ public class DossierGrossesseService {
         // sont pas nuls
         // ou qu'ils appartiennent à une liste fixe (exemple ici : "Positive",
         // "Négative", "Inconnue", "Non fait")
-        List<String> valeursValides = List.of("Positive", "Négative", "Inconnue", "Non fait");
+        // Listes de valeurs valides
+        List<String> valeursImmunisation = List.of("Immunisé", "Non immunisé");
+        List<String> valeursSerologie = List.of("Négatif", "Positif", "Inconnue", "Non fait");
 
+        // Vérifications des statuts d'immunisation
         if (dossier.getStatutImmunisationRubeole() == null
-                || !valeursValides.contains(dossier.getStatutImmunisationRubeole())) {
+                || !valeursImmunisation.contains(dossier.getStatutImmunisationRubeole())) {
             throw new IllegalArgumentException("Statut immunisation rubéole invalide.");
         }
+
         if (dossier.getStatutImmunisationToxo() == null
-                || !valeursValides.contains(dossier.getStatutImmunisationToxo())) {
+                || !valeursImmunisation.contains(dossier.getStatutImmunisationToxo())) {
             throw new IllegalArgumentException("Statut immunisation toxoplasmose invalide.");
         }
+
         if (dossier.getStatutImmunisationHepatiteB() == null
-                || !valeursValides.contains(dossier.getStatutImmunisationHepatiteB())) {
+                || !valeursImmunisation.contains(dossier.getStatutImmunisationHepatiteB())) {
             throw new IllegalArgumentException("Statut immunisation hépatite B invalide.");
         }
-        if (dossier.getStatutSerologieHiv() == null || !valeursValides.contains(dossier.getStatutSerologieHiv())) {
+
+        // Vérifications des statuts de sérologie
+        if (dossier.getStatutSerologieHiv() == null
+                || !valeursSerologie.contains(dossier.getStatutSerologieHiv())) {
             throw new IllegalArgumentException("Statut sérologie HIV invalide.");
         }
+
         if (dossier.getStatutSerologieSyphilis() == null
-                || !valeursValides.contains(dossier.getStatutSerologieSyphilis())) {
+                || !valeursSerologie.contains(dossier.getStatutSerologieSyphilis())) {
             throw new IllegalArgumentException("Statut sérologie syphilis invalide.");
         }
 
@@ -197,25 +206,35 @@ public class DossierGrossesseService {
         }
 
         // Statuts immunisation et sérologie valides
-        List<String> valeursValides = List.of("Positive", "Négative", "Inconnue", "Non fait");
 
+        // Listes de valeurs valides
+        List<String> valeursImmunisation = List.of("Immunisé", "Non immunisé");
+        List<String> valeursSerologie = List.of("Positif", "Négatif", "Inconnue", "Non fait");
+
+        // Vérifications des statuts d'immunisation
         if (updated.getStatutImmunisationRubeole() == null
-                || !valeursValides.contains(updated.getStatutImmunisationRubeole())) {
+                || !valeursImmunisation.contains(updated.getStatutImmunisationRubeole())) {
             throw new IllegalArgumentException("Statut immunisation rubéole invalide.");
         }
+
         if (updated.getStatutImmunisationToxo() == null
-                || !valeursValides.contains(updated.getStatutImmunisationToxo())) {
+                || !valeursImmunisation.contains(updated.getStatutImmunisationToxo())) {
             throw new IllegalArgumentException("Statut immunisation toxoplasmose invalide.");
         }
+
         if (updated.getStatutImmunisationHepatiteB() == null
-                || !valeursValides.contains(updated.getStatutImmunisationHepatiteB())) {
+                || !valeursImmunisation.contains(updated.getStatutImmunisationHepatiteB())) {
             throw new IllegalArgumentException("Statut immunisation hépatite B invalide.");
         }
-        if (updated.getStatutSerologieHiv() == null || !valeursValides.contains(updated.getStatutSerologieHiv())) {
+
+        // Vérifications des statuts de sérologie
+        if (updated.getStatutSerologieHiv() == null
+                || !valeursSerologie.contains(updated.getStatutSerologieHiv())) {
             throw new IllegalArgumentException("Statut sérologie HIV invalide.");
         }
+
         if (updated.getStatutSerologieSyphilis() == null
-                || !valeursValides.contains(updated.getStatutSerologieSyphilis())) {
+                || !valeursSerologie.contains(updated.getStatutSerologieSyphilis())) {
             throw new IllegalArgumentException("Statut sérologie syphilis invalide.");
         }
 
