@@ -169,6 +169,7 @@ import com.gestion_hospitaliere.UeEntreprise.model.Pregnancy.SuiviGrossesse;
 
 import jakarta.persistence.*;
 
+@Table(name = "personne")
 @Entity
 public class Personne {
 

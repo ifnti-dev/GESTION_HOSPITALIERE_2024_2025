@@ -13,8 +13,8 @@ import com.gestion_hospitaliere.UeEntreprise.model.pharmacy.Commande;
 import com.gestion_hospitaliere.UeEntreprise.service.pharmacy.CommandeService;
 
 @RestController
-@RequestMapping("/api/pharmacie/commandes")
-@CrossOrigin(origins = "*")
+@RequestMapping("/api/commandes")
+// @CrossOrigin(origins = "*")
 public class CommandeController {
 
     @Autowired
