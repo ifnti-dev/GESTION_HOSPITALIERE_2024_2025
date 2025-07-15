@@ -159,6 +159,22 @@ export const API_ENDPOINTS = {
     },
   },
 
+   DOSSIER: {
+    DOSSIER_MEDICAL: "/api/dossiers-medical",
+    DOSSIER_MEDICAL_SEARCH: {
+      BY_PATIENT: "/api/dossiers-medical/search/patient",
+      BY_DATE: "/api/dossiers-medical/search/date",
+      
+    },
+    DOSSIER_MEDICAL_DETAILS: "/api/dossiers-medical/details",
+    DOSSIER_GROSSES: "/api/dossiers-grossesse",
+    DOSSIER_GROSSES_SEARCH: {
+      BY_PATIENT: "/api/dossiers-grossesse/search/patient",
+      BY_DATE: "/api/dossiers-grossesses/search/date",
+    },
+  },
+
+
   UTILISATEUR: {
     // PersonneController endpoints
     PERSONNES: "/api/personne",
@@ -218,6 +234,7 @@ export const API_ENDPOINTS = {
   PRESCRIPTIONS: "/api/prescriptions",
   SUIVIETATS: "/api/suiviEtats",
   }
+
 ,
   HOSPITALISATIONS: {
     HOSPITALISATIONS: "/api/hospitalisations",

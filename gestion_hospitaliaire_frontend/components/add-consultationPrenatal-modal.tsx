@@ -26,15 +26,15 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { Personne } from "@/types/utilisateur"
-import { ConsultationFormData } from "@/types/consultstionsTraitement"
+import { CreateConsultationPrenatalePayload } from "@/types/consultstionsTraitement"
 import { calculateAge } from "@/lib/utils"
 
 interface AddConsultationModalProps {
   isOpen: boolean
   onClose: () => void
   patientes: Personne[]
-  newConsultation: ConsultationFormData
-  setNewConsultation: (data: ConsultationFormData) => void
+  newConsultation: CreateConsultationPrenatalePayload
+  setNewConsultation: (data: CreateConsultationPrenatalePayload) => void
   handleAddConsultation: () => Promise<void>
 }
 

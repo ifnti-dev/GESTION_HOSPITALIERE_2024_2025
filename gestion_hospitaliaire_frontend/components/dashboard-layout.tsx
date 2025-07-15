@@ -49,7 +49,10 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     )
   }
 
-  const userRole = user.role?.toLowerCase().trim()
+  // Logique de récupération du rôle, alignée sur TopBar.tsx pour la cohérence
+  const profile = userProfile || user?.profile
+  const userRole = profile?.employe?.roles?.[0]?.nom?.toLowerCase().trim()
+
   console.log("DashboardLayout - Role normalisé:", userRole)
 
   const renderSidebarWithLayout = () => {

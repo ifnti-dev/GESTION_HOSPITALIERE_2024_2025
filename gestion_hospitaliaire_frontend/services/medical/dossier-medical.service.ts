@@ -11,7 +11,7 @@ export const dossierMedicalService = {
    * @returns Une promesse qui résout en un tableau de DossierMedical.
   */
   getAllDossiers: async (): Promise<DossierMedical[]> => {
-    const allDossiersUrl = API_ENDPOINTS.DOSSIER.DOSSIER_MEDICAL_SEARCH.ALL
+    const allDossiersUrl = API_ENDPOINTS.DOSSIER.DOSSIER_MEDICAL
     console.log("🔍 Fetching all medical records...")
     return apiClient.get<DossierMedical[]>(allDossiersUrl)
   },

@@ -1,7 +1,6 @@
 import { apiFetch } from "@/lib/apiClient";
 import { API_CONFIG, API_ENDPOINTS, API_HEADERS } from "@/config/api";
 
-import { API_ENDPOINTS } from "@/config/api"
 import type {
   Personne,
   PersonneFormData,
@@ -37,15 +36,7 @@ export async function getPersonneById(personneId: number): Promise<Personne> {
 
 
 // Ajouter une nouvelle personne
-export async function addPersonne(newPersonne: Personne): Promise<Personne> {
-    console.log("Adding new person:", newPersonne);
-    const response = await apiFetch<Personne>(API_ENDPOINTS.UTILISATEUR.PERSONNES, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newPersonne),
-    });
+// (Supprimé: doublon de la fonction addPersonne)
 
 // Ajouter une nouvelle personne - correspond à ajouterPersonne dans PersonneController
 export async function addPersonne(newPersonne: PersonneFormData): Promise<Personne> {
@@ -111,10 +102,9 @@ export async function deletePersonne(personneId: number): Promise<void> {
     }
 }
 
-  await apiFetch<void>(API_ENDPOINTS.UTILISATEUR.PERSONNES_BY_ID(personneId), {
-    method: "DELETE",
-  })
-}
+// await apiFetch<void>(API_ENDPOINTS.UTILISATEUR.PERSONNES_BY_ID(personneId), {
+//   method: "DELETE",
+// })
 
 // Rechercher des personnes par nom
 export async function searchPersonnesByNom(nom: string): Promise<Personne[]> {
