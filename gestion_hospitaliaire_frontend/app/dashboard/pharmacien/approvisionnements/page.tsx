@@ -110,7 +110,7 @@ export default function ApprovisionnementPage() {
   const fournisseurs = Array.from(new Set(approvisionnements.map((a) => a.fournisseur)))
 
   // Calculs pour les statistiques
-  const totalMontant = lignes.reduce((sum, ligne) => sum + (ligne.quantite * ligne.prixUnitaireVente) / 100, 0)
+  const totalMontant = lignes.reduce((sum, ligne) => sum + ligne.quantite * ligne.prixUnitaireVente, 0)
 
   // Générer un ID temporaire unique
   const generateTempId = () => `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
@@ -163,8 +163,8 @@ export default function ApprovisionnementPage() {
           ligneId: ligne.id, // ID réel de la ligne
           medicamentReferenceId: ligne.medicamentReference?.id || null,
           quantite: ligne.quantite,
-          prixUnitaireAchat: ligne.prixUnitaireAchat / 100, // Conversion centimes -> euros
-          prixUnitaireVente: ligne.prixUnitaireVente / 100, // Conversion centimes -> euros
+          prixUnitaireAchat: ligne.prixUnitaireAchat, // No conversion
+          prixUnitaireVente: ligne.prixUnitaireVente, // No conversion
           dateReception: ligne.dateReception,
           dateExpiration: ligne.dateExpiration,
           numeroLot: ligne.numeroLot,
@@ -241,8 +241,8 @@ export default function ApprovisionnementPage() {
         employeId: 1, // À remplacer par l'ID de l'employé connecté
         lignesApprovisionnement: formLignes.map((ligne) => ({
           quantite: ligne.quantite,
-          prixUnitaireAchat: Math.round(ligne.prixUnitaireAchat * 100), // Conversion en centimes
-          prixUnitaireVente: Math.round(ligne.prixUnitaireVente * 100), // Conversion en centimes
+          prixUnitaireAchat: Math.round(ligne.prixUnitaireAchat), // No conversion, send as is
+          prixUnitaireVente: Math.round(ligne.prixUnitaireVente), // No conversion, send as is
           dateReception: ligne.dateReception,
           dateExpiration: ligne.dateExpiration,
           numeroLot: ligne.numeroLot || undefined, // Auto-généré si vide
@@ -378,7 +378,7 @@ export default function ApprovisionnementPage() {
               <CardTitle className="text-sm font-medium text-purple-700">Valeur Totale</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-purple-900">{totalMontant.toFixed(2)}€</div>
+              <div className="text-2xl font-bold text-purple-900">{totalMontant.toFixed(2)} FCFA</div>
               <p className="text-xs text-purple-600 mt-1">Montant</p>
             </CardContent>
           </Card>
@@ -556,14 +556,12 @@ export default function ApprovisionnementPage() {
                             <div>
                               <span className="text-gray-500">Prix Achat:</span>
                               <div className="font-medium text-green-700">
-                                {(ligne.prixUnitaireAchat / 100).toFixed(2)}€
+                                {ligne.prixUnitaireAchat.toFixed(2)} FCFA
                               </div>
                             </div>
                             <div>
                               <span className="text-gray-500">Prix Vente:</span>
-                              <div className="font-medium text-blue-700">
-                                {(ligne.prixUnitaireVente / 100).toFixed(2)}€
-                              </div>
+                              <div className="font-medium text-blue-700">{ligne.prixUnitaireVente.toFixed(2)} FCFA</div>
                             </div>
                             <div>
                               <span className="text-gray-500">Réception:</span>
@@ -584,7 +582,7 @@ export default function ApprovisionnementPage() {
                           <div className="flex items-center justify-between text-sm">
                             <span className="text-gray-600">Total ligne:</span>
                             <span className="font-bold text-purple-700">
-                              {((ligne.quantite * ligne.prixUnitaireVente) / 100).toFixed(2)}€
+                              {(ligne.quantite * ligne.prixUnitaireVente).toFixed(2)} FCFA
                             </span>
                           </div>
                         </div>
@@ -723,8 +721,8 @@ export default function ApprovisionnementPage() {
                                     <TableRow>
                                       <TableHead className="w-[250px] font-semibold">Médicament</TableHead>
                                       <TableHead className="w-[100px] font-semibold">Quantité</TableHead>
-                                      <TableHead className="w-[120px] font-semibold">Prix Achat (€)</TableHead>
-                                      <TableHead className="w-[120px] font-semibold">Prix Vente (€)</TableHead>
+                                      <TableHead className="w-[120px] font-semibold">Prix Achat (FCFA)</TableHead>
+                                      <TableHead className="w-[120px] font-semibold">Prix Vente (FCFA)</TableHead>
                                       <TableHead className="w-[140px] font-semibold">Date Réception</TableHead>
                                       <TableHead className="w-[140px] font-semibold">Date Expiration</TableHead>
                                       <TableHead className="w-[140px] font-semibold">N° Lot</TableHead>
@@ -833,7 +831,7 @@ export default function ApprovisionnementPage() {
                                         </TableCell>
                                         <TableCell className="p-2">
                                           <Badge variant="outline" className="bg-purple-50 text-purple-700 font-medium">
-                                            {(ligne.quantite * ligne.prixUnitaireVente).toFixed(2)}€
+                                            {(ligne.quantite * ligne.prixUnitaireVente).toFixed(2)} FCFA
                                           </Badge>
                                         </TableCell>
                                         <TableCell className="p-2">
@@ -899,12 +897,12 @@ export default function ApprovisionnementPage() {
                                   {formLignes
                                     .reduce((sum, ligne) => sum + ligne.quantite * ligne.prixUnitaireAchat, 0)
                                     .toFixed(2)}
-                                  €
+                                  FCFA
                                 </span>
                               </div>
                               <div className="flex justify-between text-lg font-bold">
                                 <span className="text-purple-800">Valeur de vente:</span>
-                                <span className="text-purple-900">{totalFormulaire.toFixed(2)}€</span>
+                                <span className="text-purple-900">{totalFormulaire.toFixed(2)} FCFA</span>
                               </div>
                             </div>
                           </div>
@@ -922,8 +920,8 @@ export default function ApprovisionnementPage() {
                                   >
                                     <span>Ligne {index + 1}</span>
                                     <span className="font-medium">
-                                      {ligne.quantite} × {ligne.prixUnitaireVente.toFixed(2)}€ ={" "}
-                                      {(ligne.quantite * ligne.prixUnitaireVente).toFixed(2)}€
+                                      {ligne.quantite} × {ligne.prixUnitaireVente.toFixed(2)} FCFA ={" "}
+                                      {(ligne.quantite * ligne.prixUnitaireVente).toFixed(2)} FCFA
                                     </span>
                                   </div>
                                 ))}

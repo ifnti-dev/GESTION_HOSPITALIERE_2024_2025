@@ -255,6 +255,9 @@ export const getApiHeaders = (additionalHeaders?: Record<string, string>) => ({
 // Types pour la configuration
 export type ApiEndpoint = (typeof API_ENDPOINTS)[keyof typeof API_ENDPOINTS]
 
+
+
+
 // Fonctions helper pour construire les URLs avec paramètres
 export const buildCommandeUrl = {
   byId: (id: number) => `${API_ENDPOINTS.PHARMACIE.COMMANDES}/${id}`,

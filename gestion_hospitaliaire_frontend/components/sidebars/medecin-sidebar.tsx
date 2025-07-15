@@ -274,13 +274,15 @@ export function MedecinSidebar({ children }: MedecinSidebarProps) {
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* TopBar */}
-        <TopBar
+        {/* <TopBar
           userRole="Médecin"
           userName="Dr. Jean Dupont"
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}
           isMobile={isMobile}
-        />
+        /> */}
+        <TopBar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} isMobile={isMobile} />
+        
 
         {/* Page Content */}
         <main className="flex-1 overflow-auto p-6 bg-gray-50">{children}</main>
