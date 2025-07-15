@@ -185,8 +185,8 @@ public class Personne {
     private String sexe;
     private String dateNaissance;
     private String situationMatrimoniale;
+    @Column(nullable = true) 
     private String password;
-
     
     @OneToOne(mappedBy = "personne", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -27,25 +27,20 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command"
-import { Check, ChevronsUpDown } from "lucide-react"
+import { Check, ChevronsUpDown } from "lucide-react" // Keep these imports
+// import { getPersonnes } from "@/services/utilisateur/personne.service" // Removed: patients are now passed as a prop
 import { cn } from "@/lib/utils" // Assurez-vous que ce chemin est correct et que cn est exporté
-import type { Patient } from "@/types" // Assurez-vous que ce chemin est correct
+import type { Personne } from "@/types/utilisateur" // Assurez-vous que ce chemin est correct
+import { toast } from "sonner"
+import type { CreateDossierMedicalPayload, DossierMedical } from "@/types/medical" // Assurez-vous que ce chemin est correct
 
-export interface DossierFormData {
-  patientId: string
-  antecedents: string
-  allergies: string
-  traitementsEnCours: string
-  tension: number
-  groupeSanguin: string
-}
 
 interface CreateDossierPatientModalProps {
   isOpen: boolean
   onOpenChange: (isOpen: boolean) => void
-  onSubmit: (data: DossierFormData) => void
-  patients: Patient[] // Liste des patients à afficher dans le select
-  initialData?: Partial<DossierFormData> // Pour une éventuelle modification
+  onSubmit: (data: CreateDossierMedicalPayload, id?: number) => void
+  patients: Personne[] // Liste des patients à afficher dans le select
+  initialData?: DossierMedical | null // Pour la modification
 }
 
 export function CreateDossierPatientModal({
@@ -55,28 +50,40 @@ export function CreateDossierPatientModal({
   patients,
   initialData,
 }: CreateDossierPatientModalProps) {
-  const [selectedPatientId, setSelectedPatientId] = useState<string | undefined>(initialData?.patientId)
+  const isEditMode = !!initialData
+
+  const [selectedPatientId, setSelectedPatientId] = useState<string | undefined>(
+    initialData?.personne?.id?.toString()
+  )
   const [antecedents, setAntecedents] = useState(initialData?.antecedents || "")
   const [allergies, setAllergies] = useState(initialData?.allergies || "")
   const [traitementsEnCours, setTraitementsEnCours] = useState(initialData?.traitementsEnCours || "")
   const [tension, setTension] = useState<string>(initialData?.tension?.toString() || "")
   const [groupeSanguin, setGroupeSanguin] = useState<string | undefined>(initialData?.groupeSanguin)
   const [isPatientComboboxOpen, setIsPatientComboboxOpen] = useState(false)
+  const [errors, setErrors] = useState<Partial<Record<keyof CreateDossierMedicalPayload | 'patient', string>>>({})
+
 
   useEffect(() => {
-    if (isOpen && initialData) {
-      setSelectedPatientId(initialData.patientId)
-      setAntecedents(initialData.antecedents || "")
-      setAllergies(initialData.allergies || "")
-      setTraitementsEnCours(initialData.traitementsEnCours || "")
-      setTension(initialData.tension?.toString() || "")
-      setGroupeSanguin(initialData.groupeSanguin)
+    if (isOpen) {
+      if (isEditMode && initialData) {
+        setSelectedPatientId(initialData.personne?.id ? String(initialData.personne.id) : undefined)
+        setAntecedents(initialData.antecedents || "")
+        setAllergies(initialData.allergies || "")
+        setTraitementsEnCours(initialData.traitementsEnCours || "")
+        setTension(initialData.tension?.toString() || "")
+        setGroupeSanguin(initialData.groupeSanguin)
+      } else {
+        setErrors({})
+        resetForm()
+      }
     } else if (!isOpen) {
-        // Reset form when modal is closed if not for editing
-        // If you want to keep values for next open, remove this reset logic
-        // resetForm(); // Le reset est déjà géré par le parent ou onOpenChange si nécessaire
+      // Optional: Reset form when closing, handled by the logic above on open.
+      // This ensures a clean state every time the modal is opened.
     }
-  }, [isOpen, initialData])
+  }, [isOpen, initialData, isEditMode])
+
+
 
   const resetForm = () => {
     setSelectedPatientId(undefined)
@@ -86,60 +93,82 @@ export function CreateDossierPatientModal({
     setTension("")
     setGroupeSanguin(undefined)
     setIsPatientComboboxOpen(false)
+    setErrors({})
   }
 
   const handleSubmit = () => {
-    if (!selectedPatientId || !antecedents || !allergies || !traitementsEnCours || !tension || !groupeSanguin) {
-      alert("Veuillez remplir tous les champs obligatoires.")
-      return
-    }
-    const tensionValue = parseFloat(tension)
-    if (isNaN(tensionValue)) {
-        alert("La tension doit être une valeur numérique.")
-        return;
+    const newErrors: Partial<Record<keyof CreateDossierMedicalPayload | 'patient', string>> = {}
+
+    if (!selectedPatientId) newErrors.patient = "Veuillez sélectionner un patient."
+    if (!antecedents.trim()) newErrors.antecedents = "Les antécédents sont obligatoires."
+    if (!allergies.trim()) newErrors.allergies = "Le champ allergies est obligatoire."
+    if (!traitementsEnCours.trim()) newErrors.traitementsEnCours = "Les traitements en cours sont obligatoires."
+    if (!groupeSanguin) newErrors.groupeSanguin = "Le groupe sanguin est obligatoire."
+
+    if (!tension.trim()) {
+      newErrors.tension = "La tension est obligatoire."
+    } else {
+      const tensionNum = parseFloat(tension)
+      if (isNaN(tensionNum)) {
+        newErrors.tension = "La tension doit être une valeur numérique."
+      } else if (tensionNum < 0 || tensionNum > 30) {
+        newErrors.tension = "La tension doit être entre 0 et 30 (cmHg)."
+      }
     }
 
-    onSubmit({
-      patientId: selectedPatientId,
+    setErrors(newErrors)
+
+    if (Object.keys(newErrors).length > 0) {
+      toast.error("Veuillez corriger les erreurs dans le formulaire.")
+      return
+    }
+
+    const tensionValue = parseFloat(tension)
+
+    const payload: CreateDossierMedicalPayload = {
+      personne:{
+        id: Number(selectedPatientId)
+      },
       antecedents,
       allergies,
       traitementsEnCours,
       tension: tensionValue,
-      groupeSanguin,
-    })
-    // Optionnel: réinitialiser le formulaire ici si la modale reste ouverte après soumission
-    // ou si le parent ne gère pas la réinitialisation en fermant/réouvrant.
-    // Pour l'instant, on suppose que le parent ferme la modale, ce qui déclenchera le useEffect ou une nouvelle initialisation.
-    onOpenChange(false) // Ferme la modale après soumission
-    resetForm() // Assure la réinitialisation pour la prochaine ouverture
-    // La fermeture de la modale et le reset sont gérés par le parent ou via onOpenChange
+      groupeSanguin: groupeSanguin as string,
+    }
+
+    onSubmit(payload, isEditMode ? initialData.id : undefined)
+    onOpenChange(false) // Parent component will close the modal
   }
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>Créer un Nouveau Dossier Patient</DialogTitle>
+          <DialogTitle>{isEditMode ? "Modifier le Dossier Patient" : "Créer un Nouveau Dossier Patient"}</DialogTitle>
           <DialogDescription>
-            Remplissez les informations ci-dessous pour créer un nouveau dossier médical.
+            {isEditMode ? "Mettez à jour les informations du dossier médical." : "Remplissez les informations ci-dessous pour créer un nouveau dossier médical."}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="space-y-2">
             <Label htmlFor="patient-combobox">Patient *</Label>
-            <Popover open={isPatientComboboxOpen} onOpenChange={setIsPatientComboboxOpen}>
+             <Popover open={isPatientComboboxOpen} onOpenChange={setIsPatientComboboxOpen}>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
                   role="combobox"
                   aria-expanded={isPatientComboboxOpen}
-                  className="w-full justify-between"
+                  className={cn(
+                    "w-full justify-between",
+                    errors.patient && "border-red-500 focus-visible:ring-red-500"
+                  )}
                   id="patient-combobox"
                 >
                   {selectedPatientId
-                    ? patients.find((patient) => patient.id === selectedPatientId)?.prenom +
+                    ? patients.find((p) => p.id?.toString() === selectedPatientId)?.prenom +
                       " " +
-                      patients.find((patient) => patient.id === selectedPatientId)?.nom
+                      patients.find((p) => p.id?.toString() === selectedPatientId)?.nom
+
                     : "Sélectionner un patient..."}
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
@@ -153,19 +182,20 @@ export function CreateDossierPatientModal({
                       {patients.map((patient) => (
                         <CommandItem
                           key={patient.id}
-                          value={`${patient.prenom} ${patient.nom} ${patient.id} ${patient.numeroSecuriteSociale}`}
+                          value={`${patient.prenom} ${patient.nom} ${patient.id} ${patient.dateNaissance}`}
                           onSelect={() => {
-                            setSelectedPatientId(patient.id)
+                            setSelectedPatientId(String(patient.id))
                             setIsPatientComboboxOpen(false)
                           }}
                         >
                           <Check
                             className={cn(
                               "mr-2 h-4 w-4",
-                              selectedPatientId === patient.id ? "opacity-100" : "opacity-0"
+                              String(selectedPatientId) === String(patient.id) ? "opacity-100" : "opacity-0"
+
                             )}
                           />
-                          {patient.prenom} {patient.nom} ({patient.numeroSecuriteSociale})
+                          {patient.prenom} {patient.nom} ({patient.dateNaissance})
                         </CommandItem>
                       ))}
                     </CommandGroup>
@@ -173,6 +203,7 @@ export function CreateDossierPatientModal({
                 </Command>
               </PopoverContent>
             </Popover>
+            {errors.patient && <p className="text-sm font-medium text-red-500">{errors.patient}</p>}
           </div>
 
           <div className="space-y-2">
@@ -182,7 +213,9 @@ export function CreateDossierPatientModal({
               placeholder="Décrire les antécédents médicaux..."
               value={antecedents}
               onChange={(e) => setAntecedents(e.target.value)}
+              className={cn(errors.antecedents && "border-red-500 focus-visible:ring-red-500")}
             />
+            {errors.antecedents && <p className="text-sm font-medium text-red-500">{errors.antecedents}</p>}
           </div>
 
           <div className="space-y-2">
@@ -192,7 +225,9 @@ export function CreateDossierPatientModal({
               placeholder="Lister les allergies connues..."
               value={allergies}
               onChange={(e) => setAllergies(e.target.value)}
+              className={cn(errors.allergies && "border-red-500 focus-visible:ring-red-500")}
             />
+            {errors.allergies && <p className="text-sm font-medium text-red-500">{errors.allergies}</p>}
           </div>
 
           <div className="space-y-2">
@@ -202,24 +237,31 @@ export function CreateDossierPatientModal({
               placeholder="Indiquer les traitements actuels..."
               value={traitementsEnCours}
               onChange={(e) => setTraitementsEnCours(e.target.value)}
+              className={cn(errors.traitementsEnCours && "border-red-500 focus-visible:ring-red-500")}
             />
+            {errors.traitementsEnCours && <p className="text-sm font-medium text-red-500">{errors.traitementsEnCours}</p>}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="tension">Tension (valeur numérique) *</Label>
+            <Label htmlFor="tension">Tension (en cmHg) *</Label>
             <Input
               id="tension"
               type="number"
-              placeholder="Ex: 120"
+              placeholder="Ex: 12 (en cmHg)"
               value={tension}
               onChange={(e) => setTension(e.target.value)}
+              className={cn(errors.tension && "border-red-500 focus-visible:ring-red-500")}
             />
+            {errors.tension && <p className="text-sm font-medium text-red-500">{errors.tension}</p>}
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="groupeSanguin">Groupe Sanguin *</Label>
             <Select value={groupeSanguin} onValueChange={setGroupeSanguin}>
-              <SelectTrigger id="groupeSanguin">
+              <SelectTrigger
+                id="groupeSanguin"
+                className={cn(errors.groupeSanguin && "border-red-500 focus-visible:ring-red-500")}
+              >
                 <SelectValue placeholder="Sélectionner..." />
               </SelectTrigger>
               <SelectContent className="bg-white dark:bg-slate-900 text-slate-950 dark:text-slate-50">
@@ -228,6 +270,7 @@ export function CreateDossierPatientModal({
                 ))}
               </SelectContent>
             </Select>
+            {errors.groupeSanguin && <p className="text-sm font-medium text-red-500">{errors.groupeSanguin}</p>}
           </div>
         </div>
         <DialogFooter>
@@ -235,7 +278,7 @@ export function CreateDossierPatientModal({
             Annuler
           </Button>
           <Button onClick={handleSubmit} className="bg-blue-600 hover:bg-blue-700">
-            Créer Dossier
+            {isEditMode ? "Modifier le Dossier" : "Créer Dossier"}
           </Button>
         </DialogFooter>
       </DialogContent>

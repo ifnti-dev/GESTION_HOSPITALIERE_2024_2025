@@ -1,7 +1,9 @@
+
 import type { Employe } from "./utilisateur"
 import type { Personne } from "./utilisateur"
 
 // Types de base
+
 export interface BaseEntity {
   id: number // Long en Java = number en TypeScript
   createdAt?: string

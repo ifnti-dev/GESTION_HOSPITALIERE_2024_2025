@@ -17,6 +17,15 @@ public class Permission {
     
     private String nom;
     private String description;
+
+	public Permission() {
+	}
+
+	public Permission(String nom, String description) {
+		this.nom = nom;
+		this.description = description;
+	}
+
 	public Long getId() {
 		return id;
 	}

@@ -3,6 +3,7 @@ package com.gestion_hospitaliere.UeEntreprise.service.User;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -54,6 +55,7 @@ public class PersonneService {
             throw new IllegalArgumentException("Le numéro de téléphone est requis.");
         }
         
+        
         if (personne.getPassword() != null && !personne.getPassword().isEmpty()) {
             String hashedPassword = passwordEncoder.encode(personne.getPassword());
             personne.setPassword(hashedPassword);
@@ -76,6 +78,21 @@ public class PersonneService {
     public List<Personne> obtenirTousLesPersonnes() {
         return personneRepository.findAll();
     }
+
+    public List<Personne> obtenirPersonnesSansDossierMedical() {
+        return personneRepository.findAll()
+                .stream()
+                .filter(personne -> personne.getDossierMedical() == null)
+                .collect(Collectors.toList());
+    }
+
+    // 2️⃣ Récupérer toutes les femmes SANS dossier de grossesse
+   public List<Personne> obtenirToutesLesFemmes() {
+    return personneRepository.findAll().stream()
+        .filter(personne -> personne.getSexe() != null && personne.getSexe().equalsIgnoreCase("f"))
+        .collect(Collectors.toList());
+}
+
 
     // Récupérer un utilisateur par ID
     public Optional<Personne> obtenirPersonneParId(Long id) {
