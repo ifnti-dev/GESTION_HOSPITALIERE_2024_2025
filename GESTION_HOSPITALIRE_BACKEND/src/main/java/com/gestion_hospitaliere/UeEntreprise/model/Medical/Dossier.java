@@ -22,7 +22,6 @@ public abstract class Dossier { // Rendue abstraite pour éviter une table dédi
     private String antecedents;
     private String allergies;
     private String traitementsEnCours;
-    private Float tension;
     private String groupeSanguin;
     
     
@@ -62,13 +61,7 @@ public abstract class Dossier { // Rendue abstraite pour éviter une table dédi
 		this.traitementsEnCours = traitementsEnCours;
 	}
 
-	public Float getTension() {
-		return tension;
-	}
-
-	public void setTension(Float tension) {
-		this.tension = tension;
-	}
+	
 
 	public String getGroupeSanguin() {
 		return groupeSanguin;

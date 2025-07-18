@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.gestion_hospitaliere.UeEntreprise.model.Medical.DossierMedical;
 import com.gestion_hospitaliere.UeEntreprise.model.User.Employe;
 import com.gestion_hospitaliere.UeEntreprise.model.User.Personne;
 import jakarta.persistence.CascadeType;
@@ -24,17 +25,22 @@ public class Consultation {
     private LocalDate date;
     private String symptomes;
     private String diagnostic;
+	private float temperature;
+	
+	private float poids;
+	private String tensionArterielle;
+	private String pressionArterielle;
+	
     
     @OneToMany(mappedBy = "consultation", cascade = CascadeType.ALL)
-
+	private List<Prescription> prescriptions = new ArrayList<>();
 	@JsonIgnore
 
-    private List<Prescription> prescriptions = new ArrayList<>();
     
     
     @ManyToOne
-    @JoinColumn(name = "personne_id")
-    private Personne personne;
+    @JoinColumn(name = "dossierMedical_id")
+    private DossierMedical dossierMedical;
 
 
 
@@ -91,12 +97,45 @@ public class Consultation {
 		this.prescriptions = prescriptions;
 	}
 
-	public Personne getPersonne() {
-		return personne;
+	public DossierMedical getDossierMedical() {
+		return dossierMedical;
 	}
 
-	public void setPersonne(Personne personne) {
-		this.personne = personne;
+	public void setDossierMedical(DossierMedical dossierMedical) {
+		this.dossierMedical = dossierMedical;
 	}
+
+	public float getTemperature() {
+		return temperature;
+	}
+
+	public void setTemperature(float temperature) {
+		this.temperature = temperature;
+	}
+
+	public float getPoids() {
+		return poids;
+	}
+
+	public void setPoids(float poids) {
+		this.poids = poids;
+	}
+
+	public String getTensionArterielle() {
+		return tensionArterielle;
+	}
+
+	public void setTensionArterielle(String tensionArterielle) {
+		this.tensionArterielle = tensionArterielle;
+	}
+
+	public String getPressionArterielle() {
+		return pressionArterielle;
+	}
+
+	public void setPressionArterielle(String pressionArterielle) {
+		this.pressionArterielle = pressionArterielle;
+	}
+
 
 }

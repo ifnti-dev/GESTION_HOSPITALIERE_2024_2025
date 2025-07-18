@@ -159,9 +159,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.gestion_hospitaliere.UeEntreprise.model.Appointments.RendezVous;
-import com.gestion_hospitaliere.UeEntreprise.model.ConsultationTraitement.Consultation;
 import com.gestion_hospitaliere.UeEntreprise.model.ConsultationTraitement.SuiviEtat;
-import com.gestion_hospitaliere.UeEntreprise.model.User.Employe;
 import com.gestion_hospitaliere.UeEntreprise.model.Medical.DossierGrossesse;
 import com.gestion_hospitaliere.UeEntreprise.model.Medical.DossierMedical;
 import com.gestion_hospitaliere.UeEntreprise.model.Pregnancy.Accouchement;
@@ -204,9 +202,7 @@ public class Personne {
     @JsonIgnore
     private List<RendezVous> rendezVous = new ArrayList<>();
 
-    @OneToMany(mappedBy = "personne", cascade = CascadeType.ALL)
-    @JsonIgnore
-    private List<Consultation> consultations = new ArrayList<>();
+    
 
     @OneToMany(mappedBy = "personne", cascade = CascadeType.ALL)
     @JsonIgnore
@@ -334,13 +330,7 @@ public class Personne {
         this.rendezVous = rendezVous;
     }
 
-    public List<Consultation> getConsultations() {
-        return consultations;
-    }
-
-    public void setConsultations(List<Consultation> consultations) {
-        this.consultations = consultations;
-    }
+    
 
     public List<SuiviEtat> getSuiviEtat() {
         return suiviEtat;
