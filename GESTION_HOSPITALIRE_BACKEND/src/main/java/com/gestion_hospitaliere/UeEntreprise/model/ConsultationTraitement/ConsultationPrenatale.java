@@ -2,7 +2,11 @@ package com.gestion_hospitaliere.UeEntreprise.model.ConsultationTraitement;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
-import com.gestion_hospitaliere.UeEntreprise.model.User.Personne;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.gestion_hospitaliere.UeEntreprise.model.Medical.DossierGrossesse;
+import com.gestion_hospitaliere.UeEntreprise.model.User.Employe;
 
 @Entity
 @Table(name = "consultations_prenatales")
@@ -12,9 +16,16 @@ public class ConsultationPrenatale {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-   @ManyToOne
-    @JoinColumn(name = "patiente_id")
-    private Personne personne;
+    @OneToMany(mappedBy = "consultationPrenatale", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Prescription> prescriptions = new ArrayList<>();
+
+    @ManyToOne
+    @JoinColumn(name = "dossier_id")
+    private DossierGrossesse dossierGrossesse;
+
+    @ManyToOne
+    @JoinColumn(name = "employe_id", nullable = false)
+    private Employe employe;
 
     @Column(nullable = false)
     private LocalDate dateConsultation;
@@ -29,16 +40,15 @@ public class ConsultationPrenatale {
     private String tensionArterielle;
 
     private Integer hauteurUterine;
-
     private String bruitsCardiaquesFoetaux;
+
     @Column(columnDefinition = "TEXT")
     private String observations;
 
     private LocalDate prochainRdv;
-
     private String alerte;
 
-    // Getters et Setters
+    // === Getters & Setters ===
 
     public Long getId() {
         return id;
@@ -48,12 +58,28 @@ public class ConsultationPrenatale {
         this.id = id;
     }
 
-    public Personne getPatiente() {
-        return personne;
+    public List<Prescription> getPrescriptions() {
+        return prescriptions;
     }
 
-    public void setPatiente(Personne personne) {
-        this.personne = personne;
+    public void setPrescriptions(List<Prescription> prescriptions) {
+        this.prescriptions = prescriptions;
+    }
+
+    public DossierGrossesse getDossierGrossesse() {
+        return dossierGrossesse;
+    }
+
+    public void setDossierGrossesse(DossierGrossesse dossierGrossesse) {
+        this.dossierGrossesse = dossierGrossesse;
+    }
+
+    public Employe getEmploye() {
+        return employe;
+    }
+
+    public void setEmploye(Employe employe) {
+        this.employe = employe;
     }
 
     public LocalDate getDateConsultation() {
