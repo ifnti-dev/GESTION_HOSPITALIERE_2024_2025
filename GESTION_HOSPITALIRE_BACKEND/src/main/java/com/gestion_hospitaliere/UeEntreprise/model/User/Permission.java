@@ -2,6 +2,8 @@ package com.gestion_hospitaliere.UeEntreprise.model.User;
 
 import static com.gestion_hospitaliere.UeEntreprise.Utilis.RegexConstants.*;
 
+import com.gestion_hospitaliere.UeEntreprise.Utilis.Auditable;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -11,7 +13,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
 @Entity
-public class Permission {
+public class Permission extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

@@ -160,6 +160,8 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import static com.gestion_hospitaliere.UeEntreprise.Utilis.RegexConstants.*;
+
+import com.gestion_hospitaliere.UeEntreprise.Utilis.Auditable;
 import com.gestion_hospitaliere.UeEntreprise.model.Appointments.RendezVous;
 import com.gestion_hospitaliere.UeEntreprise.model.ConsultationTraitement.SuiviEtat;
 import com.gestion_hospitaliere.UeEntreprise.model.Medical.DossierGrossesse;
@@ -176,7 +178,7 @@ import jakarta.validation.constraints.Pattern;
 
 @Table(name = "personne")
 @Entity
-public class Personne {
+public class Personne extends Auditable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
