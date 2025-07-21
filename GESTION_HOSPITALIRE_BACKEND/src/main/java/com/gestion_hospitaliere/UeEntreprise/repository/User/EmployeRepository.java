@@ -21,4 +21,6 @@ public interface EmployeRepository extends JpaRepository<Employe, Long> {
            "LEFT JOIN FETCH r.permissions " +
            "WHERE p.email = :email")
     Optional<Employe> findByPersonneEmailWithRoles(@Param("email") String email);
+        Optional<Employe> findByNumOrdre(String numOrdre);
+
 }

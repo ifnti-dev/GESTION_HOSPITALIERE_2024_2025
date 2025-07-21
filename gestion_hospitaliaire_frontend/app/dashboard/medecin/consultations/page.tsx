@@ -2,10 +2,8 @@
 
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import {
   Dialog,
@@ -17,41 +15,41 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
 import {
   Stethoscope,
   Search,
   Filter,
   Plus,
   Eye,
-  Edit,
   Calendar,
-  Clock,
-  Activity,
-  AlertCircle,
   FileText,
-  CheckCircle,
+  AlertCircle,
   Trash,
-  BarChart,
-  Pencil,
+  Activity,
 } from "lucide-react"
 import { useState, useEffect } from "react"
 import { Consultation } from "@/types/consultstionsTraitement"
 import { getConsultations, deleteConsultation } from "@/services/consultationTraitement/consultationService"
 import { useToast } from "@/components/ui/use-toast"
+import { AddConsultationModal } from "@/components/modals/consultation/consultation-modal"
+import { AddPrescriptionModal } from "@/components/modals/prescriptions/prescription-modal"
 
 export default function MedecinConsultationsPage() {
   const [searchTerm, setSearchTerm] = useState("")
-  const [statusFilter, setStatusFilter] = useState("all")
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [consultations, setConsultations] = useState<Consultation[]>([])
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [consultationToDelete, setConsultationToDelete] = useState<Consultation | null>(null)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false)
+  const [selectedConsultation, setSelectedConsultation] = useState<Consultation | null>(null)
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false)
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
+  const [isPrescriptionModalOpen, setIsPrescriptionModalOpen] = useState(false)
+const [selectedConsultationId, setSelectedConsultationId] = useState<number | null>(null)
+
   const { toast } = useToast()
 
+  
   useEffect(() => {
     const fetchConsultations = async () => {
       try {
@@ -59,13 +57,18 @@ export default function MedecinConsultationsPage() {
         setConsultations(data)
       } catch (err) {
         setError(err instanceof Error ? err.message : "Une erreur est survenue")
+        toast({
+          title: "Erreur",
+          description: "Impossible de charger les consultations",
+          variant: "destructive",
+        })
       } finally {
         setIsLoading(false)
       }
     }
 
     fetchConsultations()
-  }, [])
+  }, [toast])
 
   const handleDeleteConsultation = async () => {
     if (!consultationToDelete) return
@@ -74,7 +77,6 @@ export default function MedecinConsultationsPage() {
       await deleteConsultation(consultationToDelete.id)
       setConsultations(consultations.filter(c => c.id !== consultationToDelete.id))
       setIsDeleteDialogOpen(false)
-      setIsSuccessDialogOpen(true)
       
       toast({
         title: "Succès",
@@ -87,30 +89,48 @@ export default function MedecinConsultationsPage() {
         description: "Une erreur est survenue lors de la suppression.",
         variant: "destructive",
       })
-    } finally {
-      setConsultationToDelete(null)
     }
   }
 
+  const handleAddConsultationSuccess = (newConsultation: Consultation) => {
+    setConsultations([...consultations, newConsultation])
+    setIsAddDialogOpen(false)
+    toast({
+      title: "Succès",
+      description: "La consultation a été créée avec succès",
+      variant: "default",
+    })
+  }
+
   const filteredConsultations = consultations.filter((consultation) => {
-    const matchesSearch =
-      consultation.id.toString().includes(searchTerm.toLowerCase()) ||
-      consultation.personne?.nom?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      consultation.personne?.prenom?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      consultation.symptomes?.toLowerCase().includes(searchTerm.toLowerCase())
-
-    const matchesStatus = statusFilter === "all" 
-
-    return matchesSearch && matchesStatus
+    const searchLower = searchTerm.toLowerCase()
+    return (
+      consultation.id.toString().includes(searchLower) ||
+      (consultation.personne?.prenom?.toLowerCase().includes(searchLower) ?? false) ||
+      (consultation.personne?.nom?.toLowerCase().includes(searchLower) ?? false) ||
+      consultation.symptomes.toLowerCase().includes(searchLower) ||
+      (consultation.diagnostic?.toLowerCase().includes(searchLower) ?? false)
+    )
   })
 
-  const getStatusBadge = () => {
-    return <Badge className="bg-green-100 text-green-800 border-green-200">Terminée</Badge>
+  const hasPrescriptions = (consultation: Consultation) => {
+    return consultation.prescriptions && consultation.prescriptions.length > 0
   }
 
-  const getTypeConsultationBadge = () => {
-    return <Badge className="bg-blue-100 text-blue-800 border-blue-200 text-xs">Standard</Badge>
-  }
+  const patients = Array.from(
+    new Map(
+      consultations
+        .filter(c => c.personne && c.personne.id !== undefined)
+        .map(c => [c.personne!.id, c.personne!])
+    ).values()
+  )
+  const medecins = Array.from(
+    new Map(
+      consultations
+        .filter(c => c.employe && c.employe.id !== undefined)
+        .map(c => [c.employe!.id, c.employe!])
+    ).values()
+  )
 
   if (isLoading) {
     return (
@@ -135,7 +155,7 @@ export default function MedecinConsultationsPage() {
   return (
     <DashboardLayout userRole="Médecin">
       <div className="space-y-6">
-        {/* Header */}
+        {/* En-tête */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
@@ -147,65 +167,17 @@ export default function MedecinConsultationsPage() {
             <p className="text-gray-600 mt-2">Gérez vos consultations et générez des rapports</p>
           </div>
           
-          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 shadow-lg">
-                <Plus className="h-4 w-4 mr-2" />
-                Nouvelle Consultation
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-3xl">
-              <DialogHeader>
-                <DialogTitle>Créer une Nouvelle Consultation</DialogTitle>
-                <DialogDescription>Enregistrez une nouvelle consultation médicale</DialogDescription>
-              </DialogHeader>
-              <div className="grid grid-cols-2 gap-4 py-4">
-                <div className="space-y-2">
-                  <Label htmlFor="patient">Patient</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sélectionner un patient" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {consultations.map((c) => (
-                        <SelectItem key={c.id} value={c.id.toString()}>
-                          {c.personne?.prenom} {c.personne?.nom} - ID: {c.personneId}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="dateConsultation">Date</Label>
-                  <Input id="dateConsultation" type="date" />
-                </div>
-                <div className="space-y-2 col-span-2">
-                  <Label htmlFor="symptomes">Symptômes</Label>
-                  <Textarea id="symptomes" placeholder="Décrivez les symptômes" />
-                </div>
-                <div className="space-y-2 col-span-2">
-                  <Label htmlFor="diagnostic">Diagnostic</Label>
-                  <Textarea id="diagnostic" placeholder="Diagnostic médical" />
-                </div>
-                <div className="space-y-2 col-span-2">
-                  <Label htmlFor="prescriptions">Prescriptions</Label>
-                  <Textarea id="prescriptions" placeholder="Médicaments prescrits" />
-                </div>
-              </div>
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
-                  Annuler
-                </Button>
-                <Button className="bg-gradient-to-r from-cyan-600 to-blue-600">Créer Consultation</Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+          <Button 
+            className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 shadow-lg"
+            onClick={() => setIsAddDialogOpen(true)}
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Nouvelle Consultation
+          </Button>
         </div>
 
-        {/* Stats Cards */}
+        {/* Cartes de statistiques */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {/* Total Consultations */}
           <Card className="border-0 shadow-lg">
             <CardHeader>
               <CardTitle className="text-sm font-medium text-cyan-600">Total Consultations</CardTitle>
@@ -219,7 +191,6 @@ export default function MedecinConsultationsPage() {
             </CardContent>
           </Card>
 
-          {/* Aujourd'hui */}
           <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-50 to-indigo-50">
             <CardHeader>
               <CardTitle className="text-sm font-medium text-blue-600">Aujourd'hui</CardTitle>
@@ -235,14 +206,13 @@ export default function MedecinConsultationsPage() {
             </CardContent>
           </Card>
 
-          {/* Avec Prescriptions */}
           <Card className="border-0 shadow-lg bg-gradient-to-br from-green-50 to-emerald-50">
             <CardHeader>
               <CardTitle className="text-sm font-medium text-green-600">Avec Prescriptions</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-green-900">
-                {consultations.filter(c => c.prescriptions && c.prescriptions.length > 0).length}
+                {consultations.filter(hasPrescriptions).length}
               </div>
               <p className="text-xs text-green-600 flex items-center mt-1">
                 <FileText className="h-3 w-3 mr-1" />
@@ -251,7 +221,6 @@ export default function MedecinConsultationsPage() {
             </CardContent>
           </Card>
 
-          {/* Filtres et Recherche */}
           <Card className="border-0 shadow-lg rounded-lg">
             <CardHeader className="border-b p-4">
               <CardTitle className="flex items-center gap-2 text-xl font-semibold text-gray-900">
@@ -277,7 +246,7 @@ export default function MedecinConsultationsPage() {
           </Card>
         </div>
 
-        {/* Consultations Table */}
+        {/* Tableau des consultations */}
         <Card className="border-0 shadow-lg">
           <CardHeader className="bg-gradient-to-r from-teal-500 to-cyan-600 text-white rounded-t-lg">
             <CardTitle className="flex items-center gap-2">
@@ -293,95 +262,96 @@ export default function MedecinConsultationsPage() {
               <Table className="w-full">
                 <TableHeader>
                   <TableRow className="bg-gray-50">
-                    <TableHead className="font-semibold text-gray-700 px-4 py-3">ID</TableHead>
                     <TableHead className="font-semibold text-gray-700 px-4 py-3">Patient</TableHead>
                     <TableHead className="font-semibold text-gray-700 px-4 py-3">Date</TableHead>
                     <TableHead className="font-semibold text-gray-700 px-4 py-3">Symptômes</TableHead>
                     <TableHead className="font-semibold text-gray-700 px-4 py-3">Diagnostic</TableHead>
-                    <TableHead className="font-semibold text-gray-700 px-4 py-3">Prescriptions</TableHead>
+                    <TableHead className="font-semibold text-gray-700 px-4 py-3">Médecin</TableHead>
                     <TableHead className="font-semibold text-gray-700 px-4 py-3">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredConsultations.map((consultation) => (
                     <TableRow key={consultation.id} className="hover:bg-blue-50">
-                      <TableCell className="font-medium px-4 py-3 align-top">
-                        <span className="text-gray-900">CON-{consultation.id.toString().padStart(4, '0')}</span>
-                      </TableCell>
-                      
-                      <TableCell className="px-4 py-3 align-top">
-                        <div className="space-y-1">
-                          <div className="font-medium text-gray-900">
-                            {consultation.personne?.prenom} {consultation.personne?.nom}
+                      <TableCell className="px-4 py-3">
+                        {consultation.personne ? (
+                          <div className="font-medium">
+                            {consultation.personne.prenom} {consultation.personne.nom}
                           </div>
-                          <div className="text-xs text-gray-500">
-                            ID: {consultation.personneId}
-                          </div>
-                        </div>
+                        ) : (
+                          <div className="text-gray-400">Non spécifié</div>
+                        )}
                       </TableCell>
                       
-                      <TableCell className="px-4 py-3 align-top">
-                        <div className="text-sm text-gray-900 font-medium">
-                          {new Date(consultation.date).toLocaleDateString("fr-FR")}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          Créé le: {new Date(consultation.createdAt || "").toLocaleDateString("fr-FR")}
-                        </div>
+                      <TableCell className="px-4 py-3">
+                        {new Date(consultation.date).toLocaleDateString("fr-FR")}
                       </TableCell>
                       
-                      <TableCell className="px-4 py-3 align-top max-w-[250px]">
-                        <div className="text-sm text-gray-900 whitespace-pre-wrap">
+                      <TableCell className="px-4 py-3 max-w-[250px]">
+                        <div className="text-sm whitespace-pre-wrap">
                           {consultation.symptomes}
                         </div>
                       </TableCell>
                       
-                      <TableCell className="px-4 py-3 align-top max-w-[250px]">
-                        <div className="text-sm text-gray-900 whitespace-pre-wrap">
-                          {consultation.diagnostic}
+                      <TableCell className="px-4 py-3 max-w-[250px]">
+                        <div className="text-sm whitespace-pre-wrap">
+                          {consultation.diagnostic ?? 'Non spécifié'}
                         </div>
                       </TableCell>
                       
-                      <TableCell className="px-4 py-3 align-top">
-                        {consultation.prescriptions?.length ? (
-                          <div className="space-y-2">
-                            {consultation.prescriptions.slice(0, 2).map((prescription, idx) => (
-                              <div key={idx} className="text-sm text-gray-900">
-                                <span className="font-medium">{prescription.medicament?.nom || 'Médicament'}</span>
-                                <span className="text-xs text-gray-500 ml-1">(x{prescription.quantite})</span>
-                              </div>
-                            ))}
-                            {consultation.prescriptions.length > 2 && (
-                              <div className="text-xs text-gray-500">
-                                +{consultation.prescriptions.length - 2} autres
-                              </div>
-                            )}
+                      <TableCell className="px-4 py-3">
+                        {consultation.employe ? (
+                          <div>
+                            {consultation.employe.personne?.prenom} {consultation.employe.personne?.nom}
+                            <div className="text-xs text-gray-500">{consultation.employe.specialite}</div>
                           </div>
                         ) : (
-                          <span className="text-gray-500 text-sm">Aucune</span>
+                          <div className="text-gray-400">Non spécifié</div>
                         )}
                       </TableCell>
-                      
-                      <TableCell className="px-4 py-3 align-top">
+                    <TableCell className="px-4 py-3">
                         <div className="flex items-center gap-2">
-                          <Button size="sm" variant="outline" className="h-8 text-white border-gray-400 bg-gray-600 hover:bg-gray-700">
-                            <Eye className="h-4 w-4 mr-1" />
-                         
-                          </Button>
-                          
                           <Button 
                             size="sm" 
-                            variant="outline" 
-                            className="h-8 text-white border-red-600 bg-red-600 hover:bg-red-700"
+                            title="Voir le detail de la consultation"
+                            variant="outline"
+                            className="text-blue-600 border-blue-600 hover:bg-blue-50 hover:text-blue-700"
+                            onClick={() => {
+                              setSelectedConsultation(consultation)
+                              setIsViewDialogOpen(true)
+                            }}
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+
+                          <Button 
+                            size="sm" 
+                            variant="destructive"
+                            title="supprimer la consultation"
+                            className="bg-red-600 hover:bg-red-700 text-white"
                             onClick={() => {
                               setConsultationToDelete(consultation)
                               setIsDeleteDialogOpen(true)
                             }}
                           >
-                            <Trash className="h-4 w-4 mr-1" />
-                            
+                            <Trash className="h-4 w-4" />
                           </Button>
+
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          title="ajouter une prescription"
+                          className="text-green-600 border-green-600 hover:bg-green-50 hover:text-green-700"
+                          onClick={() => {
+                            setSelectedConsultationId(consultation.id)
+                            setIsPrescriptionModalOpen(true)
+                          }}
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Button>
                         </div>
-                      </TableCell>
+                        </TableCell>
+
                     </TableRow>
                   ))}
                 </TableBody>
@@ -390,7 +360,7 @@ export default function MedecinConsultationsPage() {
           </CardContent>
         </Card>
 
-        {/* Delete Confirmation Dialog */}
+        {/* Dialogue de suppression */}
         <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
           <DialogContent>
             <DialogHeader>
@@ -399,7 +369,7 @@ export default function MedecinConsultationsPage() {
                 Confirmer la suppression
               </DialogTitle>
               <DialogDescription>
-                Êtes-vous sûr de vouloir supprimer la consultation de {consultationToDelete?.personne?.prenom} {consultationToDelete?.personne?.nom} ?
+                Êtes-vous sûr de vouloir supprimer la consultation CON-{consultationToDelete?.id.toString().padStart(4, '0')} ?
                 <br />
                 <span className="font-medium">Cette action est irréversible.</span>
               </DialogDescription>
@@ -411,38 +381,130 @@ export default function MedecinConsultationsPage() {
               <Button 
                 variant="destructive" 
                 onClick={handleDeleteConsultation}
-                className="bg-red-600 hover:bg-red-700"
               >
                 <Trash className="h-4 w-4 mr-2" />
-                Confirmer la suppression
+                Confirmer
               </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
 
-        {/* Success Dialog */}
-        <Dialog open={isSuccessDialogOpen} onOpenChange={setIsSuccessDialogOpen}>
-          <DialogContent>
+        {/* Dialogue de visualisation */}
+        <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
+          <DialogContent className="max-w-2xl">
             <DialogHeader>
-              <DialogTitle className="flex items-center gap-2 text-green-600">
-                <CheckCircle className="h-5 w-5" />
-                Suppression réussie
+              <DialogTitle className="flex items-center gap-2">
+                <Stethoscope className="h-5 w-5 text-cyan-600" />
+                Détails de la consultation
               </DialogTitle>
-              <DialogDescription>
-                La consultation a été supprimée avec succès.
-              </DialogDescription>
             </DialogHeader>
+            {selectedConsultation && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>ID Consultation</Label>
+                    <p className="font-medium">CON-{selectedConsultation.id.toString().padStart(4, '0')}</p>
+                  </div>
+                  <div>
+                    <Label>Date</Label>
+                    <p className="font-medium">
+                      {new Date(selectedConsultation.date).toLocaleDateString("fr-FR")}
+                    </p>
+                  </div>
+                  <div>
+                    <Label>Patient</Label>
+                    <p className="font-medium">
+                      {selectedConsultation.personne ? 
+                        `${selectedConsultation.personne.prenom} ${selectedConsultation.personne.nom}` : 
+                        'Non spécifié'}
+                    </p>
+                  </div>
+                  <div>
+                    <Label>Médecin</Label>
+                    <p className="font-medium">
+                      {selectedConsultation.employe ? 
+                        `${selectedConsultation.employe.personne?.prenom ?? ''} ${selectedConsultation.employe.personne?.nom ?? ''} (${selectedConsultation.employe.specialite})` : 
+                        'Non spécifié'}
+                    </p>
+                  </div>
+                  <div className="col-span-2">
+                    <Label>Symptômes</Label>
+                    <div className="p-3 bg-gray-50 rounded-md">
+                      <p className="whitespace-pre-wrap">{selectedConsultation.symptomes}</p>
+                    </div>
+                  </div>
+                  <div className="col-span-2">
+                    <Label>Diagnostic</Label>
+                    <div className="p-3 bg-gray-50 rounded-md">
+                      <p className="whitespace-pre-wrap">{selectedConsultation.diagnostic ?? 'Non spécifié'}</p>
+                    </div>
+                  </div>
+                  {selectedConsultation.prescriptions && selectedConsultation.prescriptions.length > 0 && (
+                    <div className="col-span-2">
+                      <Label>Prescriptions ({selectedConsultation.prescriptions.length})</Label>
+                      <div className="space-y-2">
+                        {selectedConsultation.prescriptions.map((prescription) => (
+                          <Card key={prescription.id}>
+                            <CardHeader className="p-3">
+                              <CardTitle className="text-sm">Prescription #{prescription.id}</CardTitle>
+                            </CardHeader>
+                            <CardContent className="p-3 pt-0">
+                              <div className="text-sm">
+                                <p><span className="font-medium">Instructions:</span> {prescription.instructions}</p>
+                                <p><span className="font-medium">Durée:</span> {prescription.duree} jours</p>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
             <DialogFooter>
-              <Button 
-                className="bg-green-600 hover:bg-green-700"
-                onClick={() => setIsSuccessDialogOpen(false)}
-              >
-                Fermer
-              </Button>
+              <Button onClick={() => setIsViewDialogOpen(false)}>Fermer</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        {/* Modal d'ajout */}
+        <AddConsultationModal
+          isOpen={isAddDialogOpen}
+          onClose={() => setIsAddDialogOpen(false)}
+          onSuccess={handleAddConsultationSuccess}
+          patients={patients}
+          medecins={medecins}
+        />
       </div>
+
+
+{selectedConsultationId !== null && (
+  <AddPrescriptionModal
+    isOpen={isPrescriptionModalOpen}
+    onClose={() => setIsPrescriptionModalOpen(false)}
+    onSuccess={(newPrescription) => {
+      // mettre à jour les prescriptions de la consultation correspondante
+      setConsultations((prev) =>
+        prev.map((consultation) =>
+          consultation.id === selectedConsultationId
+            ? {
+                ...consultation,
+                prescriptions: [...(consultation.prescriptions || []), newPrescription],
+              }
+            : consultation
+        )
+      )
+      setIsPrescriptionModalOpen(false)
+    }}
+    prescriptions={
+      consultations.find(c => c.id === selectedConsultationId)?.prescriptions || []
+    }
+    consultationId={selectedConsultationId}
+  />
+)}
+
     </DashboardLayout>
   )
+  
 }

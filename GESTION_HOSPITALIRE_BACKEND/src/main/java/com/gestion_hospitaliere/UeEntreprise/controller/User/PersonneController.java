@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.gestion_hospitaliere.UeEntreprise.model.Medical.DossierMedical;
 import com.gestion_hospitaliere.UeEntreprise.model.User.Personne;
 import com.gestion_hospitaliere.UeEntreprise.service.User.PersonneService;
 
@@ -35,6 +36,18 @@ public class PersonneController {
     @GetMapping
     public ResponseEntity<List<Personne>> obtenirTousLesPersonne() {
         List<Personne> personnes = personneService.obtenirTousLesPersonnes();
+        return ResponseEntity.ok(personnes);
+    }
+
+    @GetMapping("/pas-dossier-medical")
+    public ResponseEntity<List<Personne>> getPasDossiersMedical() {
+            List<Personne> personnes = personneService.obtenirPersonnesSansDossierMedical();
+            return ResponseEntity.ok(personnes);
+    }
+
+    @GetMapping("/pas-dossier-grossesse")
+    public ResponseEntity<List<Personne>> getPasDossiersGrossesse() {
+        List<Personne> personnes = personneService.obtenirToutesLesFemmes();
         return ResponseEntity.ok(personnes);
     }
 

@@ -64,10 +64,7 @@ public class DossierMedicalService {
 
         // Validation tension (par exemple entre 0 et 30, correspondant à 0-30 kPa ou
         // 0-300 mmHg)
-        Float tension = dossierMedical.getTension();
-        if (tension == null || tension < 0 || tension > 30) {
-            throw new IllegalArgumentException("La tension doit être renseignée et comprise entre 0 et 30.");
-        }
+       
 
         // Validation groupe sanguin (ex: A+, A-, B+, B-, AB+, AB-, O+, O-)
         List<String> groupesValides = List.of("A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-");
@@ -87,12 +84,12 @@ public class DossierMedicalService {
         DossierMedical dossier = dossierMedicalRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Dossier non trouvé"));
 
-        // Détacher le dossier du Patient (côté propriétaire ET inverse)
-        // Patient patient = dossier.getPersonne();
-        // if (patient != null) {
-        // patient.setDossierMedical(null); // Côté inverse (Patient)
-        // dossier.setPersonne(null); // Côté propriétaire (DossierMedical)
-        // }
+        //Détacher le dossier du Patient (côté propriétaire ET inverse)
+        Personne patient = dossier.getPersonne();
+        if (patient != null) {
+        patient.setDossierMedical(null); // Côté inverse (Patient)
+        dossier.setPersonne(null); // Côté propriétaire (DossierMedical)
+        }
 
         dossierMedicalRepository.delete(dossier); // Suppression unique
     }
@@ -125,10 +122,7 @@ public class DossierMedicalService {
         }
 
         // Validation tension
-        Float tension = updatedDossier.getTension();
-        if (tension == null || tension < 0 || tension > 30) {
-            throw new IllegalArgumentException("La tension doit être renseignée et comprise entre 0 et 30.");
-        }
+       
 
         // Validation groupe sanguin
         List<String> groupesValides = List.of("A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-");

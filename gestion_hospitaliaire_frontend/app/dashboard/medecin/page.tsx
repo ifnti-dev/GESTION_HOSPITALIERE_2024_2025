@@ -1,3 +1,4 @@
+"use client"
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -14,7 +15,33 @@ import {
   TrendingUp,
 } from "lucide-react"
 
+import { useState, useEffect } from "react" // Import useState and useEffect
+import { CreateDossierPatientModal, DossierFormData } from "@/components/modals/medical/create-dossier-patient-modal" // Import the new modal
+import type { Personne } from "@/types/utilisateur" // Import Personne type
+import { getPersonnes } from "@/services/utilisateur/personne.service" // Import the service for fetching persons
+
 export default function MedecinDashboardPage() {
+  const [isCreateDossierModalOpen, setIsCreateDossierModalOpen] = useState(false)
+  const [patients, setPatients] = useState<Personne[]>([])
+  const [isLoadingPatients, setIsLoadingPatients] = useState(true)
+  const [patientsError, setPatientsError] = useState<Error | null>(null)
+
+  // Fetch patients when the component mounts
+  useEffect(() => {
+    const fetchPatients = async () => {
+      try {
+        const data = await getPersonnes()
+        setPatients(data)
+      } catch (error) {
+        console.error("Error fetching patients:", error)
+        setPatientsError(error as Error)
+      } finally {
+        setIsLoadingPatients(false)
+      }
+    }
+    fetchPatients()
+  }, [])
+  
   const quickStats = [
     {
       title: "Mes Patients",

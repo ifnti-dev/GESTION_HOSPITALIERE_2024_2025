@@ -81,9 +81,9 @@ public class ConsultationController {
 
     // Récupérer les consultations par ID de personne (patient)
     // Note: "Personne" est utilisé ici en se basant sur la méthode findByPersonne_Id du repository.
-    @GetMapping("/by-personne/{personneId}")
-    public ResponseEntity<List<Consultation>> getConsultationsByPersonneId(@PathVariable Long personneId) {
-        List<Consultation> consultations = consultationService.getConsultationsByPersonneId(personneId);
+    @GetMapping("/by-personne/{dossierMedicalId}")
+    public ResponseEntity<List<Consultation>> getConsultationsByPersonneId(@PathVariable Long dossierMedicalId) {
+        List<Consultation> consultations = consultationService.getConsultationsByDossierMedicalId(dossierMedicalId);
         return ResponseEntity.ok(consultations);
     }
 

@@ -1,7 +1,9 @@
+
 import type { Employe } from "./utilisateur"
 import type { Personne } from "./utilisateur"
 
 // Types de base
+
 export interface BaseEntity {
   id: number // Long en Java = number en TypeScript
   createdAt?: string
@@ -72,15 +74,29 @@ export interface LigneApprovisionnement {
   lignesCommande?: LigneCommande[] // Relation OneToMany - ventes de ce lot
 }
 
-// TYPES COMMANDES
+// // TYPES COMMANDES
+// export interface Commande {
+//   id?: number // Long en Java
+//   dateCommande: string // LocalDate en Java -> string ISO en TypeScript
+//   montantTotal: string // String en Java
+//   personne?: Personne // Relation ManyToOne
+//   personneId?: number // Pour les formulaires
+//   lignesCommande?: LigneCommande[] // Relation OneToMany
+// }
+
+
+
 export interface Commande {
-  id?: number // Long en Java
-  dateCommande: string // LocalDate en Java -> string ISO en TypeScript
-  montantTotal: string // String en Java
-  personne?: Personne // Relation ManyToOne
-  personneId?: number // Pour les formulaires
-  lignesCommande?: LigneCommande[] // Relation OneToMany
+  id?: number
+  dateCommande: string
+  montantTotal: string
+  personne?: Personne // CHANGEMENT ICI : Utilise l'objet Personne complet
+  lignesCommande?: LigneCommande[]
+  nombreLignes?: number
+  montantTotalAsDouble?: number
+  valid?: boolean
 }
+
 
 // LIGNE COMMANDE - Vente d'un lot spécifique
 export interface LigneCommande {

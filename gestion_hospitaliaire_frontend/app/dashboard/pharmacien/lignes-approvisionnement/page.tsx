@@ -353,10 +353,10 @@ export default function LignesApprovisionnementPage() {
                           <span className="font-medium text-gray-900">{ligne.quantite}</span>
                         </TableCell>
                         <TableCell className="font-medium text-blue-700 py-4">
-                          {(ligne.prixUnitaireAchat / 100).toFixed(2)}€
+                          {(ligne.prixUnitaireAchat / 100).toFixed(2)}FCFA
                         </TableCell>
                         <TableCell className="font-medium text-green-700 py-4">
-                          {(ligne.prixUnitaireVente / 100).toFixed(2)}€
+                          {(ligne.prixUnitaireVente / 100).toFixed(2)}FCFA
                         </TableCell>
                         <TableCell className="py-4">
                           <div className="flex flex-col gap-1">
@@ -468,7 +468,7 @@ export default function LignesApprovisionnementPage() {
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="prixUnitaireAchat">Prix Achat (€)</Label>
+                  <Label htmlFor="prixUnitaireAchat">Prix Achat (FCFA)</Label>
                   <Input
                     id="prixUnitaireAchat"
                     type="number"
@@ -482,7 +482,7 @@ export default function LignesApprovisionnementPage() {
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="prixUnitaireVente">Prix Vente (€)</Label>
+                  <Label htmlFor="prixUnitaireVente">Prix Vente (FCFA)</Label>
                   <Input
                     id="prixUnitaireVente"
                     type="number"

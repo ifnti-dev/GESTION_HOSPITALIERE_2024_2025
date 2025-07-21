@@ -33,7 +33,7 @@ public class AdminAccountInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        final String adminEmail = "admin@admin.com";
+        final String adminEmail = "admin@gmail.com";
         final String adminPassword = "123"; // Dans une application réelle, utilisez des variables d'environnement ou des méthodes plus sécurisées
         final String adminRoleName = "directeur";
 
