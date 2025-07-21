@@ -10,6 +10,7 @@ import com.gestion_hospitaliere.UeEntreprise.service.User.PersonneService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
@@ -51,7 +52,7 @@ public class AdminAccountInitializer implements CommandLineRunner {
             adminPersonne.setAdresse("komah");
             adminPersonne.setTelephone("0123456789");
             adminPersonne.setSexe("M");
-            adminPersonne.setDateNaissance("01/01/1980");
+            adminPersonne.setDateNaissance(LocalDate.of(2000, 1, 1)); // Date fictive pour l'exemple
             adminPersonne.setSituationMatrimoniale("Célibataire");
             adminPersonne.setPassword(adminPassword); // Le mot de passe sera encodé par PersonneService
 

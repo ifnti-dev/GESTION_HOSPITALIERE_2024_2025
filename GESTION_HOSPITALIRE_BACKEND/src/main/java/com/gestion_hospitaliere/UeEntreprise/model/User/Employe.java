@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import static com.gestion_hospitaliere.UeEntreprise.Utilis.RegexConstants.*;
 import com.gestion_hospitaliere.UeEntreprise.model.Payments.Facture;
 import com.gestion_hospitaliere.UeEntreprise.model.Pregnancy.Accouchement;
 import com.gestion_hospitaliere.UeEntreprise.model.Pregnancy.SuiviGrossesse;
@@ -23,6 +24,9 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 
 
 @Entity
@@ -31,6 +35,27 @@ public class Employe{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+
+	@NotBlank(message = "L'horaire ne peut pas être vide.")
+	@NotNull(message = "L'horaire ne peut pas être nul.")
+	@Pattern(regexp = HEURE_PLAGE, message = "L'horaire doit être au format HH:mm-HH:mm.")
+	private String Horaire;
+
+	@NotNull(message = "La date d'affectation ne peut pas être nulle.")
+	@Pattern(regexp = DATE, message = "La date d'affectation doit être au format YYYY-MM-DD.")
+	@NotBlank(message = "La date d'affectation ne peut pas être vide.")
+	private Date DateAffectation;
+
+	@NotBlank(message = "La spécialité ne peut pas être vide.")
+	@NotNull(message = "La spécialité ne peut pas être nulle.")
+	@Pattern(regexp = LETTRES_SEULEMENT, message = "La spécialité doit contenir entre 3 et 50 caractères alphanumériques.")
+	private String specialite;
+
+	@NotBlank(message = "Le numéro d'ordre ne peut pas être vide.")
+	@NotNull(message = "Le numéro d'ordre ne peut pas être nul.")
+	@Pattern(regexp = NUM_ORDRE, message = "Le numéro d'ordre peut contenir des lettres et des chiffres.")
+	@Column(unique = true)
+	private String numOrdre;
 
 	
 	@ManyToMany(fetch = FetchType.EAGER)
@@ -59,11 +84,6 @@ public class Employe{
     private List<Facture> factures;
 	
 	
-	private String Horaire;
-	private Date DateAffectation;
-	private String specialite;
-	@Column(unique = true)
-	private String numOrdre;
 
 
 

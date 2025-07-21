@@ -1,5 +1,6 @@
 package com.gestion_hospitaliere.UeEntreprise.config;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -199,7 +200,7 @@ public class DatabaseSeeder implements CommandLineRunner {
             admin.setPassword(encodedPassword);
             admin.setSexe("M");
             admin.setTelephone("90330819");
-            admin.setDateNaissance("01/01/2000");
+            admin.setDateNaissance(LocalDate.of(2000, 1, 1));
             admin.setSituationMatrimoniale("célibataire");
             personneRepository.save(admin);
 
