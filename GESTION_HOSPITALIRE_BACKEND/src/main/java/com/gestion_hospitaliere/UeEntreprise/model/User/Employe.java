@@ -8,6 +8,8 @@ import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import static com.gestion_hospitaliere.UeEntreprise.Utilis.RegexConstants.*;
+
+import com.gestion_hospitaliere.UeEntreprise.Utilis.Auditable;
 import com.gestion_hospitaliere.UeEntreprise.model.Payments.Facture;
 import com.gestion_hospitaliere.UeEntreprise.model.Pregnancy.Accouchement;
 import com.gestion_hospitaliere.UeEntreprise.model.Pregnancy.SuiviGrossesse;
@@ -30,7 +32,7 @@ import jakarta.validation.constraints.Pattern;
 
 
 @Entity
-public class Employe{
+public class Employe extends Auditable {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
