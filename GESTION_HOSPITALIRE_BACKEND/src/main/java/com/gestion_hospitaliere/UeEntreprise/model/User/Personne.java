@@ -154,10 +154,12 @@
 
 package com.gestion_hospitaliere.UeEntreprise.model.User;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import static com.gestion_hospitaliere.UeEntreprise.Utilis.RegexConstants.*;
 import com.gestion_hospitaliere.UeEntreprise.model.Appointments.RendezVous;
 import com.gestion_hospitaliere.UeEntreprise.model.ConsultationTraitement.SuiviEtat;
 import com.gestion_hospitaliere.UeEntreprise.model.Medical.DossierGrossesse;
@@ -166,6 +168,11 @@ import com.gestion_hospitaliere.UeEntreprise.model.Pregnancy.Accouchement;
 import com.gestion_hospitaliere.UeEntreprise.model.Pregnancy.SuiviGrossesse;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.Pattern;
 
 @Table(name = "personne")
 @Entity
@@ -175,14 +182,48 @@ public class Personne {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Le nom est obligatoire et doit être en lettre uniquement.")
+    @Pattern(regexp = LETTRES_SEULEMENT, message = "Ce champ ne doit contenir que des lettres, des espaces, des tirets ou des apostrophes.")
     private String nom;
+
+    @NotBlank(message = "Le prénom est obligatoire et doit être en lettre uniquement.")
+    @Pattern(regexp = LETTRES_SEULEMENT, message = "Ce champ ne doit contenir que des lettres, des espaces, des tirets ou des apostrophes.")
     private String prenom;
+
+    @NotBlank(message = "L'email est obligatoire et doit être au format valide.")
+    @Email(message = "L'email doit être au format valide.")
+    @Column(unique = true)
     private String email;
+
+    @NotBlank(message = "L'adresse est obligatoire.")
+    @Pattern(regexp = ADRESSE, message = "Ce champ ne doit contenir que des lettres, des espaces, des tirets ou des apostrophes.")
     private String adresse;
+
+    @NotBlank(message = "Le téléphone est obligatoire et doit être au format valide.")
+    @Pattern(
+        regexp = TELEPHONE,
+        message = "Le téléphone doit être au format international (ex: +228XXXXXXXX)."
+    )
+    @Column(unique = true)
     private String telephone;
+
+    @NotBlank(message = "Le sexe est obligatoire.")
+    @Pattern(regexp = SEXE, message = "Le sexe doit être 'Homme', 'Femme', 'H', 'F' ou 'Autre'.")
     private String sexe;
-    private String dateNaissance;
+
+    @NotNull(message = "La date de naissance est obligatoire.")
+    @Past(message = "La date de naissance doit être dans le passé.")
+    private LocalDate dateNaissance;
+
+    @NotBlank(message = "La situation matrimoniale est obligatoire.")
+    @Pattern(regexp = LETTRES_SEULEMENT, message = "La situation matrimoniale ne doit contenir que des lettres, des espaces, des tirets ou des apostrophes.")
     private String situationMatrimoniale;
+
+    @NotBlank(message = "Le mot de passe est obligatoire.")
+    @Pattern(
+        regexp = MOT_DE_PASSE_FORT,
+        message = "Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial."
+    )
     @Column(nullable = true) 
     private String password;
     
@@ -274,11 +315,11 @@ public class Personne {
         this.sexe = sexe;
     }
 
-    public String getDateNaissance() {
+    public LocalDate getDateNaissance() {
         return dateNaissance;
     }
 
-    public void setDateNaissance(String dateNaissance) {
+    public void setDateNaissance(LocalDate dateNaissance) {
         this.dateNaissance = dateNaissance;
     }
 
