@@ -35,8 +35,7 @@ public class EmployeService {
         
         // Vérifier que l'employé a une personne associée
         Personne personneInput = employe.getPersonne();
-        System.out.println("Personne associée: " + personneInput);
-        
+        System.out.println("Personne associée: " + personneInput);   
         if (personneInput == null) {
             throw new IllegalArgumentException("Les détails personnels (Personne) sont requis pour créer un employé.");
         }
