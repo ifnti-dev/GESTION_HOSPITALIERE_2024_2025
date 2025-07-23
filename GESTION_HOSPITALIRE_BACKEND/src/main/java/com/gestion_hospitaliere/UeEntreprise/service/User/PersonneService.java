@@ -8,11 +8,19 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
+import com.gestion_hospitaliere.UeEntreprise.exceptions.BusinessException;
+import com.gestion_hospitaliere.UeEntreprise.exceptions.PersonneNotFoundException;
 import com.gestion_hospitaliere.UeEntreprise.model.User.Personne;
 import com.gestion_hospitaliere.UeEntreprise.repository.User.PersonneRepository;
 
+import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
+@Validated
 public class PersonneService {
 
     @Autowired
@@ -22,55 +30,15 @@ public class PersonneService {
     private PasswordEncoder passwordEncoder;
 
     // Ajouter un utilisateur
-    public Personne ajouterPersonne(Personne personne) {
-        // Validation des données
-        if (personne.getNom() == null || personne.getNom().isEmpty()) {
-            throw new IllegalArgumentException("Le nom est requis.");
-        }
-
-        if (personne.getEmail() == null || personne.getEmail().isEmpty()) {
-            throw new IllegalArgumentException("L'email est requis.");
-        }
-
-        Pattern emailPattern = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$");
-        if (!emailPattern.matcher(personne.getEmail()).matches()) {
-            throw new IllegalArgumentException("Email invalide.");
-        }
-        
+    public Personne ajouterPersonne(@Valid Personne personne) {
         if (personneRepository.existsByEmail(personne.getEmail())) {
-            throw new IllegalArgumentException("Cet email est déjà utilisé.");
+            throw new BusinessException("Email déjà utilisé");
         }
-
-        if (personne.getAdresse() == null || personne.getAdresse().isEmpty()) {
-            throw new IllegalArgumentException("L'adresse est requise.");
-        }
-        
-        // Vérification que l'adresse ne contient que des lettres et espaces
-        Pattern addressPattern = Pattern.compile("^[A-Za-zÀ-ÿ\\s]+$");
-        if (!addressPattern.matcher(personne.getAdresse()).matches()) {
-            throw new IllegalArgumentException("L'adresse doit contenir uniquement des lettres.");
-        }
-
-        if (personne.getTelephone() == null || personne.getTelephone().isEmpty()) {
-            throw new IllegalArgumentException("Le numéro de téléphone est requis.");
+        if (personneRepository.existsByTelephone(personne.getTelephone())) {
+            throw new BusinessException("Téléphone déjà utilisé");
         }
         
-        
-        if (personne.getPassword() != null && !personne.getPassword().isEmpty()) {
-            String hashedPassword = passwordEncoder.encode(personne.getPassword());
-            personne.setPassword(hashedPassword);
-        } else {
-            throw new IllegalArgumentException("Le mot de passe est requis.");
-        }
-
-        // Vérification que le téléphone ne contient que des chiffres
-        Pattern phonePattern = Pattern.compile("^[0-9]+$");
-        if (!phonePattern.matcher(personne.getTelephone()).matches()) {
-            throw new IllegalArgumentException("Le numéro de téléphone doit contenir uniquement des chiffres.");
-        }
-
-        
-
+        personne.setPassword(passwordEncoder.encode(personne.getPassword()));
         return personneRepository.save(personne);
     }
 
@@ -79,46 +47,78 @@ public class PersonneService {
         return personneRepository.findAll();
     }
 
+    // public List<Personne> obtenirPersonnesSansDossierMedical() {
+    //     return personneRepository.findAll()
+    //             .stream()
+    //             .filter(personne -> personne.getDossierMedical() == null)
+    //             .collect(Collectors.toList());
+    // }
     public List<Personne> obtenirPersonnesSansDossierMedical() {
-        return personneRepository.findAll()
-                .stream()
-                .filter(personne -> personne.getDossierMedical() == null)
-                .collect(Collectors.toList());
+        return personneRepository.findPersonnesSansDossierMedical();
     }
 
     // 2️⃣ Récupérer toutes les femmes SANS dossier de grossesse
-   public List<Personne> obtenirToutesLesFemmes() {
-    return personneRepository.findAll().stream()
-        .filter(personne -> personne.getSexe() != null && personne.getSexe().equalsIgnoreCase("f"))
-        .collect(Collectors.toList());
-}
+    // public List<Personne> obtenirToutesLesFemmes() {
+    //     return personneRepository.findAll().stream()
+    //         .filter(personne -> personne.getSexe() != null && personne.getSexe().equalsIgnoreCase("f"))
+    //         .collect(Collectors.toList());
+    // }
+    public List<Personne> obtenirToutesLesFemmes() {
+        return personneRepository.findBySexeIgnoreCase("f");
+    }
 
 
     // Récupérer un utilisateur par ID
-    public Optional<Personne> obtenirPersonneParId(Long id) {
-        return personneRepository.findById(id);
+    public Personne obtenirParId(Long id) {
+        return personneRepository.findById(id)
+               .orElseThrow(() -> new PersonneNotFoundException(id));
     }
 
     
 
-    // Mettre à jour un utilisateur
-    public Personne mettreAJourPersonne(Long id, Personne personneDetails) {
-        Optional<Personne> personnelOptional = personneRepository.findById(id);
-        if (personnelOptional.isPresent()) {
-            Personne personnel = personnelOptional.get();
-            personnel.setNom(personneDetails.getNom());
-            personnel.setPrenom(personneDetails.getPrenom());
-            personnel.setEmail(personneDetails.getEmail());
-            personnel.setPassword(personneDetails.getPassword());
-            // Ajoutez d'autres champs à mettre à jour ici
-            return personneRepository.save(personnel);
-        } else {
-            throw new RuntimeException("Personne non trouvée avec l'ID : " + id);
-        }
+    // Mise à jour sécurisée
+    public Personne mettreAJourPersonne(Long id, @Valid Personne details) {
+        return personneRepository.findById(id)
+            .map(existant -> {
+                if (!existant.getEmail().equals(details.getEmail()) && 
+                    personneRepository.existsByEmail(details.getEmail())) {
+                    throw new BusinessException("Email déjà utilisé");
+                }
+
+                existant.setNom(details.getNom());
+                existant.setPrenom(details.getPrenom());
+                
+                if (details.getPassword() != null) {
+                    existant.setPassword(passwordEncoder.encode(details.getPassword()));
+                }
+                
+                return personneRepository.save(existant);
+            })
+            .orElseThrow(() -> new PersonneNotFoundException(id));
     }
 
-    // Supprimer un utilisateur
+    // Suppression avec vérification
     public void supprimerPersonne(Long id) {
+        if (!personneRepository.existsById(id)) {
+            throw new PersonneNotFoundException(id);
+        }
         personneRepository.deleteById(id);
+        log.info("Personne {} supprimée", id);
+    }
+
+    // Trouver les personnes qui sont des patients
+    public List<Personne> obtenirPatients() {
+        return personneRepository.findByEmployeIsNull();
+    }
+
+    // Trouver les personnes qui sont des employés
+    public List<Personne> obtenirEmployes() {
+        return personneRepository.findByEmployeIsNotNull();
+    }
+
+
+    // Trouver une personne par email
+    public Optional<Personne> obtenirParEmail(@Valid String email) {
+        return personneRepository.findByEmail(email);
     }
 }

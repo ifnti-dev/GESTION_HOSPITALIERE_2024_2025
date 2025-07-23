@@ -209,7 +209,7 @@ public class DatabaseSeeder implements CommandLineRunner {
             adminEmploye.setHoraire("9h-17h");
             adminEmploye.setSpecialite("Administration");
             adminEmploye.setNumOrdre("ADM123456");
-            adminEmploye.setDateAffectation(new java.util.Date());
+            adminEmploye.setDateAffectation(LocalDate.now());
             adminEmploye.setRoles(new HashSet<>(List.of(roleRepository.findByNom("DIRECTEUR").orElseThrow(() -> new RuntimeException("Role ADMIN not found")))));
             employeRepository.save(adminEmploye);
         }

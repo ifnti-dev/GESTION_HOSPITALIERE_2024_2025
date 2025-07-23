@@ -9,6 +9,7 @@ import com.gestion_hospitaliere.UeEntreprise.Utilis.Auditable;
 import static com.gestion_hospitaliere.UeEntreprise.Utilis.RegexConstants.*;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -30,14 +31,18 @@ public class Role extends Auditable {
 	@Pattern(regexp = LETTRES_SEULEMENT, message = "Le nom du rôle doit contenir entre 3 et 50 caractères alphanumériques.")
     private String nom;
     
-    @ManyToMany
-	@JsonIgnore
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "role_permissions",
         joinColumns = @JoinColumn(name = "role_id"),
         inverseJoinColumns = @JoinColumn(name = "permission_id")
     )
     private Set<Permission> permissions = new HashSet<>();
+
+	@JsonIgnore
+	@ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
+	private Set<Employe> employes = new HashSet<>();
+
 
 
 	public Role() {
@@ -72,6 +77,13 @@ public class Role extends Auditable {
 		this.permissions = permissions;
 	}
     
+	public Set<Employe> getEmployes() {
+		return employes;
+	}
+
+	public void setEmployes(Set<Employe> employes) {
+		this.employes = employes;
+	}
     
     
     // Getters and setters

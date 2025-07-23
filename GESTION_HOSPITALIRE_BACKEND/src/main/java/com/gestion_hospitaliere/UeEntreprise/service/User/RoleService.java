@@ -2,6 +2,7 @@ package com.gestion_hospitaliere.UeEntreprise.service.User;
 
 import com.gestion_hospitaliere.UeEntreprise.model.User.Role;
 import com.gestion_hospitaliere.UeEntreprise.model.dto.RoleRequest;
+import com.gestion_hospitaliere.UeEntreprise.model.dto.RoleResponse;
 import com.gestion_hospitaliere.UeEntreprise.model.User.Permission;
 import com.gestion_hospitaliere.UeEntreprise.repository.User.RoleRepository;
 import com.gestion_hospitaliere.UeEntreprise.repository.User.PermissionRepository;
@@ -26,6 +27,10 @@ public class RoleService {
     // Créer un nouveau rôle
     public Role creerRole(RoleRequest roleRequest) {
         Role role = new Role();
+        if (roleRequest.getNom() == null || roleRequest.getNom().isBlank()) {
+            throw new IllegalArgumentException("Le nom du rôle est obligatoire");
+        }
+
         role.setNom(roleRequest.getNom());
 
         Set<Permission> permissions = roleRequest.getPermissions().stream()
@@ -55,6 +60,10 @@ public class RoleService {
 
     public Role mettreAJourRole(Long id, RoleRequest roleRequest) {
         return roleRepository.findById(id).map(role -> {
+            if (roleRequest.getNom() == null || roleRequest.getNom().isBlank()) {
+                throw new IllegalArgumentException("Le nom du rôle est obligatoire");
+            }
+
             role.setNom(roleRequest.getNom());
 
             Set<Permission> permissions = roleRequest.getPermissions().stream()
@@ -70,6 +79,9 @@ public class RoleService {
 
     // Supprimer un rôle
     public void supprimerRole(Long id) {
+        if (!roleRepository.existsById(id)) {
+            throw new RuntimeException("Rôle non trouvé avec l'ID : " + id);
+        }
         roleRepository.deleteById(id);
     }
 
@@ -78,6 +90,10 @@ public class RoleService {
                 .orElseThrow(() -> new RuntimeException("Role non trouvé"));
         Permission permission = permissionRepository.findById(permissionId)
                 .orElseThrow(() -> new RuntimeException("Permission non trouvée"));
+        if (role.getPermissions().contains(permission)) {
+            throw new RuntimeException("La permission est déjà associée à ce rôle.");
+        }
+
         role.getPermissions().add(permission);
         return roleRepository.save(role);
     }
@@ -90,4 +106,19 @@ public class RoleService {
         role.getPermissions().remove(permission);
         return roleRepository.save(role);
     }
+    
+    public RoleResponse toRoleResponse(Role role) {
+        RoleResponse dto = new RoleResponse();
+        dto.setId(role.getId());
+        dto.setNom(role.getNom());
+        dto.setNombrePermissions(role.getPermissions().size());
+        dto.setNombreEmployes(role.getEmployes() != null ? role.getEmployes().size() : 0);
+        dto.setPermissionsLabels(
+            role.getPermissions().stream()
+                .map(Permission::getNom) // ou getLabel selon ton modèle
+                .collect(Collectors.toSet())
+        );
+        return dto;
+    }
+
 }

@@ -176,7 +176,12 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Pattern;
 
-@Table(name = "personne")
+@Table(
+    name = "personne",
+    indexes = {
+        @Index(name = "idx_email", columnList = "email", unique = true),
+        @Index(name = "idx_telephone", columnList = "telephone", unique = true)
+    })
 @Entity
 public class Personne extends Auditable {
 
@@ -186,6 +191,7 @@ public class Personne extends Auditable {
 
     @NotBlank(message = "Le nom est obligatoire et doit être en lettre uniquement.")
     @Pattern(regexp = LETTRES_SEULEMENT, message = "Ce champ ne doit contenir que des lettres, des espaces, des tirets ou des apostrophes.")
+    @Column(nullable = false, length = 50)
     private String nom;
 
     @NotBlank(message = "Le prénom est obligatoire et doit être en lettre uniquement.")
@@ -239,7 +245,7 @@ public class Personne extends Auditable {
 
     @OneToMany(mappedBy = "personne", cascade = CascadeType.ALL)
     @JsonIgnore
-    private List<DossierGrossesse> dossierGrossesse;
+    private List<DossierGrossesse> dossierGrossesse = new ArrayList<>();
 
     @OneToMany(mappedBy = "personne", cascade = CascadeType.ALL)
     @JsonIgnore
@@ -397,6 +403,14 @@ public class Personne extends Auditable {
 
     public void setAccouchements(List<Accouchement> accouchements) {
         this.accouchements = accouchements;
+    }
+
+    public boolean isPatient() {
+        return this.employe == null;
+    }
+
+    public boolean isEmploye() {
+        return this.employe != null;
     }
     
 }
