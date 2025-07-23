@@ -54,9 +54,11 @@ public class Permission extends Auditable {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-    
-    // Getters and setters
-    
+
+	@Override
+	public String toString() {
+		return "Permission{" + "id=" + id + ", nom=" + nom + '}';
+	}
     
     
 }

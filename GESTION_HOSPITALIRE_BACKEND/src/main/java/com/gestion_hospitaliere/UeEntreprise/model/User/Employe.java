@@ -1,7 +1,7 @@
 package com.gestion_hospitaliere.UeEntreprise.model.User;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -21,17 +21,30 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Pattern;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 
+@Getter 
+@Setter 
+@NoArgsConstructor
 @Entity
+@Table(indexes = {
+    @Index(name = "idx_num_ordre", columnList = "numOrdre"),
+    @Index(name = "idx_specialite", columnList = "specialite")
+})
 public class Employe extends Auditable {
 	
 	@Id
@@ -39,37 +52,34 @@ public class Employe extends Auditable {
 	private Long id;
 
 	@NotBlank(message = "L'horaire ne peut pas être vide.")
-	@NotNull(message = "L'horaire ne peut pas être nul.")
 	@Pattern(regexp = HEURE_PLAGE, message = "L'horaire doit être au format HH:mm-HH:mm.")
-	private String Horaire;
+	private String horaire;
 
-	@NotNull(message = "La date d'affectation ne peut pas être nulle.")
-	@Pattern(regexp = DATE, message = "La date d'affectation doit être au format YYYY-MM-DD.")
-	@NotBlank(message = "La date d'affectation ne peut pas être vide.")
-	private Date DateAffectation;
+	@NotNull
+	@PastOrPresent(message = "La date d'affectation doit être dans le passé ou le présent.")
+	private LocalDate dateAffectation;
 
 	@NotBlank(message = "La spécialité ne peut pas être vide.")
-	@NotNull(message = "La spécialité ne peut pas être nulle.")
 	@Pattern(regexp = LETTRES_SEULEMENT, message = "La spécialité doit contenir entre 3 et 50 caractères alphanumériques.")
 	private String specialite;
 
 	@NotBlank(message = "Le numéro d'ordre ne peut pas être vide.")
-	@NotNull(message = "Le numéro d'ordre ne peut pas être nul.")
 	@Pattern(regexp = NUM_ORDRE, message = "Le numéro d'ordre peut contenir des lettres et des chiffres.")
 	@Column(unique = true)
 	private String numOrdre;
 
 	
-	@ManyToMany(fetch = FetchType.EAGER)
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JsonIgnore
     @JoinTable(
-        name = "personne_roles",
-        joinColumns = @JoinColumn(name = "personne_id"),
+        name = "employe_roles",
+        joinColumns = @JoinColumn(name = "employe_id"),
         inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles = new HashSet<>();
 	
 	@OneToOne
-    @JoinColumn(name = "personne_id")
+    @JoinColumn(name = "personne_id", referencedColumnName = "id")
     private Personne personne;
 
 	
@@ -83,7 +93,7 @@ public class Employe extends Auditable {
 
 	@OneToMany(mappedBy = "employe")
 	@JsonIgnore // Pour éviter la récursivité JSON
-    private List<Facture> factures;
+    private List<Facture> factures = new ArrayList<>();
 	
 	
 
@@ -111,17 +121,17 @@ public class Employe extends Auditable {
 		this.roles = roles;
 	}
 	public String getHoraire() {
-		return Horaire;
+		return horaire;
 	}
 	public void setHoraire(String horaire) {
-		Horaire = horaire;
+		this.horaire = horaire;
 	}
-	public Date getDateAffectation() {
-		return DateAffectation;
+	public LocalDate getDateAffectation() {
+		return dateAffectation;
 	}
 	
-	public void setDateAffectation(Date dateAffectation) {
-		DateAffectation = dateAffectation;
+	public void setDateAffectation(LocalDate dateAffectation) {
+		this.dateAffectation = dateAffectation;
 	}
 	public String getSpecialite() {
 		return specialite;

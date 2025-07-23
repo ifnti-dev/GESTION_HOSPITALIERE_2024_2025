@@ -11,32 +11,6 @@ export interface BaseEntity {
 }
 
 
-
-// Interfaces qui représentent l'entité Permission
-export interface Permission extends BaseEntity {
-    id?: number
-    nom: string
-    description?: string
-}
-
-// Interface qui représente l'entité Role
-export interface Role extends BaseEntity {
-    id?: number
-    nom: string
-    permissions?: Permission[] // Relation Many-to-Many avec Permissions
-}
-
-
-
-// Interface qui représente l'entité Personne
-
-// Types pour les entités de l'application de gestion hospitalière
-export interface BaseEntity {
-  id?: number
-  createdAt?: string
-  updatedAt?: string
-}
-
 // Interfaces qui représentent l'entité Permission
 export interface Permission extends BaseEntity {
   id?: number
@@ -50,6 +24,7 @@ export interface Role extends BaseEntity {
   nom: string
   description?: string
   permissions?: Permission[] // Relation Many-to-Many avec Permissions
+  employes?: Employe[] // Relation Many-to-Many avec Employés
 }
 
 // Interface qui représente l'entité Personne
