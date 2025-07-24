@@ -1,129 +1,149 @@
-// Formatage des dates
-export const formatDate = (dateString: string | undefined): string => {
-  if (!dateString) return "Non défini"
+/**
+ * Formate un prix en FCFA
+ */
+export function formatPrice(price: number | string): string {
+  const numPrice = typeof price === "string" ? Number.parseFloat(price) : price
+  if (isNaN(numPrice)) return "0 FCFA"
+
+  return (
+    new Intl.NumberFormat("fr-FR", {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(numPrice) + " FCFA"
+  )
+}
+
+/**
+ * Formate une devise (alias pour formatPrice pour compatibilité)
+ */
+export function formatCurrency(amount: number | string): string {
+  return formatPrice(amount)
+}
+
+/**
+ * Formate une date au format français
+ */
+export function formatDate(date: string | Date | null | undefined): string {
+  if (!date) return "N/A"
 
   try {
-    const date = new Date(dateString)
-    return date.toLocaleDateString("fr-FR", {
+    const dateObj = typeof date === "string" ? new Date(date) : date
+    if (isNaN(dateObj.getTime())) return "N/A"
+
+    return new Intl.DateTimeFormat("fr-FR", {
+      day: "2-digit",
+      month: "2-digit",
       year: "numeric",
-      month: "long",
-      day: "numeric",
-    })
-  } catch {
-    return "Date invalide"
+    }).format(dateObj)
+  } catch (error) {
+    console.error("Erreur lors du formatage de la date:", error)
+    return "N/A"
   }
 }
 
-export const formatDateTime = (dateString: string | undefined): string => {
-  if (!dateString) return "Non défini"
+/**
+ * Formate une date et heure au format français
+ */
+export function formatDateTime(date: string | Date | null | undefined): string {
+  if (!date) return "N/A"
 
   try {
-    const date = new Date(dateString)
-    return date.toLocaleDateString("fr-FR", {
+    const dateObj = typeof date === "string" ? new Date(date) : date
+    if (isNaN(dateObj.getTime())) return "N/A"
+
+    return new Intl.DateTimeFormat("fr-FR", {
+      day: "2-digit",
+      month: "2-digit",
       year: "numeric",
-      month: "short",
-      day: "numeric",
       hour: "2-digit",
       minute: "2-digit",
-    })
-  } catch {
-    return "Date invalide"
+    }).format(dateObj)
+  } catch (error) {
+    console.error("Erreur lors du formatage de la date/heure:", error)
+    return "N/A"
   }
 }
 
-// Formatage des prix (conversion centimes -> euros)
-export const formatPrice = (priceInCents: number | undefined): string => {
-  if (priceInCents === undefined || priceInCents === null) return "0,00 €"
+/**
+ * Formate un nombre avec séparateurs de milliers
+ */
+export function formatNumber(num: number | string): string {
+  const numValue = typeof num === "string" ? Number.parseFloat(num) : num
+  if (isNaN(numValue)) return "0"
 
-  const euros = priceInCents / 100
-  return euros.toLocaleString("fr-FR", {
-    style: "currency",
-    currency: "EUR",
-    minimumFractionDigits: 2,
-  })
+  return new Intl.NumberFormat("fr-FR").format(numValue)
 }
 
-// Formatage des nombres
-export const formatNumber = (num: number | undefined): string => {
-  if (num === undefined || num === null) return "0"
+/**
+ * Formate un pourcentage
+ */
+export function formatPercentage(value: number | string, decimals = 1): string {
+  const numValue = typeof value === "string" ? Number.parseFloat(value) : value
+  if (isNaN(numValue)) return "0%"
 
-  return num.toLocaleString("fr-FR")
+  return new Intl.NumberFormat("fr-FR", {
+    style: "percent",
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  }).format(numValue / 100)
 }
 
-// Formatage des pourcentages
-export const formatPercentage = (value: number | undefined, total: number): string => {
-  if (!value || !total) return "0%"
+/**
+ * Formate une quantité avec unité
+ */
+export function formatQuantity(quantity: number | string, unit = "unité(s)"): string {
+  const numQuantity = typeof quantity === "string" ? Number.parseFloat(quantity) : quantity
+  if (isNaN(numQuantity)) return `0 ${unit}`
 
-  const percentage = (value / total) * 100
-  return `${percentage.toFixed(1)}%`
+  return `${formatNumber(numQuantity)} ${unit}`
 }
 
-// Formatage du statut
-export const formatStatus = (status: string): string => {
-  const statusMap: Record<string, string> = {
-    Actif: "Actif",
-    Inactif: "Inactif",
-    "En attente": "En attente",
-    Suspendu: "Suspendu",
-    Archivé: "Archivé",
+/**
+ * Formate une durée en jours
+ */
+export function formatDuration(days: number): string {
+  if (days === 0) return "Aujourd'hui"
+  if (days === 1) return "1 jour"
+  if (days < 0) return `Il y a ${Math.abs(days)} jour(s)`
+  return `Dans ${days} jour(s)`
+}
+
+/**
+ * Calcule et formate la différence entre deux dates en jours
+ */
+export function formatDateDifference(date1: string | Date, date2: string | Date = new Date()): string {
+  try {
+    const d1 = typeof date1 === "string" ? new Date(date1) : date1
+    const d2 = typeof date2 === "string" ? new Date(date2) : date2
+
+    if (isNaN(d1.getTime()) || isNaN(d2.getTime())) return "N/A"
+
+    const diffTime = d1.getTime() - d2.getTime()
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+
+    return formatDuration(diffDays)
+  } catch (error) {
+    console.error("Erreur lors du calcul de la différence de dates:", error)
+    return "N/A"
+  }
+}
+
+/**
+ * Formate un statut avec couleur
+ */
+export function formatStatus(status: string): { text: string; color: string } {
+  const statusMap: Record<string, { text: string; color: string }> = {
+    ACTIVE: { text: "Actif", color: "green" },
+    INACTIVE: { text: "Inactif", color: "gray" },
+    PENDING: { text: "En attente", color: "orange" },
+    COMPLETED: { text: "Terminé", color: "blue" },
+    CANCELLED: { text: "Annulé", color: "red" },
+    EXPIRED: { text: "Expiré", color: "red" },
+    EXPIRING_SOON: { text: "Expire bientôt", color: "orange" },
+    AVAILABLE: { text: "Disponible", color: "green" },
+    OUT_OF_STOCK: { text: "Rupture de stock", color: "red" },
+    LOW_STOCK: { text: "Stock faible", color: "orange" },
   }
 
-  return statusMap[status] || status
-}
-
-// Formatage des noms complets
-export const formatFullName = (prenom?: string, nom?: string): string => {
-  if (!prenom && !nom) return "Non défini"
-  if (!prenom) return nom || ""
-  if (!nom) return prenom || ""
-
-  return `${prenom} ${nom}`
-}
-
-// Formatage des adresses email
-export const formatEmail = (email?: string): string => {
-  if (!email) return "Non défini"
-  return email.toLowerCase()
-}
-
-// Formatage des numéros de téléphone
-export const formatPhone = (phone?: string): string => {
-  if (!phone) return "Non défini"
-
-  // Supprime tous les caractères non numériques
-  const cleaned = phone.replace(/\D/g, "")
-
-  // Formate selon le standard français
-  if (cleaned.length === 10) {
-    return cleaned.replace(/(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1 $2 $3 $4 $5")
-  }
-
-  return phone
-}
-
-// Formatage des durées
-export const formatDuration = (minutes: number): string => {
-  if (minutes < 60) {
-    return `${minutes} min`
-  }
-
-  const hours = Math.floor(minutes / 60)
-  const remainingMinutes = minutes % 60
-
-  if (remainingMinutes === 0) {
-    return `${hours}h`
-  }
-
-  return `${hours}h ${remainingMinutes}min`
-}
-
-// Formatage des tailles de fichier
-export const formatFileSize = (bytes: number): string => {
-  if (bytes === 0) return "0 B"
-
-  const k = 1024
-  const sizes = ["B", "KB", "MB", "GB"]
-  const i = Math.floor(Math.log(bytes) / Math.log(k))
-
-  return `${Number.parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`
+  return statusMap[status.toUpperCase()] || { text: status, color: "gray" }
 }

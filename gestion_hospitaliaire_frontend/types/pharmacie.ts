@@ -1,4 +1,3 @@
-
 import type { Employe } from "./utilisateur"
 import type { Personne } from "./utilisateur"
 
@@ -84,19 +83,19 @@ export interface LigneApprovisionnement {
 //   lignesCommande?: LigneCommande[] // Relation OneToMany
 // }
 
-
+export type StatutCommande = "EN_COURS" | "VALIDEE" | "ANNULEE"
 
 export interface Commande {
   id?: number
   dateCommande: string
   montantTotal: string
-  personne?: Personne // CHANGEMENT ICI : Utilise l'objet Personne complet
+  statut?: StatutCommande // Ajouter cette ligne
+  personne?: Personne
   lignesCommande?: LigneCommande[]
   nombreLignes?: number
   montantTotalAsDouble?: number
   valid?: boolean
 }
-
 
 // LIGNE COMMANDE - Vente d'un lot spécifique
 export interface LigneCommande {
@@ -244,7 +243,7 @@ export interface CommandeFilters {
   personneId?: number
   montantMin?: number
   montantMax?: number
-  statut?: "en_cours" | "validee" | "annulee"
+  statut?:  "validee" | "annulee"
 }
 
 // Types pour les rapports
@@ -315,20 +314,16 @@ export interface StockStats {
   valeurTotaleStock: number
 }
 
-// export interface LigneApprovisionnement {
-//   id?: number
-//   approvisionnementId?: number
-//   medicamentReferenceId?: number
-//   numeroLot?: string
-//   dateFabrication?: string
-//   dateExpiration?: string
-//   quantiteRecue?: number
-//   quantiteDisponible?: number
-//   prixAchatUnitaire?: number
-//   prixVenteUnitaire?: number
-//   createdAt?: string
-//   updatedAt?: string
-// }
+export interface Notification {
+  id?: number
+  type: string // Type de notification (Stock Critique, Expiration Proche, etc.)
+  message: string // Message descriptif
+  dateNotif: string // LocalDate - Date de création
+  statut?: "lue" | "non_lue" // Statut de lecture
+  priorite?: "haute" | "moyenne" | "normale" | "basse" // Niveau de priorité
+  createdAt?: string
+  updatedAt?: string
+}
 
 export interface LotInfo extends LigneApprovisionnement {
   isExpired: boolean
