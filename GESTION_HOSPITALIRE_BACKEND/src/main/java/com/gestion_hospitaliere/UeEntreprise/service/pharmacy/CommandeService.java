@@ -8,15 +8,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.gestion_hospitaliere.UeEntreprise.repository.pharmacy.CommandeRepository; 
-import com.gestion_hospitaliere.UeEntreprise.model.pharmacy.Commande; 
+import com.gestion_hospitaliere.UeEntreprise.repository.pharmacy.CommandeRepository;
+import com.gestion_hospitaliere.UeEntreprise.model.pharmacy.Commande;
+import com.gestion_hospitaliere.UeEntreprise.repository.pharmacy.LigneCommandeRepository;
+import com.gestion_hospitaliere.UeEntreprise.repository.pharmacy.LigneApprovisionnementRepository;
+import com.gestion_hospitaliere.UeEntreprise.model.pharmacy.LigneCommande;
+import com.gestion_hospitaliere.UeEntreprise.model.pharmacy.LigneApprovisionnement;
 
 @Service
 @Transactional
 public class CommandeService {
-  
+
   @Autowired
   private final CommandeRepository commandeRepository;
+
+  @Autowired
+  private LigneCommandeRepository ligneCommandeRepository;
+
+  @Autowired
+  private LigneApprovisionnementRepository ligneApprovisionnementRepository;
 
   public CommandeService(CommandeRepository commandeRepository) {
       this.commandeRepository = commandeRepository;
@@ -37,12 +47,12 @@ public class CommandeService {
       } else {
           commande.setMontantTotal("0.0");
       }
-      
+
       // Définir la date de commande si elle n'est pas définie
       if (commande.getDateCommande() == null) {
           commande.setDateCommande(LocalDate.now());
       }
-      
+
       return commandeRepository.save(commande);
   }
 
@@ -80,7 +90,7 @@ public class CommandeService {
           return commandeRepository.findByMontantTotalGreaterThanString(montant);
       }
   }
-  
+
   // Méthode alternative avec Double directement
   public List<Commande> getCommandesByMontantGreaterThan(Double montant) {
       return commandeRepository.findByMontantTotalGreaterThan(montant);
@@ -153,5 +163,43 @@ public class CommandeService {
           commande.calculerMontantTotal();
           commandeRepository.save(commande);
       }
+  }
+
+  @Transactional
+  public Commande annulerCommande(Long commandeId) {
+      Optional<Commande> optionalCommande = getCommandeById(commandeId);
+      if (!optionalCommande.isPresent()) {
+          throw new RuntimeException("Commande non trouvée avec l'ID: " + commandeId);
+      }
+
+      Commande commande = optionalCommande.get();
+
+      // Vérifier si la commande peut être annulée
+      if (commande.isAnnulee()) {
+          throw new RuntimeException("La commande est déjà annulée");
+      }
+
+      // Récupérer toutes les lignes de commande
+      List<LigneCommande> lignesCommande = ligneCommandeRepository.findByCommandeId(commandeId);
+
+      // Remettre les quantités en stock
+      for (LigneCommande ligneCommande : lignesCommande) {
+          if (ligneCommande.getLigneApprovisionnement() != null) {
+              LigneApprovisionnement ligneAppro = ligneCommande.getLigneApprovisionnement();
+
+              // Remettre la quantité vendue en stock
+              int nouvelleQuantiteDisponible = ligneAppro.getQuantiteDisponible() + ligneCommande.getQuantite();
+              ligneAppro.setQuantiteDisponible(nouvelleQuantiteDisponible);
+
+              // Sauvegarder la ligne d'approvisionnement mise à jour
+              ligneApprovisionnementRepository.save(ligneAppro);
+          }
+      }
+
+      // Changer le statut de la commande
+      commande.annuler();
+
+      // Sauvegarder la commande
+      return commandeRepository.save(commande);
   }
 }
