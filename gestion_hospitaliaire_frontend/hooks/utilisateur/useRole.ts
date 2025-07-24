@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { getRoles, addRole, updateRole, deleteRole } from "@/services/utilisateur/role.service";
+import { getRoles, addRole, updateRole, deleteRole, getEmployeeCountByRole as fetchEmployeeCount } from "@/services/utilisateur/role.service";
 import { Role } from "@/types/utilisateur";
 
 export function useRole() {
@@ -34,6 +34,21 @@ export function useRole() {
             setRoles((prev) => [...prev, role]);
         } catch (err: any) {
             setError(err.message || "Erreur lors de l'ajout du rôle");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Compter les employés par rôle
+    const getEmployeeCountByRole = async (roleId: number) => {
+        setLoading(true);
+        setError(null);
+        try {
+            const count = await fetchEmployeeCount(roleId);
+            return count; // Retourne le nombre d'employés
+        } catch (err: any) {
+            setError(err.message || "Erreur lors du comptage des employés");
+            return 0; // Retourne 0 en cas d'erreur
         } finally {
             setLoading(false);
         }
@@ -77,5 +92,6 @@ export function useRole() {
         addRole: handleAddRole,
         updateRole: handleUpdateRole,
         deleteRole: handleDeleteRole,
+        getEmployeeCountByRole,
     };
 }

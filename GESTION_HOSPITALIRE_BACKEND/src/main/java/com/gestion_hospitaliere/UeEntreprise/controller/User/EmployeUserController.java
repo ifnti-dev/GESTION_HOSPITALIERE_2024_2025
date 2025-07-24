@@ -12,13 +12,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.http.HttpStatus;
 
 import com.gestion_hospitaliere.UeEntreprise.model.User.Employe;
-import com.gestion_hospitaliere.UeEntreprise.model.dto.EmployeParRoleDTO;
 import com.gestion_hospitaliere.UeEntreprise.service.User.EmployeService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import jakarta.validation.Valid;
 
 @RestController
@@ -30,35 +30,34 @@ public class EmployeUserController {
     private EmployeService employeService;
 
     // 🔹 Créer un nouvel employé
-    @Operation(summary = "Crée un nouvel employé")
+    @Operation(summary = "Crée un nouvel employé",
+        requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            content = @Content(
+                examples = {
+                    @ExampleObject(
+                        name = "Création avec nouvelle personne",
+                        value = "{...}" // Coller votre JSON exemple ici
+                    )
+                }
+            )
+        )
+    )
     @PostMapping
     public ResponseEntity<?> creerEmploye(@Valid @RequestBody Employe employe) {
         try {
             System.out.println("=== CRÉATION EMPLOYÉ ===");
             System.out.println("Données reçues: " + employe);
-            System.out.println("Personne associée: " + employe.getPersonne());
-            
-            if (employe.getPersonne() != null) {
-                System.out.println("Détails personne:");
-                System.out.println("- Nom: " + employe.getPersonne().getNom());
-                System.out.println("- Prénom: " + employe.getPersonne().getPrenom());
-                System.out.println("- Email: " + employe.getPersonne().getEmail());
-                System.out.println("- ID: " + employe.getPersonne().getId());
-            }
             
             Employe nouveau = employeService.creerEmploye(employe);
-            System.out.println("Employé créé avec succès: " + nouveau.getId());
             return ResponseEntity.ok(nouveau);
         } catch (Exception e) {
             System.err.println("Erreur lors de la création de l'employé: " + e.getMessage());
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Erreur: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Erreur: " + e.getMessage());
         }
     }
 
     // 🔹 Récupérer tous les employés
-    @Operation(summary = "Récupéré tous les employés")
+    @Operation(summary = "Récupérer tous les employés")
     @GetMapping
     public ResponseEntity<List<Employe>> getAll() {
         try {
@@ -66,53 +65,47 @@ public class EmployeUserController {
             return ResponseEntity.ok(employes);
         } catch (Exception e) {
             System.err.println("Erreur lors de la récupération des employés: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.internalServerError().build();
         }
     }
 
     // 🔹 Récupérer un employé par ID
-    @Operation(summary = "Récupéré un employé par id")
+    @Operation(summary = "Récupérer un employé par id")
     @GetMapping("/{id}")
     public ResponseEntity<Employe> getById(@PathVariable Long id) {
         try {
-            Optional<Employe> employe = employeService.obtenirEmployeParId(id);
-            return employe.map(ResponseEntity::ok)
-                          .orElseGet(() -> ResponseEntity.notFound().build());
+            return employeService.obtenirEmployeParId(id)
+                    .map(ResponseEntity::ok)
+                    .orElse(ResponseEntity.notFound().build());
         } catch (Exception e) {
             System.err.println("Erreur lors de la récupération de l'employé: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.internalServerError().build();
         }
     }
 
     // 🔹 Mettre à jour un employé
     @Operation(summary = "Mettre à jour un employé")
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody Employe updated) {
+    public ResponseEntity<?> update(@PathVariable Long id, @Valid @RequestBody Employe updated) {
         try {
-            System.out.println("=== MISE À JOUR EMPLOYÉ ===");
-            System.out.println("ID: " + id);
-            System.out.println("Données: " + updated);
-            
             Employe employe = employeService.mettreAJourEmploye(id, updated);
             return ResponseEntity.ok(employe);
         } catch (Exception e) {
             System.err.println("Erreur lors de la mise à jour: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Erreur: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Erreur: " + e.getMessage());
         }
     }
 
     // 🔹 Supprimer un employé
     @Operation(summary = "Supprimer un employé")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         try {
             employeService.supprimerEmploye(id);
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
             System.err.println("Erreur lors de la suppression: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Erreur: " + e.getMessage());
+            return ResponseEntity.badRequest().build();
         }
     }
 
@@ -125,8 +118,7 @@ public class EmployeUserController {
             return ResponseEntity.ok(employe);
         } catch (Exception e) {
             System.err.println("Erreur lors de l'ajout du rôle: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Erreur: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Erreur: " + e.getMessage());
         }
     }
 
@@ -139,8 +131,7 @@ public class EmployeUserController {
             return ResponseEntity.ok(employe);
         } catch (Exception e) {
             System.err.println("Erreur lors du retrait du rôle: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Erreur: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Erreur: " + e.getMessage());
         }
     }
 
@@ -155,14 +146,20 @@ public class EmployeUserController {
             return ResponseEntity.ok(employe);
         } catch (Exception e) {
             System.err.println("Erreur lors de l'affectation: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Erreur: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Erreur: " + e.getMessage());
         }
     }
 
-    @Operation(summary = "Trouver le nombre d'employé pour chaque rôle !")
+    // 🔹 Statistiques employés par rôle (version sans DTO)
+    @Operation(summary = "Nombre d'employés par rôle")
     @GetMapping("/stats/roles")
-    public List<EmployeParRoleDTO> getStatsRoles() {
-        return employeService.getNombreEmployesParRole();
+    public ResponseEntity<List<Object[]>> getStatsRoles() {
+        try {
+            List<Object[]> stats = employeService.getNombreEmployesParRole();
+            return ResponseEntity.ok(stats);
+        } catch (Exception e) {
+            System.err.println("Erreur lors de la récupération des stats: " + e.getMessage());
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }

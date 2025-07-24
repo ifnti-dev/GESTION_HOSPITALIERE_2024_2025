@@ -133,3 +133,8 @@ export async function assignPersonToEmploye(employeId: number, personneId: numbe
 export async function getEmployeStats(): Promise<EmployeStats> {
   return apiFetch<EmployeStats>(`${API_ENDPOINTS.UTILISATEUR.STATS.EMPLOYES}`)
 }
+
+// Récupérer les employés par rôle
+export async function getEmployesParRoleStats(): Promise<any[]> {
+  return apiFetch<any[]>(API_ENDPOINTS.UTILISATEUR.STATS.EMPLOYES_PAR_ROLE)
+}

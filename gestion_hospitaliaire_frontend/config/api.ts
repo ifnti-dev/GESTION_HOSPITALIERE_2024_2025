@@ -175,16 +175,17 @@ export const API_ENDPOINTS = {
   },
 
 
-  UTILISATEUR: {
+ UTILISATEUR: {
     // PersonneController endpoints
     PERSONNES: "/api/personne",
     PERSONNES_BY_ID: (id: number) => `/api/personne/${id}`,
-
-    // EmployeController endpoints
-    EMPLOYES: "/api/employe",
+    PATIENTS_ONLY: "/api/personne/patients",
+    EMPLOYES_ONLY: "/api/personne/employes",
     PAS_MEDICALE: "/api/personne/pas-dossier-medical",
     PAS_GROSSES: "/api/personne/pas-dossier-grossesse",
 
+    // EmployeController endpoints
+    EMPLOYES: "/api/employe",
     EMPLOYES_BY_ID: (id: number) => `/api/employe/${id}`,
     EMPLOYES_SEARCH: {
       BY_SPECIALITE: "/api/employe/search/specialite",
@@ -192,30 +193,57 @@ export const API_ENDPOINTS = {
       BY_PERSONNE: "/api/employe/search/personne",
       BY_ROLE: "/api/employe/search/role",
     },
+    EMPLOYES_ACTIONS: {
+      AJOUTER_ROLE: (employeId: number, roleId: number) =>
+        `/api/employe/${employeId}/roles/${roleId}`,
+      RETIRER_ROLE: (employeId: number, roleId: number) =>
+        `/api/employe/${employeId}/roles/${roleId}`,
+      AFFECTER_PERSONNE: (employeId: number, personneId: number) =>
+        `/api/employe/${employeId}/personne/${personneId}`,
+    },
 
     // RoleController endpoints
-    ROLES: "/api/roles",
-    ROLES_BY_ID: (id: number) => `/api/role/${id}`,
+    ROLES: {
+      BASE: "/api/roles",
+      BY_ID: (id: number) => `/api/roles/${id}`,
+      PERMISSIONS: {
+        ADD: (roleId: number, permissionId: number) =>
+          `/api/roles/${roleId}/permissions/${permissionId}`,
+        REMOVE: (roleId: number, permissionId: number) =>
+          `/api/roles/${roleId}/permissions/${permissionId}`,
+      },
+      STATS: {
+        EMPLOYE_COUNT: (id: number) => `/api/roles/${id}/employes/count`,
+      },
+    },
 
     // PermissionController endpoints
     PERMISSIONS: "/api/permissions",
-    PERMISSIONS_BY_ID: (id: number) => `/api/permission/${id}`,
+    PERMISSIONS_BY_ID: (id: number) => `/api/permissions/${id}`,
+    PERMISSIONS_FOR_ROLE: {
+      ADD: (roleId: number, permissionId: number) =>
+        `/api/roles/${roleId}/permissions/${permissionId}`,
+      REMOVE: (roleId: number, permissionId: number) =>
+        `/api/roles/${roleId}/permissions/${permissionId}`,
+    },
 
     // Endpoints de recherche
     PERSONNES_SEARCH: {
       BY_NOM: "/api/personne/search/nom",
       BY_EMAIL: "/api/personne/search/email",
       BY_TELEPHONE: "/api/personne/search/telephone",
-      EMPLOYES_ONLY: "/api/personne/employes",
-      PATIENTS_ONLY: "/api/personne/patients",
     },
 
     // Endpoints statistiques
     STATS: {
       PERSONNES: "/api/personne/stats",
       EMPLOYES: "/api/employe/stats",
+      EMPLOYE_COUNT: (id: number) => `/api/roles/${id}/employes/count`,
+      ROLES: "/api/roles/stats",
+      EMPLOYES_PAR_ROLE: "/api/employe/stats/roles", // ✅ Ajouté ici
     },
   },
+
 
   // Patients
   PATIENTS: "/api/patients",

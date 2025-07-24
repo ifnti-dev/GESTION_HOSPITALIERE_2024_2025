@@ -164,4 +164,17 @@ public class Employe extends Auditable {
 	public void setFactures(List<Facture> factures) {
 		this.factures = factures;
 	}
+
+	public void addRole(Role role) {
+		this.roles.add(role);
+	}
+
+	public void removeRole(Role role) {
+		this.roles.remove(role);
+	}
+
+	@Override
+	public String toString() {
+		return "Employe{id=" + id + ", numOrdre='" + numOrdre + "'}";
+	}
 }

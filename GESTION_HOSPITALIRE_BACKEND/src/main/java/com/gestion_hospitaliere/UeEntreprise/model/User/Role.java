@@ -20,6 +20,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
+/**
+ * Représente un rôle dans le système, incluant les permissions associées.
+ */
+
 @Entity
 public class Role extends Auditable {
     @Id
@@ -37,7 +41,7 @@ public class Role extends Auditable {
         joinColumns = @JoinColumn(name = "role_id"),
         inverseJoinColumns = @JoinColumn(name = "permission_id")
     )
-    private Set<Permission> permissions = new HashSet<>();
+    private Set<Permission> rolePermissions = new HashSet<>();
 
 	@JsonIgnore
 	@ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
@@ -48,9 +52,9 @@ public class Role extends Auditable {
 	public Role() {
 	}
 
-	public Role(String nom, Set<Permission> permissions) {
+	public Role(String nom, Set<Permission> rolePermissions) {
 		this.nom = nom;
-		this.permissions = permissions;
+		this.rolePermissions = rolePermissions;
 	}
 
 	public Long getId() {
@@ -70,11 +74,27 @@ public class Role extends Auditable {
 	}
 
 	public Set<Permission> getPermissions() {
-		return permissions;
+		return rolePermissions;
 	}
 
-	public void setPermissions(Set<Permission> permissions) {
-		this.permissions = permissions;
+	public void setPermissions(Set<Permission> rolePermissions) {
+		this.rolePermissions = rolePermissions;
+	}
+
+	public void addPermission(Permission rolePermissions) {
+		if (rolePermissions != null) {
+			this.rolePermissions.add(rolePermissions);
+		} else {
+			throw new IllegalArgumentException("La permission ne peut pas être nulle.");
+		}
+	}
+
+	public void removePermission(Permission rolePermissions) {
+		if (rolePermissions != null) {
+			this.rolePermissions.remove(rolePermissions);
+		} else {
+			throw new IllegalArgumentException("La permission ne peut pas être nulle.");
+		}
 	}
     
 	public Set<Employe> getEmployes() {
@@ -84,7 +104,14 @@ public class Role extends Auditable {
 	public void setEmployes(Set<Employe> employes) {
 		this.employes = employes;
 	}
-    
-    
-    // Getters and setters
+
+	public int getNombreEmployes() {
+		return employes.size();
+	}
+
+	@Override
+	public String toString() {
+		return "Role{id=" + id + ", nom='" + nom + "'}";
+	}
+        
 }

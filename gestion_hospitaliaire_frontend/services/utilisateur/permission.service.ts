@@ -53,3 +53,13 @@ export async function deletePermission(permissionId: number): Promise<void> {
         method: "DELETE",
     });
 }
+
+export async function getPermissionsByRole(roleId: number): Promise<Permission[]> {
+    return apiFetch<Permission[]>(`${API_ENDPOINTS.UTILISATEUR.ROLES}/${roleId}/permissions`);
+}
+
+
+export async function permissionExists(nom: string): Promise<boolean> {
+    const permission = await getPermissionByName(nom);
+    return !!permission; // Retourne true si la permission existe
+}
