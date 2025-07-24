@@ -14,8 +14,8 @@ public interface ConsultationRepository extends JpaRepository<Consultation, Long
     List<Consultation> findByDate(LocalDate date);
 
     // Utilisée par ConsultationService.getConsultationsByPersonneId
-    List<Consultation> findByPersonne_Id(Long personneId);
 
     // Utilisée par ConsultationService.getConsultationsByDiagnosticContaining
+    List<Consultation> findByDossierMedical_Id(long id);
     List<Consultation> findByDiagnosticContaining(String keyword);
 }

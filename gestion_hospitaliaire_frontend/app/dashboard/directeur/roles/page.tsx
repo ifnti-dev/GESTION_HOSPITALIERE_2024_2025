@@ -102,24 +102,34 @@ const RoleForm = ({
           <div className="text-red-600 text-center p-4">Erreur lors du chargement des permissions</div>
         ) : (
           <div className="grid grid-cols-1 gap-3 max-h-64 overflow-y-auto border rounded-lg p-4 bg-gray-50">
-            {permissions.map((permission) => (
-              <div
-                key={permission.id}
-                className="flex items-start space-x-3 p-2 bg-white rounded-lg border border-gray-100"
-              >
-                <Checkbox
-                  id={`perm_${permission.id}`}
-                  checked={formData.permissions.includes(permission.id!)}
-                  onCheckedChange={(checked) => handlePermissionChange(permission.id!, !!checked)}
-                />
-                <div className="grid gap-1.5 leading-none flex-1">
-                  <label htmlFor={`perm_${permission.id}`} className="text-sm font-medium leading-none cursor-pointer">
-                    {permission.nom}
-                  </label>
-                  <p className="text-xs text-muted-foreground">{permission.description}</p>
+            {permissions.map((permission) => {
+              const isChecked = formData.permissions.includes(permission.id!);
+              return (
+                <div
+                  key={permission.id}
+                  className="flex items-start space-x-3 p-3 rounded-lg border cursor-pointer
+                    bg-white border-gray-200 hover:bg-gray-50"
+                >
+                  <Checkbox
+                    id={`perm_${permission.id}`}
+                    checked={isChecked}
+                    onCheckedChange={(checked) => handlePermissionChange(permission.id!, !!checked)}
+                    className={`${isChecked ? 'border-blue-600 bg-blue-100' : ''}`}
+                  />
+                  <div className="grid gap-1.5 leading-none flex-1">
+                    <label
+                      htmlFor={`perm_${permission.id}`}
+                      className={`text-sm font-medium leading-none cursor-pointer text-gray-900`}
+                    >
+                      {permission.nom}
+                    </label>
+                    <p className="text-xs text-gray-600">
+                      {permission.description}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
@@ -156,7 +166,12 @@ export default function RolesPage() {
   const stats = useMemo(() => {
     const totalRoles = roles.length
     const totalPermissions = permissions.length
-    const totalEmployes = roles.reduce((acc, r) => acc + (r.employesCount || 0), 0)
+    const totalEmployes = roles.reduce((acc, r) => {
+      if (Array.isArray(r.employes)) {
+        return acc + r.employes.length
+      }
+      return acc + (typeof r.employes === "number" ? r.employes : 0)
+    }, 0)
     const roleImportant = roles.reduce(
       (max, role) => ((role.permissions?.length || 0) > (max.permissions?.length || 0) ? role : max),
       roles[0] || { nom: "Aucun", permissions: [] },
@@ -397,6 +412,12 @@ export default function RolesPage() {
                           </div>
                         </TableCell>
                         <TableCell className="py-4">
+                          <span className="text-sm text-slate-700">
+                            {role.permissions?.length ?? 0} permission{(role.permissions?.length ?? 0) > 1 ? 's' : ''}
+                          </span>
+                        </TableCell>
+
+                        {/* <TableCell className="py-4">
                           <div className="flex flex-wrap gap-1">
                             {(role.permissions ?? []).slice(0, 2).map((perm, idx) => (
                               <Badge
@@ -413,11 +434,12 @@ export default function RolesPage() {
                               </Badge>
                             )}
                           </div>
-                        </TableCell>
+                        </TableCell> */}
+                        
                         <TableCell className="py-4">
                           <div className="flex items-center gap-2">
                             <Users className="h-3 w-3 text-gray-400" />
-                            <span className="font-medium text-gray-900">{role.employesCount || 0}</span>
+                            <span className="font-medium text-gray-900">{role.employes || 0}</span>
                             <span className="text-sm text-gray-500">employés</span>
                           </div>
                         </TableCell>
@@ -427,10 +449,10 @@ export default function RolesPage() {
                               size="sm"
                               variant="ghost"
                               onClick={() => handleViewDetails(role)}
-                              className="h-8 w-8 p-0 hover:bg-green-100 hover:text-green-700 transition-all duration-200"
+                              className="h-8 w-8 p-0 hover:bg-green-100 rounded hover:text-green-700 transition-all duration-200"
                               title="Voir les détails"
                             >
-                              <Eye className="h-4 w-4" />
+                              <Eye className="h-4 w-4 text-green-600" />
                             </Button>
                             <Button
                               size="sm"
@@ -439,7 +461,7 @@ export default function RolesPage() {
                               className="h-8 w-8 p-0 hover:bg-blue-100 hover:text-blue-700 transition-all duration-200"
                               title="Modifier le rôle"
                             >
-                              <Edit className="h-4 w-4" />
+                              <Edit className="h-4 w-4 text-blue-600"/>
                             </Button>
                             <Button
                               size="sm"
@@ -448,7 +470,7 @@ export default function RolesPage() {
                               className="h-8 w-8 p-0 hover:bg-red-100 hover:text-red-700 transition-all duration-200"
                               title="Supprimer le rôle"
                             >
-                              <Trash2 className="h-4 w-4" />
+                              <Trash2 className="h-4 w-4 text-red-600" />
                             </Button>
                           </div>
                         </TableCell>
@@ -478,7 +500,7 @@ export default function RolesPage() {
               loadingPermissions={loadingPermissions}
               errorPermissions={errorPermissions}
             />
-            <DialogFooter>
+            <DialogFooter className="text-black">
               <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
                 Annuler
               </Button>

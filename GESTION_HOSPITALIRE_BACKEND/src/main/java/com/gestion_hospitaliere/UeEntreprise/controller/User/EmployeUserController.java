@@ -15,7 +15,11 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.http.HttpStatus;
 
 import com.gestion_hospitaliere.UeEntreprise.model.User.Employe;
+import com.gestion_hospitaliere.UeEntreprise.model.dto.EmployeParRoleDTO;
 import com.gestion_hospitaliere.UeEntreprise.service.User.EmployeService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("api/employe")
@@ -26,8 +30,9 @@ public class EmployeUserController {
     private EmployeService employeService;
 
     // 🔹 Créer un nouvel employé
+    @Operation(summary = "Crée un nouvel employé")
     @PostMapping
-    public ResponseEntity<?> creerEmploye(@RequestBody Employe employe) {
+    public ResponseEntity<?> creerEmploye(@Valid @RequestBody Employe employe) {
         try {
             System.out.println("=== CRÉATION EMPLOYÉ ===");
             System.out.println("Données reçues: " + employe);
@@ -53,6 +58,7 @@ public class EmployeUserController {
     }
 
     // 🔹 Récupérer tous les employés
+    @Operation(summary = "Récupéré tous les employés")
     @GetMapping
     public ResponseEntity<List<Employe>> getAll() {
         try {
@@ -65,6 +71,7 @@ public class EmployeUserController {
     }
 
     // 🔹 Récupérer un employé par ID
+    @Operation(summary = "Récupéré un employé par id")
     @GetMapping("/{id}")
     public ResponseEntity<Employe> getById(@PathVariable Long id) {
         try {
@@ -78,6 +85,7 @@ public class EmployeUserController {
     }
 
     // 🔹 Mettre à jour un employé
+    @Operation(summary = "Mettre à jour un employé")
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable Long id, @RequestBody Employe updated) {
         try {
@@ -95,6 +103,7 @@ public class EmployeUserController {
     }
 
     // 🔹 Supprimer un employé
+    @Operation(summary = "Supprimer un employé")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
         try {
@@ -108,6 +117,7 @@ public class EmployeUserController {
     }
 
     // 🔹 Ajouter un rôle à un employé
+    @Operation(summary = "Ajouter un rôle à un employé")
     @PostMapping("/{employeId}/roles/{roleId}")
     public ResponseEntity<?> ajouterRole(@PathVariable Long employeId, @PathVariable Long roleId) {
         try {
@@ -121,6 +131,7 @@ public class EmployeUserController {
     }
 
     // 🔹 Retirer un rôle à un employé
+    @Operation(summary = "Retirer un rôle à un employé")
     @DeleteMapping("/{employeId}/roles/{roleId}")
     public ResponseEntity<?> retirerRole(@PathVariable Long employeId, @PathVariable Long roleId) {
         try {
@@ -134,6 +145,7 @@ public class EmployeUserController {
     }
 
     // 🔹 Affecter une personne existante à un employé existant
+    @Operation(summary = "Affecter une personne existante à un employé existant")
     @PutMapping("/{employeId}/personne/{personneId}")
     public ResponseEntity<?> affecterPersonne(
             @PathVariable Long employeId,
@@ -146,5 +158,11 @@ public class EmployeUserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body("Erreur: " + e.getMessage());
         }
+    }
+
+    @Operation(summary = "Trouver le nombre d'employé pour chaque rôle !")
+    @GetMapping("/stats/roles")
+    public List<EmployeParRoleDTO> getStatsRoles() {
+        return employeService.getNombreEmployesParRole();
     }
 }

@@ -369,7 +369,7 @@ export default function PermissionsPage() {
                               className="h-8 w-8 p-0 hover:bg-green-100 hover:text-green-700 transition-all duration-200"
                               title="Voir les détails"
                             >
-                              <Eye className="h-4 w-4" />
+                              <Eye className="h-4 w-4 text-green-600" />
                             </Button>
                             <Button
                               size="sm"
@@ -378,7 +378,7 @@ export default function PermissionsPage() {
                               className="h-8 w-8 p-0 hover:bg-blue-100 hover:text-blue-700 transition-all duration-200"
                               title="Modifier la permission"
                             >
-                              <Edit className="h-4 w-4" />
+                              <Edit className="h-4 w-4 text-blue-600" />
                             </Button>
                             <Button
                               size="sm"
@@ -387,7 +387,7 @@ export default function PermissionsPage() {
                               className="h-8 w-8 p-0 hover:bg-red-100 hover:text-red-700 transition-all duration-200"
                               title="Supprimer la permission"
                             >
-                              <Trash2 className="h-4 w-4" />
+                            <Trash2 className="h-4 w-4 text-red-600" />
                             </Button>
                           </div>
                         </TableCell>

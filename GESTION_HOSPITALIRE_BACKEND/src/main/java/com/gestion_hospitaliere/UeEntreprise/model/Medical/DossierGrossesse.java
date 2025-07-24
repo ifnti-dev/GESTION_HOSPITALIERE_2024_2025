@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.gestion_hospitaliere.UeEntreprise.controller.ConsultationTraitement.ConsultationPrenataleController;
+import com.gestion_hospitaliere.UeEntreprise.model.ConsultationTraitement.Consultation;
+import com.gestion_hospitaliere.UeEntreprise.model.ConsultationTraitement.ConsultationPrenatale;
 import com.gestion_hospitaliere.UeEntreprise.model.Pregnancy.Accouchement;
 import com.gestion_hospitaliere.UeEntreprise.model.Pregnancy.SuiviGrossesse;
 import com.gestion_hospitaliere.UeEntreprise.model.User.Personne;
@@ -51,10 +54,20 @@ public class DossierGrossesse extends Dossier {
 	@JsonIgnore  // Ignore dans le JSON
 	private List<Accouchement> accouchements = new ArrayList<>();
 
-	
+    @OneToMany(mappedBy = "dossierGrossesse") // ← Correction du nom    
+	@JsonIgnore
+    private List<ConsultationPrenatale> consultationPrenatale = new ArrayList<>();
 
  // Getters and setters
     
+	public List<ConsultationPrenatale> getConsultationPrenatale() {
+		return consultationPrenatale;
+	}
+
+	public void setConsultationPrenatale(List<ConsultationPrenatale> consultationPrenatale) {
+		this.consultationPrenatale = consultationPrenatale;
+	}
+
 	public LocalDate getDateOuverture() {
 		return dateOuverture;
 	}

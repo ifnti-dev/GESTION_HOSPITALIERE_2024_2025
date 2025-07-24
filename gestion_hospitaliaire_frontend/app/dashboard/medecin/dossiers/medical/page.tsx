@@ -195,7 +195,7 @@ export default function MedecinDossiersPage() {
 
   if (isLoading) {
     return (
-      <DashboardLayout userRole="Médecin">
+      <DashboardLayout >
         <div className="flex h-full items-center justify-center">
           <div className="flex flex-col items-center gap-2">
             <Activity className="h-12 w-12 animate-spin text-indigo-500" />
@@ -207,11 +207,11 @@ export default function MedecinDossiersPage() {
   }
 
   if (error) {
-    return <DashboardLayout userRole="Médecin"><div className="text-red-500 text-center">{error}</div></DashboardLayout>
+    return <DashboardLayout ><div className="text-red-500 text-center">{error}</div></DashboardLayout>
   }
 
   return (
-    <DashboardLayout userRole="Médecin">
+    <DashboardLayout >
       <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -247,6 +247,7 @@ export default function MedecinDossiersPage() {
             <ConfirmationModal
               isOpen={isDeleteConfirmOpen}
               onOpenChange={setIsDeleteConfirmOpen}
+              onClose={() => setIsDeleteConfirmOpen(false)}
               onConfirm={handleConfirmDelete}
               title="Confirmation de suppression"
               description="Êtes-vous sûr de vouloir supprimer ce dossier ? Cette action est irréversible."

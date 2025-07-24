@@ -2,6 +2,7 @@ package com.gestion_hospitaliere.UeEntreprise.controller.User;
 
 import com.gestion_hospitaliere.UeEntreprise.model.User.Role;
 import com.gestion_hospitaliere.UeEntreprise.model.dto.RoleRequest;
+import com.gestion_hospitaliere.UeEntreprise.model.dto.RoleResponse;
 import com.gestion_hospitaliere.UeEntreprise.service.User.RoleService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/roles")
@@ -28,10 +30,18 @@ public class RoleController {
 
     // Récupérer tous les rôles
     @GetMapping
-    public ResponseEntity<List<Role>> obtenirTousLesRoles() {
+    public ResponseEntity<List<RoleResponse>> getAllRoles() {
         List<Role> roles = roleService.obtenirTousLesRoles();
-        return ResponseEntity.ok(roles);
+        List<RoleResponse> response = roles.stream()
+            .map(roleService::toRoleResponse)
+            .collect(Collectors.toList());
+        return ResponseEntity.ok(response);
     }
+
+    // public ResponseEntity<List<Role>> obtenirTousLesRoles() {
+    //     List<Role> roles = roleService.obtenirTousLesRoles();
+    //     return ResponseEntity.ok(roles);
+    // }
 
     // Récupérer un rôle par ID
     @GetMapping("/{id}")
