@@ -31,12 +31,10 @@ import {
   MessageSquare,
   Calendar,
   ChevronDown,
-  Shield,
-  Phone,
-  MapPin,
   Mail,
 } from "lucide-react"
 import { useAuth } from "@/contexts/AuthContext"
+import { useNotifications } from "@/hooks/pharmacie/useNotifications"
 
 interface TopBarProps {
   sidebarOpen: boolean
@@ -44,55 +42,13 @@ interface TopBarProps {
   isMobile: boolean
 }
 
-interface Notification {
-  id: string
-  type: "info" | "warning" | "success" | "urgent"
-  title: string
-  message: string
-  time: string
-  read: boolean
-}
-
 export function TopBar({ sidebarOpen, setSidebarOpen, isMobile }: TopBarProps) {
   const { user, userProfile, logout, isLoading } = useAuth()
   const [searchQuery, setSearchQuery] = useState("")
   const [isDarkMode, setIsDarkMode] = useState(false)
-  const [notifications, setNotifications] = useState<Notification[]>([
-    {
-      id: "1",
-      type: "urgent",
-      title: "Urgence Médicale",
-      message: "Patient en détresse respiratoire - Salle 204",
-      time: "Il y a 2 min",
-      read: false,
-    },
-    {
-      id: "2",
-      type: "warning",
-      title: "Stock Faible",
-      message: "Médicament Paracétamol - Stock critique",
-      time: "Il y a 15 min",
-      read: false,
-    },
-    {
-      id: "3",
-      type: "info",
-      title: "Nouveau Message",
-      message: "Dr. Martin vous a envoyé un message",
-      time: "Il y a 1h",
-      read: false,
-    },
-    {
-      id: "4",
-      type: "success",
-      title: "Opération Réussie",
-      message: "Intervention chirurgicale terminée avec succès",
-      time: "Il y a 2h",
-      read: true,
-    },
-  ])
 
-  const unreadCount = notifications.filter((n) => !n.read).length
+  // Utilisation du hook useNotifications pour récupérer les vraies notifications
+  const { notifications, unreadCount, loading: notificationsLoading, markAsRead, markAllAsRead } = useNotifications()
 
   // Extraction des informations utilisateur avec gestion des cas null/undefined
   const getUserInfo = () => {
@@ -105,12 +61,6 @@ export function TopBar({ sidebarOpen, setSidebarOpen, isMobile }: TopBarProps) {
         prenom: "",
         email: "",
         role: "Utilisateur",
-        // specialite: "",
-        // numOrdre: "",
-        // telephone: "",
-        // adresse: "",
-        // dateNaissance: "",
-        // statut: "Inconnu",
       }
     }
 
@@ -119,12 +69,6 @@ export function TopBar({ sidebarOpen, setSidebarOpen, isMobile }: TopBarProps) {
       prenom: profile.prenom || "",
       email: profile.email || "",
       role: profile.employe?.roles?.[0]?.nom || "Utilisateur",
-      // specialite: profile.employe?.specialite || "",
-      // numOrdre: profile.employe?.numOrdre || "",
-      // telephone: profile.telephone || "",
-      // adresse: profile.adresse || "",
-      // dateNaissance: profile.dateNaissance || "",
-      // statut: "Actif", // Par défaut si connecté
     }
   }
 
@@ -210,21 +154,41 @@ export function TopBar({ sidebarOpen, setSidebarOpen, isMobile }: TopBarProps) {
 
   const theme = getRoleTheme(userInfo.role)
 
+  // Fonction pour obtenir l'icône appropriée selon le type de notification
   const getNotificationIcon = (type: string) => {
-    switch (type) {
-      case "urgent":
+    switch (type.toLowerCase()) {
+      case "rupture_stock":
+      case "stock_critique":
+      case "lot_expire":
         return <AlertCircle className="h-4 w-4 text-red-500" />
-      case "warning":
+      case "stock_faible":
+      case "expiration_imminente":
+      case "commande_annulee":
         return <AlertCircle className="h-4 w-4 text-orange-500" />
-      case "success":
+      case "nouvelle_commande":
+      case "nouvel_approvisionnement":
+      case "resume_quotidien":
         return <CheckCircle className="h-4 w-4 text-green-500" />
+      case "expiration_proche":
       default:
         return <Activity className="h-4 w-4 text-blue-500" />
     }
   }
 
-  const markAsRead = (id: string) => {
-    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)))
+  // Fonction pour formater le temps de la notification
+  const formatNotificationTime = (dateString: string) => {
+    const date = new Date(dateString)
+    const now = new Date()
+    const diffMs = now.getTime() - date.getTime()
+    const diffMinutes = Math.floor(diffMs / (1000 * 60))
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+
+    if (diffMinutes < 1) return "À l'instant"
+    if (diffMinutes < 60) return `Il y a ${diffMinutes} min`
+    if (diffHours < 24) return `Il y a ${diffHours}h`
+    if (diffDays < 7) return `Il y a ${diffDays} jour${diffDays > 1 ? "s" : ""}`
+    return date.toLocaleDateString("fr-FR")
   }
 
   const currentDate = new Date().toLocaleDateString("fr-FR", {
@@ -321,37 +285,6 @@ export function TopBar({ sidebarOpen, setSidebarOpen, isMobile }: TopBarProps) {
                 <Activity className="h-3 w-3 mr-2" />
                 {userInfo.role}
               </Badge>
-
-              {/* {userInfo.specialite && (
-                <Badge variant="outline" className="text-gray-700 border-gray-200 bg-gray-50 px-3 py-1">
-                  <Shield className="h-3 w-3 mr-1" />
-                  {userInfo.specialite}
-                </Badge>
-              )}
-
-              {userInfo.numOrdre && (
-                <Badge variant="outline" className="text-gray-600 border-gray-200 bg-gray-50 px-2 py-1 text-xs">
-                  N° {userInfo.numOrdre}
-                </Badge>
-              )}
-
-              <div className="h-6 w-px bg-gray-300"></div>
-
-              <Badge
-                variant="outline"
-                className={`px-3 py-1 ${
-                  userInfo.statut === "Actif"
-                    ? "text-green-700 border-green-200 bg-green-50"
-                    : "text-orange-700 border-orange-200 bg-orange-50"
-                }`}
-              >
-                <div
-                  className={`w-2 h-2 rounded-full mr-2 animate-pulse ${
-                    userInfo.statut === "Actif" ? "bg-green-500" : "bg-orange-500"
-                  }`}
-                ></div>
-                {userInfo.statut}
-              </Badge> */}
             </div>
           </div>
 
@@ -417,7 +350,7 @@ export function TopBar({ sidebarOpen, setSidebarOpen, isMobile }: TopBarProps) {
                   {unreadCount > 0 && (
                     <div className="absolute -top-1 -right-1 flex items-center justify-center">
                       <div className="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center shadow-lg animate-pulse">
-                        <span className="text-xs font-bold text-white">{unreadCount}</span>
+                        <span className="text-xs font-bold text-white">{unreadCount > 99 ? "99+" : unreadCount}</span>
                       </div>
                     </div>
                   )}
@@ -433,34 +366,66 @@ export function TopBar({ sidebarOpen, setSidebarOpen, isMobile }: TopBarProps) {
                   </div>
                 </div>
                 <div className="max-h-96 overflow-y-auto">
-                  {notifications.map((notification) => (
-                    <div
-                      key={notification.id}
-                      className={`p-4 border-b border-gray-50 hover:bg-gray-50/50 transition-colors cursor-pointer ${
-                        !notification.read ? "bg-blue-50/30" : ""
-                      }`}
-                      onClick={() => markAsRead(notification.id)}
-                    >
-                      <div className="flex items-start space-x-3">
-                        <div className="flex-shrink-0 mt-1">{getNotificationIcon(notification.type)}</div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between">
-                            <p className="text-sm font-semibold text-gray-900 truncate">{notification.title}</p>
-                            {!notification.read && (
-                              <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0"></div>
-                            )}
-                          </div>
-                          <p className="text-sm text-gray-600 mt-1">{notification.message}</p>
-                          <div className="flex items-center mt-2 text-xs text-gray-500">
-                            <Clock className="h-3 w-3 mr-1" />
-                            {notification.time}
+                  {notificationsLoading ? (
+                    <div className="p-4 text-center text-gray-500">
+                      <div className="animate-spin h-6 w-6 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-2"></div>
+                      Chargement des notifications...
+                    </div>
+                  ) : notifications.length === 0 ? (
+                    <div className="p-4 text-center text-gray-500">
+                      <Bell className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+                      <p>Aucune notification</p>
+                    </div>
+                  ) : (
+                    notifications.map((notification) => (
+                      <div
+                        key={notification.id}
+                        className={`p-4 border-b border-gray-50 hover:bg-gray-50/50 transition-colors cursor-pointer ${
+                          !notification.lu ? "bg-blue-50/30" : ""
+                        }`}
+                        onClick={() => markAsRead(notification.id)}
+                      >
+                        <div className="flex items-start space-x-3">
+                          <div className="flex-shrink-0 mt-1">{getNotificationIcon(notification.type)}</div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between">
+                              <p className="text-sm font-semibold text-gray-900 truncate">{notification.titre}</p>
+                              {!notification.lu && (
+                                <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0"></div>
+                              )}
+                            </div>
+                            <p className="text-sm text-gray-600 mt-1">{notification.message}</p>
+                            <div className="flex items-center justify-between mt-2">
+                              <div className="flex items-center text-xs text-gray-500">
+                                <Clock className="h-3 w-3 mr-1" />
+                                {formatNotificationTime(notification.dateCreation)}
+                              </div>
+                              {notification.priorite && (
+                                <span
+                                  className={`px-2 py-1 text-xs rounded-full ${
+                                    notification.priorite === "HAUTE"
+                                      ? "bg-red-100 text-red-700"
+                                      : notification.priorite === "MOYENNE"
+                                        ? "bg-orange-100 text-orange-700"
+                                        : "bg-blue-100 text-blue-700"
+                                  }`}
+                                >
+                                  {notification.priorite.toLowerCase()}
+                                </span>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))
+                  )}
                 </div>
-                <div className="p-3 border-t border-gray-100">
+                <div className="p-3 border-t border-gray-100 space-y-2">
+                  {unreadCount > 0 && (
+                    <Button variant="ghost" size="sm" className="w-full text-sm" onClick={markAllAsRead}>
+                      Marquer tout comme lu ({unreadCount})
+                    </Button>
+                  )}
                   <Button variant="ghost" size="sm" className="w-full text-sm">
                     Voir toutes les notifications
                   </Button>
@@ -492,11 +457,6 @@ export function TopBar({ sidebarOpen, setSidebarOpen, isMobile }: TopBarProps) {
                         {getInitials(userInfo.nom, userInfo.prenom)}
                       </AvatarFallback>
                     </Avatar>
-                    <div
-                      // className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white shadow-sm ${
-                      //   userInfo.statut === "Actif" ? "bg-green-500" : "bg-orange-500"
-                      // }`}
-                    ></div>
                   </div>
                   <div className="hidden sm:flex flex-col items-start">
                     <span className="text-sm font-semibold text-gray-900 group-hover:text-gray-700 transition-colors">
@@ -520,11 +480,6 @@ export function TopBar({ sidebarOpen, setSidebarOpen, isMobile }: TopBarProps) {
                       <p className="font-semibold text-gray-900">{fullName}</p>
                       <div className="flex items-center space-x-2 mt-1">
                         <Badge className={`text-xs ${theme.badgeColor} text-white`}>{userInfo.role}</Badge>
-                        {/* {userInfo.statut && (
-                          <Badge variant="outline" className="text-xs">
-                            {userInfo.statut}
-                          </Badge>
-                        )} */}
                       </div>
 
                       {/* Informations détaillées */}
@@ -535,41 +490,6 @@ export function TopBar({ sidebarOpen, setSidebarOpen, isMobile }: TopBarProps) {
                             <span>{userInfo.email}</span>
                           </div>
                         )}
-
-                        {/* {userInfo.specialite && (
-                          <div className="flex items-center space-x-2">
-                            <Shield className="h-3 w-3" />
-                            <span>Spécialité: {userInfo.specialite}</span>
-                          </div>
-                        )}
-
-                        {userInfo.numOrdre && (
-                          <div className="flex items-center space-x-2">
-                            <User className="h-3 w-3" />
-                            <span>N° Ordre: {userInfo.numOrdre}</span>
-                          </div>
-                        )}
-
-                        {userInfo.telephone && (
-                          <div className="flex items-center space-x-2">
-                            <Phone className="h-3 w-3" />
-                            <span>{userInfo.telephone}</span>
-                          </div>
-                        )}
-
-                        {userInfo.adresse && (
-                          <div className="flex items-center space-x-2">
-                            <MapPin className="h-3 w-3" />
-                            <span>{userInfo.adresse}</span>
-                          </div>
-                        )}
-
-                        {userInfo.dateNaissance && (
-                          <div className="flex items-center space-x-2">
-                            <Calendar className="h-3 w-3" />
-                            <span>Né(e) le: {formatDate(userInfo.dateNaissance)}</span>
-                          </div>
-                        )} */}
                       </div>
                     </div>
                   </div>

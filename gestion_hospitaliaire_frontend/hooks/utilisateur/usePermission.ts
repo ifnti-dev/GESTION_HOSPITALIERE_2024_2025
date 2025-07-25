@@ -15,16 +15,31 @@ export function usePermissions() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  useEffect(() => {
+  // useEffect(() => {
+  //   setLoading(true);
+  //   setError(null);
+  //   getPermissions()
+  //     .then(setPermissions)
+  //     .catch(setError)
+  //     .finally(() => setLoading(false));
+  // }, []);
+
+  // return { permissions, loading, error };
+
+  const fetchPermissions = useCallback(() => {
     setLoading(true);
     setError(null);
-    getPermissions()
+    return getPermissions()
       .then(setPermissions)
       .catch(setError)
       .finally(() => setLoading(false));
   }, []);
 
-  return { permissions, loading, error };
+  useEffect(() => {
+    fetchPermissions();
+  }, [fetchPermissions]);
+
+  return { permissions, loading, error, refetch: fetchPermissions };
 }
 
 // Hook pour récupérer une permission par ID
@@ -132,4 +147,27 @@ export function useDeletePermission() {
   }, []);
 
   return { remove, loading, error };
+}
+
+
+// Hook pour vérifier l'existence d'une permission
+export function useCheckPermissionExists() {
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<Error | null>(null);
+
+    const checkExists = useCallback(async (nom: string): Promise<boolean> => {
+        setLoading(true);
+        setError(null);
+        try {
+            const permission = await getPermissionByName(nom);
+            return permission !== null; // Retourne true si la permission existe
+        } catch (err: any) {
+            setError(err);
+            return false; // Retourne false en cas d'erreur
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    return { checkExists, loading, error };
 }

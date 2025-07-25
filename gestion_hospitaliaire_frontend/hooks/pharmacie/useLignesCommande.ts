@@ -1,126 +1,119 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect } from "react"
 import { ligneCommandeService } from "@/services/pharmacie/ligne-commande.service"
 import { ligneApprovisionnementService } from "@/services/pharmacie/ligne-approvisionnement.service"
 import type { LigneCommande, LigneApprovisionnement } from "@/types/pharmacie"
 
 export function useLignesCommande(commandeId?: number) {
   const [lignes, setLignes] = useState<LigneCommande[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const fetchLignes = useCallback(async () => {
+  const fetchLignes = async () => {
     if (!commandeId) {
       setLignes([])
-      setLoading(false)
       return
     }
+
     setLoading(true)
     setError(null)
     try {
-      const data = await ligneCommandeService.getByCommandeId(commandeId)
-      setLignes(data)
+      console.log("Récupération des lignes de commande pour commandeId:", commandeId)
+      const lignesData = await ligneCommandeService.getByCommandeId(commandeId)
+      console.log("Lignes récupérées:", lignesData)
+
+      // Enrichir chaque ligne avec les détails du lot et du medicamentReference
+      const lignesEnrichies = await Promise.all(
+        lignesData.map(async (ligne) => {
+          if (ligne.ligneApprovisionnementId) {
+            try {
+              console.log("Récupération du lot pour ligneApprovisionnementId:", ligne.ligneApprovisionnementId)
+              const lot = await ligneApprovisionnementService.getById(ligne.ligneApprovisionnementId)
+              console.log("Lot récupéré:", lot)
+              return {
+                ...ligne,
+                ligneApprovisionnement: lot,
+              }
+            } catch (error) {
+              console.error(`Erreur lors de la récupération du lot ${ligne.ligneApprovisionnementId}:`, error)
+              return ligne
+            }
+          }
+          return ligne
+        }),
+      )
+
+      console.log("Lignes enrichies avec les lots:", lignesEnrichies)
+      setLignes(lignesEnrichies)
     } catch (err) {
-      setError("Échec du chargement des lignes de commande.")
-      console.error("Error in useLignesCommande fetchLignes:", err)
+      console.error("Erreur lors de la récupération des lignes de commande:", err)
+      setError(err instanceof Error ? err.message : "Erreur inconnue")
     } finally {
       setLoading(false)
     }
-  }, [commandeId])
+  }
+
+  const refetch = () => {
+    fetchLignes()
+  }
 
   useEffect(() => {
     fetchLignes()
-  }, [fetchLignes])
-
-  const createLigneCommande = useCallback(async (ligne: Omit<LigneCommande, "id">) => {
-    setLoading(true)
-    try {
-      // Corrected: Call the specific createLigneCommande method
-      const newLigne = await ligneCommandeService.createLigneCommande(ligne)
-      setLignes((prev) => [...prev, newLigne])
-      return newLigne
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Échec de la création de la ligne de commande."
-      setError(errorMessage)
-      console.error("Error in useLignesCommande createLigneCommande:", err)
-      throw err
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
-  const updateLigneCommande = useCallback(async (id: number, ligne: Partial<LigneCommande>) => {
-    setLoading(true)
-    try {
-      const updatedLigne = await ligneCommandeService.update(id, ligne)
-      setLignes((prev) => prev.map((l) => (l.id === id ? updatedLigne : l)))
-      return updatedLigne
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Échec de la mise à jour de la ligne de commande."
-      setError(errorMessage)
-      console.error("Error in useLignesCommande updateLigneCommande:", err)
-      throw err
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
-  const deleteLigneCommande = useCallback(async (id: number) => {
-    setLoading(true)
-    try {
-      await ligneCommandeService.delete(id)
-      setLignes((prev) => prev.filter((l) => l.id !== id))
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Échec de la suppression de la ligne de commande."
-      setError(errorMessage)
-      console.error("Error in useLignesCommande deleteLigneCommande:", err)
-      throw err
-    } finally {
-      setLoading(false)
-    }
-  }, [])
+  }, [commandeId])
 
   return {
     lignes,
     loading,
     error,
-    createLigneCommande,
-    updateLigneCommande,
-    deleteLigneCommande,
-    refetch: fetchLignes,
+    refetch,
   }
 }
 
 export function useLotsDisponibles() {
   const [lots, setLots] = useState<LigneApprovisionnement[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const fetchLots = useCallback(async () => {
+  const fetchLots = async () => {
     setLoading(true)
     setError(null)
     try {
-      // Use the service method that fetches available lots, which should include medicamentReference
-      const data = await ligneApprovisionnementService.getAvailableLots()
-      setLots(data)
-      console.log("Fetched available lots for dropdown:", data)
+      console.log("Récupération des lots disponibles...")
+      const lotsData = await ligneApprovisionnementService.getAll()
+      console.log("Tous les lots récupérés:", lotsData)
+
+      // Filtrer les lots disponibles (quantité > 0) et enrichir avec les détails
+      const lotsDisponibles = lotsData
+        .filter((lot) => (lot.quantiteDisponible || 0) > 0)
+        .map((lot) => ({
+          ...lot,
+          // S'assurer que les relations sont bien présentes
+          medicamentReference: lot.medicamentReference || null,
+        }))
+
+      console.log("Lots disponibles filtrés:", lotsDisponibles)
+      setLots(lotsDisponibles)
     } catch (err) {
-      setError("Échec du chargement des lots disponibles.")
-      console.error("Error in useLotsDisponibles fetchLots:", err)
+      console.error("Erreur lors de la récupération des lots disponibles:", err)
+      setError(err instanceof Error ? err.message : "Erreur inconnue")
     } finally {
       setLoading(false)
     }
-  }, [])
+  }
+
+  const refetch = () => {
+    fetchLots()
+  }
 
   useEffect(() => {
     fetchLots()
-  }, [fetchLots])
+  }, [])
 
   return {
     lots,
     loading,
     error,
-    refetch: fetchLots,
+    refetch,
   }
 }

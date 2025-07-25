@@ -58,7 +58,6 @@ export function PharmacienSidebar({ children }: PharmacienSidebarProps) {
       title: "Médicaments",
       icon: <Pill className="h-5 w-5" />,
       href: "/dashboard/pharmacien/medicaments",
-      badge: "1,247",
       gradient: "from-cyan-500 to-teal-500",
     },
     {
@@ -71,14 +70,12 @@ export function PharmacienSidebar({ children }: PharmacienSidebarProps) {
       title: "Produits Finaux",
       icon: <Package2 className="h-5 w-5" />,
       href: "/dashboard/pharmacien/produits",
-      badge: "2",
       gradient: "from-purple-500 to-pink-500",
     },
     {
       title: "Stock & Inventaire",
       icon: <Package className="h-5 w-5" />,
       href: "/dashboard/pharmacien/stock",
-      badge: "3",
       gradient: "from-teal-600 to-cyan-600",
     },
     {
@@ -94,13 +91,6 @@ export function PharmacienSidebar({ children }: PharmacienSidebarProps) {
       gradient: "from-teal-500 to-cyan-600",
     },
     {
-      title: "Dispensation",
-      icon: <Beaker className="h-5 w-5" />,
-      href: "/dashboard/pharmacien/dispensation",
-      badge: "7",
-      gradient: "from-blue-600 to-teal-600",
-    },
-    {
       title: "Rapports",
       icon: <BarChart3 className="h-5 w-5" />,
       href: "/dashboard/pharmacien/rapports",
@@ -110,7 +100,6 @@ export function PharmacienSidebar({ children }: PharmacienSidebarProps) {
       title: "Notifications",
       icon: <Bell className="h-5 w-5" />,
       href: "/dashboard/pharmacien/notifications",
-      badge: "5",
       gradient: "from-orange-500 to-red-500",
     },
   ]
@@ -183,20 +172,7 @@ export function PharmacienSidebar({ children }: PharmacienSidebarProps) {
                         {item.title}
                       </span>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      {item.badge && (
-                        <Badge
-                          className={`${
-                            item.title === "Notifications"
-                              ? "bg-gradient-to-r from-orange-500 to-red-500"
-                              : "bg-gradient-to-r from-teal-500 to-cyan-500"
-                          } text-white shadow-lg px-3 py-1 text-xs font-bold`}
-                        >
-                          {item.badge}
-                        </Badge>
-                      )}
-                      <ChevronRight className="h-4 w-4 text-teal-400 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-1" />
-                    </div>
+                
                   </Link>
                 ))}
               </nav>

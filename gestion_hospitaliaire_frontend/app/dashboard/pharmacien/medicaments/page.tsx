@@ -278,8 +278,7 @@ export default function MedicamentsPage() {
                         <TableHead className="font-semibold text-gray-700 py-4">Nom</TableHead>
                         <TableHead className="font-semibold text-gray-700 py-4">Catégorie</TableHead>
                         <TableHead className="font-semibold text-gray-700 py-4">Description</TableHead>
-                        <TableHead className="font-semibold text-gray-700 py-4">Stock Total</TableHead>
-                        <TableHead className="font-semibold text-gray-700 py-4">Statut</TableHead>
+                        
                         <TableHead className="text-right font-semibold text-gray-700 py-4">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -310,16 +309,7 @@ export default function MedicamentsPage() {
                           <TableCell className="py-4">
                             <div className="text-sm text-gray-600 max-w-xs truncate">{medicament.description}</div>
                           </TableCell>
-                          <TableCell className="py-4">
-                            <div className="flex items-center gap-2">
-                              <span className="font-medium text-gray-900">{medicament.stockTotal}</span>
-                              {medicament.stockTotal < 10 && medicament.stockTotal > 0 && (
-                                <AlertTriangle className="h-4 w-4 text-orange-500" />
-                              )}
-                              {medicament.stockTotal === 0 && <AlertTriangle className="h-4 w-4 text-red-500" />}
-                            </div>
-                          </TableCell>
-                          <TableCell className="py-4">{getStockStatus(medicament.stockTotal)}</TableCell>
+                        
                           <TableCell className="text-right py-4">
                             <div className="flex items-center justify-end gap-1">
                               <Button
@@ -585,18 +575,7 @@ const MedicamentForm: React.FC<MedicamentFormProps> = ({ medicament, categories,
           rows={2}
         />
       </div>
-      <div className="grid gap-2">
-        <Label htmlFor="stockTotal">Stock Total</Label>
-        <Input
-          id="stockTotal"
-          type="number"
-          value={stockTotal}
-          onChange={(e) => setStockTotal(e.target.value)}
-          placeholder="0"
-          className="border-teal-200 focus:border-teal-500 focus:ring-teal-500"
-          min="0"
-        />
-      </div>
+
       <DialogFooter>
         <Button variant="outline" onClick={onClose}>
           Annuler

@@ -249,7 +249,7 @@ class CommandeService {
   async cancel(id: number): Promise<Commande> {
     try {
       console.log(`Sending cancel commande request for ${id}`)
-      const response = await fetch(`${this.baseUrl}/${id}/cancel`, {
+      const response = await fetch(`${this.baseUrl}/${id}/annuler`, {
         method: "POST",
         headers: API_HEADERS,
         ...CORS_CONFIG,

@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Skeleton } from "@/components/ui/skeleton"
+import { useNotifications } from "@/hooks/pharmacie/useNotifications"
 import {
   Bell,
   Search,
@@ -22,6 +24,10 @@ import {
   Trash2,
   Eye,
   BookMarkedIcon as MarkAsUnread,
+  RefreshCw,
+  AlertCircle,
+  ShoppingCart,
+  PackageX,
 } from "lucide-react"
 
 export default function NotificationsPage() {
@@ -29,103 +35,110 @@ export default function NotificationsPage() {
   const [typeFilter, setTypeFilter] = useState("all")
   const [statusFilter, setStatusFilter] = useState("all")
 
-  // Données simulées pour les notifications
-  const notifications = [
-    {
-      id: "NOTIF-001",
-      type: "Stock Critique",
-      message: "Le stock de Paracétamol 500mg est critique (5 unités restantes)",
-      dateNotif: "2024-06-12T10:30:00",
-      statut: "Non lue",
-      priorite: "Haute",
-      icon: AlertTriangle,
-      color: "text-red-600",
-      bgColor: "bg-red-50",
-      borderColor: "border-red-200",
-    },
-    {
-      id: "NOTIF-002",
-      type: "Commande Livrée",
-      message: "La commande CMD-002 de MediSupply a été livrée avec succès",
-      dateNotif: "2024-06-12T09:15:00",
-      statut: "Lue",
-      priorite: "Normale",
-      icon: CheckCircle,
-      color: "text-green-600",
-      bgColor: "bg-green-50",
-      borderColor: "border-green-200",
-    },
-    {
-      id: "NOTIF-003",
-      type: "Expiration Proche",
-      message: "15 médicaments expirent dans les 30 prochains jours",
-      dateNotif: "2024-06-12T08:45:00",
-      statut: "Non lue",
-      priorite: "Moyenne",
-      icon: Calendar,
-      color: "text-orange-600",
-      bgColor: "bg-orange-50",
-      borderColor: "border-orange-200",
-    },
-    {
-      id: "NOTIF-004",
-      type: "Approvisionnement",
-      message: "Nouvel approvisionnement programmé pour le 15/06/2024",
-      dateNotif: "2024-06-11T16:20:00",
-      statut: "Lue",
-      priorite: "Normale",
-      icon: Truck,
-      color: "text-blue-600",
-      bgColor: "bg-blue-50",
-      borderColor: "border-blue-200",
-    },
-    {
-      id: "NOTIF-005",
-      type: "Système",
-      message: "Mise à jour du système programmée pour ce soir à 22h00",
-      dateNotif: "2024-06-11T14:10:00",
-      statut: "Non lue",
-      priorite: "Basse",
-      icon: Settings,
-      color: "text-gray-600",
-      bgColor: "bg-gray-50",
-      borderColor: "border-gray-200",
-    },
-    {
-      id: "NOTIF-006",
-      type: "Stock Faible",
-      message: "Le stock d'Amoxicilline 250mg est en dessous du seuil minimum",
-      dateNotif: "2024-06-11T11:30:00",
-      statut: "Lue",
-      priorite: "Moyenne",
-      icon: Package,
-      color: "text-orange-600",
-      bgColor: "bg-orange-50",
-      borderColor: "border-orange-200",
-    },
-  ]
+  const { notifications, loading, error, stats, actions } = useNotifications()
+
+  const getNotificationIcon = (type: string) => {
+    const iconMap: Record<string, any> = {
+      "Stock Critique": AlertTriangle,
+      "Stock Faible": Package,
+      "Rupture de Stock": PackageX,
+      "Commande Livrée": CheckCircle,
+      "Nouvelles Commandes": ShoppingCart,
+      "Expiration Proche": Calendar,
+      "Lots Expirés": AlertCircle,
+      Approvisionnement: Truck,
+      Système: Settings,
+    }
+    return iconMap[type] || Bell
+  }
+
+  const getNotificationColor = (type: string, priorite: string) => {
+    if (priorite === "haute") {
+      return {
+        color: "text-red-600",
+        bgColor: "bg-red-50",
+        borderColor: "border-red-200",
+      }
+    }
+
+    const colorMap: Record<string, any> = {
+      "Stock Critique": {
+        color: "text-red-600",
+        bgColor: "bg-red-50",
+        borderColor: "border-red-200",
+      },
+      "Stock Faible": {
+        color: "text-orange-600",
+        bgColor: "bg-orange-50",
+        borderColor: "border-orange-200",
+      },
+      "Rupture de Stock": {
+        color: "text-red-600",
+        bgColor: "bg-red-50",
+        borderColor: "border-red-200",
+      },
+      "Commande Livrée": {
+        color: "text-green-600",
+        bgColor: "bg-green-50",
+        borderColor: "border-green-200",
+      },
+      "Nouvelles Commandes": {
+        color: "text-blue-600",
+        bgColor: "bg-blue-50",
+        borderColor: "border-blue-200",
+      },
+      "Expiration Proche": {
+        color: "text-orange-600",
+        bgColor: "bg-orange-50",
+        borderColor: "border-orange-200",
+      },
+      "Lots Expirés": {
+        color: "text-red-600",
+        bgColor: "bg-red-50",
+        borderColor: "border-red-200",
+      },
+      Approvisionnement: {
+        color: "text-blue-600",
+        bgColor: "bg-blue-50",
+        borderColor: "border-blue-200",
+      },
+      Système: {
+        color: "text-gray-600",
+        bgColor: "bg-gray-50",
+        borderColor: "border-gray-200",
+      },
+    }
+
+    return (
+      colorMap[type] || {
+        color: "text-gray-600",
+        bgColor: "bg-gray-50",
+        borderColor: "border-gray-200",
+      }
+    )
+  }
 
   const getPriorityBadge = (priorite: string) => {
     const priorityConfig = {
-      Haute: { color: "bg-red-100 text-red-800", icon: AlertTriangle },
-      Moyenne: { color: "bg-orange-100 text-orange-800", icon: Clock },
-      Normale: { color: "bg-blue-100 text-blue-800", icon: Info },
-      Basse: { color: "bg-gray-100 text-gray-800", icon: Info },
+      haute: { color: "bg-red-100 text-red-800", icon: AlertTriangle },
+      moyenne: { color: "bg-orange-100 text-orange-800", icon: Clock },
+      normale: { color: "bg-blue-100 text-blue-800", icon: Info },
+      basse: { color: "bg-gray-100 text-gray-800", icon: Info },
     }
 
-    const config = priorityConfig[priorite as keyof typeof priorityConfig]
-    const IconComponent = config?.icon || Info
+    const config = priorityConfig[priorite as keyof typeof priorityConfig] || priorityConfig.normale
+    const IconComponent = config.icon
 
     return (
-      <Badge className={`${config?.color} hover:${config?.color} flex items-center gap-1`}>
+      <Badge className={`${config.color} hover:${config.color} flex items-center gap-1`}>
         <IconComponent className="h-3 w-3" />
-        {priorite}
+        {priorite.charAt(0).toUpperCase() + priorite.slice(1)}
       </Badge>
     )
   }
 
   const getStatusBadge = (statut: string) => {
-    return statut === "Non lue" ? (
+    return statut === "non_lue" ? (
       <Badge className="bg-teal-100 text-teal-800 hover:bg-teal-100">
         <MarkAsUnread className="h-3 w-3 mr-1" />
         Non lue
@@ -138,21 +151,7 @@ export default function NotificationsPage() {
     )
   }
 
-  const filteredNotifications = notifications.filter((notif) => {
-    const matchesSearch =
-      notif.message.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      notif.type.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesType = typeFilter === "all" || notif.type === typeFilter
-    const matchesStatus = statusFilter === "all" || notif.statut === statusFilter
-    return matchesSearch && matchesType && matchesStatus
-  })
-
-  const stats = {
-    totalNotifications: notifications.length,
-    nonLues: notifications.filter((n) => n.statut === "Non lue").length,
-    prioriteHaute: notifications.filter((n) => n.priorite === "Haute").length,
-    aujourdhui: notifications.filter((n) => new Date(n.dateNotif).toDateString() === new Date().toDateString()).length,
-  }
+  const filteredNotifications = actions.filterNotifications(searchTerm, typeFilter, statusFilter)
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
@@ -174,6 +173,24 @@ export default function NotificationsPage() {
     }
   }
 
+  if (error) {
+    return (
+      <PharmacienSidebar>
+        <div className="flex items-center justify-center h-96">
+          <div className="text-center">
+            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Erreur de chargement</h3>
+            <p className="text-gray-600 mb-4">{error}</p>
+            <Button onClick={actions.refresh} variant="outline">
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Réessayer
+            </Button>
+          </div>
+        </div>
+      </PharmacienSidebar>
+    )
+  }
+
   return (
     <PharmacienSidebar>
       <div className="space-y-8">
@@ -189,11 +206,30 @@ export default function NotificationsPage() {
             <p className="text-gray-600 mt-2">Suivez toutes les alertes et informations importantes</p>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" className="border-teal-200 hover:bg-teal-50">
+            <Button
+              onClick={actions.runAutoChecks}
+              variant="outline"
+              className="border-blue-200 hover:bg-blue-50 bg-transparent"
+              disabled={loading}
+            >
+              <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
+              Vérifier maintenant
+            </Button>
+            <Button
+              onClick={actions.markAllAsRead}
+              variant="outline"
+              className="border-teal-200 hover:bg-teal-50 bg-transparent"
+              disabled={loading || stats.nonLues === 0}
+            >
               <CheckCircle className="h-4 w-4 mr-2" />
               Marquer tout comme lu
             </Button>
-            <Button variant="outline" className="border-red-200 hover:bg-red-50 text-red-600">
+            <Button
+              onClick={actions.deleteAllRead}
+              variant="outline"
+              className="border-red-200 hover:bg-red-50 text-red-600 bg-transparent"
+              disabled={loading}
+            >
               <Trash2 className="h-4 w-4 mr-2" />
               Supprimer lues
             </Button>
@@ -208,7 +244,11 @@ export default function NotificationsPage() {
               <Bell className="h-4 w-4 text-teal-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-teal-900">{stats.totalNotifications}</div>
+              {loading ? (
+                <Skeleton className="h-8 w-16" />
+              ) : (
+                <div className="text-2xl font-bold text-teal-900">{stats.total}</div>
+              )}
               <p className="text-xs text-teal-600 mt-1">Toutes les notifications</p>
             </CardContent>
           </Card>
@@ -219,7 +259,11 @@ export default function NotificationsPage() {
               <MarkAsUnread className="h-4 w-4 text-blue-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-blue-900">{stats.nonLues}</div>
+              {loading ? (
+                <Skeleton className="h-8 w-16" />
+              ) : (
+                <div className="text-2xl font-bold text-blue-900">{stats.nonLues}</div>
+              )}
               <p className="text-xs text-blue-600 mt-1">À traiter</p>
             </CardContent>
           </Card>
@@ -230,7 +274,11 @@ export default function NotificationsPage() {
               <AlertTriangle className="h-4 w-4 text-red-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-red-900">{stats.prioriteHaute}</div>
+              {loading ? (
+                <Skeleton className="h-8 w-16" />
+              ) : (
+                <div className="text-2xl font-bold text-red-900">{stats.prioriteHaute}</div>
+              )}
               <p className="text-xs text-red-600 mt-1">Urgentes</p>
             </CardContent>
           </Card>
@@ -241,7 +289,11 @@ export default function NotificationsPage() {
               <Calendar className="h-4 w-4 text-green-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-900">{stats.aujourdhui}</div>
+              {loading ? (
+                <Skeleton className="h-8 w-16" />
+              ) : (
+                <div className="text-2xl font-bold text-green-900">{stats.aujourdhui}</div>
+              )}
               <p className="text-xs text-green-600 mt-1">Reçues aujourd'hui</p>
             </CardContent>
           </Card>
@@ -274,8 +326,11 @@ export default function NotificationsPage() {
                   <SelectItem value="all">Tous les types</SelectItem>
                   <SelectItem value="Stock Critique">Stock Critique</SelectItem>
                   <SelectItem value="Stock Faible">Stock Faible</SelectItem>
+                  <SelectItem value="Rupture de Stock">Rupture de Stock</SelectItem>
                   <SelectItem value="Commande Livrée">Commande Livrée</SelectItem>
+                  <SelectItem value="Nouvelles Commandes">Nouvelles Commandes</SelectItem>
                   <SelectItem value="Expiration Proche">Expiration Proche</SelectItem>
+                  <SelectItem value="Lots Expirés">Lots Expirés</SelectItem>
                   <SelectItem value="Approvisionnement">Approvisionnement</SelectItem>
                   <SelectItem value="Système">Système</SelectItem>
                 </SelectContent>
@@ -286,8 +341,8 @@ export default function NotificationsPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Tous les statuts</SelectItem>
-                  <SelectItem value="Non lue">Non lues</SelectItem>
-                  <SelectItem value="Lue">Lues</SelectItem>
+                  <SelectItem value="non_lue">Non lues</SelectItem>
+                  <SelectItem value="lue">Lues</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -300,48 +355,124 @@ export default function NotificationsPage() {
             <CardTitle className="text-lg font-semibold text-gray-900 flex items-center gap-2">
               <Bell className="h-5 w-5 text-teal-600" />
               Notifications
+              {!loading && (
+                <Badge variant="outline" className="ml-2">
+                  {filteredNotifications.length}
+                </Badge>
+              )}
             </CardTitle>
-            <CardDescription>{filteredNotifications.length} notification(s) trouvée(s)</CardDescription>
+            <CardDescription>
+              {loading ? (
+                <Skeleton className="h-4 w-48" />
+              ) : (
+                `${filteredNotifications.length} notification(s) trouvée(s)`
+              )}
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {filteredNotifications.map((notification) => {
-                const IconComponent = notification.icon
-                return (
-                  <div
-                    key={notification.id}
-                    className={`p-4 rounded-lg border-l-4 ${notification.borderColor} ${notification.bgColor} hover:shadow-md transition-all duration-200`}
-                  >
+              {loading ? (
+                // Skeleton de chargement
+                Array.from({ length: 5 }).map((_, index) => (
+                  <div key={index} className="p-4 rounded-lg border-l-4 border-gray-200 bg-gray-50">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex items-start gap-3 flex-1">
-                        <div className={`p-2 rounded-lg bg-white shadow-sm ${notification.color}`}>
-                          <IconComponent className="h-5 w-5" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <h3 className="font-semibold text-gray-900">{notification.type}</h3>
-                            {getPriorityBadge(notification.priorite)}
-                            {getStatusBadge(notification.statut)}
+                        <Skeleton className="h-10 w-10 rounded-lg" />
+                        <div className="flex-1 space-y-2">
+                          <div className="flex items-center gap-2">
+                            <Skeleton className="h-5 w-24" />
+                            <Skeleton className="h-5 w-16" />
+                            <Skeleton className="h-5 w-12" />
                           </div>
-                          <p className="text-gray-700 text-sm leading-relaxed">{notification.message}</p>
-                          <div className="flex items-center gap-4 mt-2">
-                            <span className="text-xs text-gray-500 font-mono">{notification.id}</span>
-                            <span className="text-xs text-gray-500">{formatDate(notification.dateNotif)}</span>
+                          <Skeleton className="h-4 w-full" />
+                          <div className="flex items-center gap-4">
+                            <Skeleton className="h-3 w-16" />
+                            <Skeleton className="h-3 w-20" />
                           </div>
                         </div>
                       </div>
                       <div className="flex items-center gap-1">
-                        <Button size="sm" variant="ghost" className="h-8 w-8 p-0 hover:bg-white/50">
-                          <Eye className="h-4 w-4 text-gray-500" />
-                        </Button>
-                        <Button size="sm" variant="ghost" className="h-8 w-8 p-0 hover:bg-white/50">
-                          <Trash2 className="h-4 w-4 text-gray-500" />
-                        </Button>
+                        <Skeleton className="h-8 w-8" />
+                        <Skeleton className="h-8 w-8" />
                       </div>
                     </div>
                   </div>
-                )
-              })}
+                ))
+              ) : filteredNotifications.length === 0 ? (
+                <div className="text-center py-12">
+                  <Bell className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Aucune notification</h3>
+                  <p className="text-gray-600">
+                    {searchTerm || typeFilter !== "all" || statusFilter !== "all"
+                      ? "Aucune notification ne correspond à vos critères de recherche."
+                      : "Aucune notification pour le moment."}
+                  </p>
+                </div>
+              ) : (
+                filteredNotifications.map((notification) => {
+                  const IconComponent = getNotificationIcon(notification.type)
+                  const colors = getNotificationColor(notification.type, notification.priorite || "normale")
+
+                  return (
+                    <div
+                      key={notification.id}
+                      className={`p-4 rounded-lg border-l-4 ${colors.borderColor} ${colors.bgColor} hover:shadow-md transition-all duration-200 ${
+                        notification.statut === "non_lue" ? "ring-1 ring-teal-200" : ""
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex items-start gap-3 flex-1">
+                          <div className={`p-2 rounded-lg bg-white shadow-sm ${colors.color}`}>
+                            <IconComponent className="h-5 w-5" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1 flex-wrap">
+                              <h3 className="font-semibold text-gray-900">{notification.type}</h3>
+                              {getPriorityBadge(notification.priorite || "normale")}
+                              {getStatusBadge(notification.statut || "non_lue")}
+                            </div>
+                            <p className="text-gray-700 text-sm leading-relaxed mb-2">{notification.message}</p>
+                            <div className="flex items-center gap-4 text-xs text-gray-500">
+                              <span className="font-mono">#{notification.id}</span>
+                              <span>{formatDate(notification.dateNotif)}</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-8 w-8 p-0 hover:bg-white/50"
+                            onClick={() => {
+                              if (notification.statut === "non_lue") {
+                                actions.markAsRead(notification.id!)
+                              } else {
+                                actions.markAsUnread(notification.id!)
+                              }
+                            }}
+                            title={notification.statut === "non_lue" ? "Marquer comme lue" : "Marquer comme non lue"}
+                          >
+                            {notification.statut === "non_lue" ? (
+                              <Eye className="h-4 w-4 text-gray-500" />
+                            ) : (
+                              <MarkAsUnread className="h-4 w-4 text-gray-500" />
+                            )}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-8 w-8 p-0 hover:bg-white/50"
+                            onClick={() => actions.deleteNotification(notification.id!)}
+                            title="Supprimer"
+                          >
+                            <Trash2 className="h-4 w-4 text-gray-500" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })
+              )}
             </div>
           </CardContent>
         </Card>

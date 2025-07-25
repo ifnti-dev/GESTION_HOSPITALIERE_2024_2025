@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.gestion_hospitaliere.UeEntreprise.model.User.Permission;
 import com.gestion_hospitaliere.UeEntreprise.service.User.PermissionService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/permissions")
 public class PermissionController {
@@ -50,17 +52,14 @@ public class PermissionController {
     // Récupérer une permission par nom
     @GetMapping("/nom")
     public ResponseEntity<Permission> obtenirPermissionParNom(@RequestParam String nom) {
-        Permission permission = permissionService.obtenirPermissionParNom(nom);
-        if (permission != null) {
-            return ResponseEntity.ok(permission);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return permissionService.obtenirPermissionParNom(nom)
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
     }
 
     // Mettre à jour une permission
     @PutMapping("/{id}")
-    public ResponseEntity<Permission> mettreAJourPermission(@PathVariable Long id, @RequestBody Permission permissionDetails) {
+    public ResponseEntity<Permission> mettreAJourPermission(@PathVariable Long id, @Valid @RequestBody Permission permissionDetails) {
         try {
             Permission permissionMiseAJour = permissionService.mettreAJourPermission(id, permissionDetails);
             return ResponseEntity.ok(permissionMiseAJour);

@@ -229,6 +229,18 @@ public class CommandeController {
       }
   }
 
+  @PostMapping("/{id}/annuler")
+  public ResponseEntity<Commande> annulerCommande(@PathVariable Long id) {
+      try {
+          Commande commandeAnnulee = commandeService.annulerCommande(id);
+          return ResponseEntity.ok(commandeAnnulee);
+      } catch (RuntimeException e) {
+          return ResponseEntity.badRequest().build();
+      } catch (Exception e) {
+          return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+      }
+  }
+
   @GetMapping("/count")
   public ResponseEntity<Long> count() {
       try {

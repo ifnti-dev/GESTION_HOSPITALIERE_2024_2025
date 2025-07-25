@@ -11,32 +11,6 @@ export interface BaseEntity {
 }
 
 
-
-// Interfaces qui représentent l'entité Permission
-export interface Permission extends BaseEntity {
-    id?: number
-    nom: string
-    description?: string
-}
-
-// Interface qui représente l'entité Role
-export interface Role extends BaseEntity {
-    id?: number
-    nom: string
-    permissions?: Permission[] // Relation Many-to-Many avec Permissions
-}
-
-
-
-// Interface qui représente l'entité Personne
-
-// Types pour les entités de l'application de gestion hospitalière
-export interface BaseEntity {
-  id?: number
-  createdAt?: string
-  updatedAt?: string
-}
-
 // Interfaces qui représentent l'entité Permission
 export interface Permission extends BaseEntity {
   id?: number
@@ -50,6 +24,7 @@ export interface Role extends BaseEntity {
   nom: string
   description?: string
   permissions?: Permission[] // Relation Many-to-Many avec Permissions
+  employes?: Employe[] // Relation Many-to-Many avec Employés
 }
 
 // Interface qui représente l'entité Personne
@@ -79,14 +54,22 @@ export interface Personne extends BaseEntity {
 export interface Employe extends BaseEntity {
     id?: number
     horaire: string
-    dateAffectation: Date
+    dateAffectation: string
     specialite: string
-    numeroOrdre: string
-    personne: Personne // Relation One-to-One avec Personne
-    roles: Role[] // Relation Many-to-Many avec Rôles
+    numOrdre: string
+    personne: Personne | number // Relation One-to-One avec Personne
+    roles: Role[]// Relation Many-to-Many avec Rôles
     // accouchements?: Accouchement[] // Relation One-to-Many avec Accouchements
     // suivisGrossesse?: SuiviGrossesse[] // Relation One-to-Many avec Suivi de Grossesse
     // factures?: Facture[] // Relation One-to-Many avec Factures
+}
+
+// DTO spécifique pour l'affichage avec les rôles inclus
+export interface EmployeWithRoles extends Omit<Employe, "roles"> {
+  roles: Array<{
+    id: number
+    nom: string
+  }>
 }
 
 // Types pour les formulaires (basés sur les validations du service Java)
@@ -103,13 +86,13 @@ export interface PersonneFormData {
 }
 
 export interface EmployeFormData {
-  horaire: string
-  dateAffectation: string
-  specialite: string
-  numOrdre: string // Corrigé pour correspondre au backend
-  statut?: "Actif" | "Congé" | "Absent" | "Suspendu"
-  personneId: number
-  roleIds: number[]
+    horaire: string
+    dateAffectation: string
+    specialite: string
+    numOrdre: string
+    personne?: PersonneFormData // Nouvelle personne
+    personneId?: number // Personne existante
+    roleIds: number[] // IDs des rôles
 }
 
 // Types pour les réponses API Spring Boot
@@ -193,4 +176,10 @@ export interface RoleRequest {
   nom: string
   description?: string
   permissions?: number[]
+}
+
+interface RoleStat {
+  roleId: number;
+  roleName: string;
+  employeeCount: number;
 }

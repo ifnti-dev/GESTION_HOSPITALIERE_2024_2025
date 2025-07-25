@@ -14,6 +14,8 @@ import {
   searchEmployesBySpecialite,
   searchEmployesByStatut,
   getEmployeStats,
+  searchEmployesByRole,
+  searchEmployesByPersonne,
 } from "@/services/utilisateur/employe.service"
 import type { Employe, EmployeFormData, EmployeResponse, EmployeStats } from "@/types/utilisateur"
 import { toast } from "@/hooks/use-toast"
@@ -24,6 +26,7 @@ export function useEmploye() {
   const [stats, setStats] = useState<EmployeStats | null>(null)
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
+  const [selectedEmploye, setSelectedEmploye] = useState<Employe | null>(null)
 
   // Charger tous les employés (sans pagination)
   const fetchAllEmployes = useCallback(async () => {
@@ -256,6 +259,33 @@ export function useEmploye() {
     }
   }, [])
 
+  const fetchEmployeById = async (id: number) => {
+    try {
+      const employe = await getEmployeById(id)
+      setSelectedEmploye(employe)
+    } catch (error) {
+      console.error("Erreur lors de la récupération de l'employé :", error)
+    }
+  }
+
+  const searchByRole = async (roleId: number) => {
+    try {
+      const result = await searchEmployesByRole(roleId)
+      setEmployes(result)
+    } catch (error) {
+      console.error("Erreur lors de la recherche par rôle :", error)
+    }
+  }
+
+  const searchByPersonne = async (personneId: number) => {
+    try {
+      const result = await searchEmployesByPersonne(personneId)
+      setEmployes(result)
+    } catch (error) {
+      console.error("Erreur lors de la recherche par personne :", error)
+    }
+  }
+
   useEffect(() => {
     fetchAllEmployes()
     fetchStats()
@@ -267,6 +297,7 @@ export function useEmploye() {
     stats,
     loading,
     error,
+    selectedEmploye,
     fetchAllEmployes,
     fetchEmployes,
     fetchStats,
@@ -279,5 +310,8 @@ export function useEmploye() {
     removeRole,
     assignPerson,
     getEmployeById,
+    fetchEmployeById,
+    searchByRole,
+    searchByPersonne,
   }
 }

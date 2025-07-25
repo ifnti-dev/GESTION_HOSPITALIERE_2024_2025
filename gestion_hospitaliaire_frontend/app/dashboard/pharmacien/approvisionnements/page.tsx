@@ -135,8 +135,28 @@ export default function ApprovisionnementPage() {
     setFormLignes(formLignes.filter((ligne) => ligne.id !== id))
   }
 
-  // Mettre à jour une ligne du formulaire
+  // Mettre à jour une ligne du formulaire avec validation
   const updateFormLigne = (id: string, field: keyof FormLigne, value: any) => {
+    // Validation pour les champs numériques
+    if (field === "quantite" || field === "prixUnitaireAchat" || field === "prixUnitaireVente") {
+      const numValue = Number(value)
+
+      // Empêcher les valeurs négatives
+      if (numValue < 0) {
+        return // Ne pas mettre à jour si la valeur est négative
+      }
+
+      // Pour la quantité, s'assurer qu'elle est au moins 1
+      if (field === "quantite" && numValue === 0) {
+        value = 1
+      }
+
+      // Pour les prix, permettre 0 mais pas de valeurs négatives
+      if ((field === "prixUnitaireAchat" || field === "prixUnitaireVente") && numValue < 0) {
+        return
+      }
+    }
+
     setFormLignes(formLignes.map((ligne) => (ligne.id === id ? { ...ligne, [field]: value } : ligne)))
   }
 
@@ -216,8 +236,12 @@ export default function ApprovisionnementPage() {
         alert(`Ligne ${index + 1}: La quantité doit être supérieure à 0`)
         return
       }
-      if (ligne.prixUnitaireAchat <= 0 || ligne.prixUnitaireVente <= 0) {
-        alert(`Ligne ${index + 1}: Les prix doivent être supérieurs à 0`)
+      if (ligne.prixUnitaireAchat < 0 || ligne.prixUnitaireVente < 0) {
+        alert(`Ligne ${index + 1}: Les prix ne peuvent pas être négatifs`)
+        return
+      }
+      if (ligne.prixUnitaireAchat === 0 && ligne.prixUnitaireVente === 0) {
+        alert(`Ligne ${index + 1}: Au moins un prix doit être supérieur à 0`)
         return
       }
       if (!ligne.dateReception || !ligne.dateExpiration) {
@@ -761,13 +785,16 @@ export default function ApprovisionnementPage() {
                                             min="1"
                                             max="9999"
                                             value={ligne.quantite}
-                                            onChange={(e) =>
-                                              updateFormLigne(
-                                                ligne.id,
-                                                "quantite",
-                                                Number.parseInt(e.target.value) || 1,
-                                              )
-                                            }
+                                            onChange={(e) => {
+                                              const value = Number.parseInt(e.target.value) || 1
+                                              updateFormLigne(ligne.id, "quantite", Math.max(1, value))
+                                            }}
+                                            onKeyDown={(e) => {
+                                              // Empêcher la saisie du signe moins
+                                              if (e.key === "-" || e.key === "e" || e.key === "E") {
+                                                e.preventDefault()
+                                              }
+                                            }}
                                             className="w-full h-9 text-center"
                                           />
                                         </TableCell>
@@ -777,13 +804,16 @@ export default function ApprovisionnementPage() {
                                             step="0.01"
                                             min="0"
                                             value={ligne.prixUnitaireAchat}
-                                            onChange={(e) =>
-                                              updateFormLigne(
-                                                ligne.id,
-                                                "prixUnitaireAchat",
-                                                Number.parseFloat(e.target.value) || 0,
-                                              )
-                                            }
+                                            onChange={(e) => {
+                                              const value = Number.parseFloat(e.target.value) || 0
+                                              updateFormLigne(ligne.id, "prixUnitaireAchat", Math.max(0, value))
+                                            }}
+                                            onKeyDown={(e) => {
+                                              // Empêcher la saisie du signe moins
+                                              if (e.key === "-" || e.key === "e" || e.key === "E") {
+                                                e.preventDefault()
+                                              }
+                                            }}
                                             className="w-full h-9"
                                           />
                                         </TableCell>
@@ -793,13 +823,16 @@ export default function ApprovisionnementPage() {
                                             step="0.01"
                                             min="0"
                                             value={ligne.prixUnitaireVente}
-                                            onChange={(e) =>
-                                              updateFormLigne(
-                                                ligne.id,
-                                                "prixUnitaireVente",
-                                                Number.parseFloat(e.target.value) || 0,
-                                              )
-                                            }
+                                            onChange={(e) => {
+                                              const value = Number.parseFloat(e.target.value) || 0
+                                              updateFormLigne(ligne.id, "prixUnitaireVente", Math.max(0, value))
+                                            }}
+                                            onKeyDown={(e) => {
+                                              // Empêcher la saisie du signe moins
+                                              if (e.key === "-" || e.key === "e" || e.key === "E") {
+                                                e.preventDefault()
+                                              }
+                                            }}
                                             className="w-full h-9"
                                           />
                                         </TableCell>
@@ -896,7 +929,7 @@ export default function ApprovisionnementPage() {
                                 <span className="font-medium text-green-700">
                                   {formLignes
                                     .reduce((sum, ligne) => sum + ligne.quantite * ligne.prixUnitaireAchat, 0)
-                                    .toFixed(2)}
+                                    .toFixed(2)}{" "}
                                   FCFA
                                 </span>
                               </div>

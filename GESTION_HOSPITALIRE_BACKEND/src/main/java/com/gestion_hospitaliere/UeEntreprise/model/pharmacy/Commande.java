@@ -14,8 +14,16 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
 
 import com.gestion_hospitaliere.UeEntreprise.model.User.Personne;
+
+enum StatutCommande {
+    
+    VALIDEE,
+    ANNULEE
+}
 
 @Entity
 public class Commande {
@@ -25,6 +33,9 @@ public class Commande {
 
   private LocalDate dateCommande;
   private String montantTotal;
+
+  @Enumerated(EnumType.STRING)
+  private StatutCommande statut = StatutCommande.VALIDEE;
 
   @ManyToOne
   @JoinColumn(name = "personne_id")
@@ -40,6 +51,7 @@ public class Commande {
       this.dateCommande = dateCommande;
       this.montantTotal = montantTotal;
       this.personne = personne;
+      this.statut = StatutCommande.VALIDEE;
   }
 
   // Getters et Setters
@@ -97,6 +109,14 @@ public class Commande {
       this.lignesCommande = lignesCommande;
   }
 
+  public StatutCommande getStatut() {
+      return statut;
+  }
+
+  public void setStatut(StatutCommande statut) {
+      this.statut = statut;
+  }
+
   // Méthodes utilitaires
   public void calculerMontantTotal() {
       if (lignesCommande != null && !lignesCommande.isEmpty()) {
@@ -120,12 +140,33 @@ public class Commande {
              !lignesCommande.isEmpty();
   }
 
+  public boolean isAnnulee() {
+      return StatutCommande.ANNULEE.equals(this.statut);
+  }
+
+  public boolean isValidee() {
+      return StatutCommande.VALIDEE.equals(this.statut);
+  }
+
+  public boolean isEnCours() {
+      return StatutCommande.VALIDEE.equals(this.statut);
+  }
+
+  public void annuler() {
+      this.statut = StatutCommande.ANNULEE;
+  }
+
+  public void valider() {
+      this.statut = StatutCommande.VALIDEE;
+  }
+
   @Override
   public String toString() {
       return "Commande{" +
               "id=" + id +
               ", dateCommande=" + dateCommande +
               ", montantTotal='" + montantTotal + '\'' +
+              ", statut=" + statut +
               ", personne=" + (personne != null ? personne.getNom() : "null") +
               ", nombreLignes=" + getNombreLignes() +
               '}';
