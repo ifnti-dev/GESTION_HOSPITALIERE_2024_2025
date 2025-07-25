@@ -1,797 +1,438 @@
 "use client"
 
-import type React from "react"
-
+import { useState } from "react"
+import { Plus, Search, Users, UserCheck, UserX, TrendingUp, Clock, Edit, AlertTriangle } from "lucide-react"
 import { DashboardLayout } from "@/components/dashboard-layout"
+import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import {
-  Users,
-  Plus,
-  Search,
-  Filter,
-  Eye,
-  Edit,
-  Trash2,
-  Phone,
-  Mail,
-  Calendar,
-  Briefcase,
-  Loader2,
-  AlertCircle,
-  UserCheck,
-  Clock,
-  AlertTriangle,
-} from "lucide-react"
-import { useState, useCallback, useMemo } from "react"
+import { Progress } from "@/components/ui/progress"
+import { EmployeTable } from "@/components/employe/employe-table"
+import { EmployeDialog } from "@/components/employe/employe-dialog"
+import { SearchFilters } from "@/components/employe/search-filters"
+import type { Employe } from "@/types/utilisateur"
 import { useEmploye } from "@/hooks/utilisateur/useEmploye"
-import { usePersonne } from "@/hooks/utilisateur/usePersonne"
-import { useRole } from "@/hooks/utilisateur/useRole"
-import type { EmployeFormData } from "@/types/utilisateur"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-
-// Composant de formulaire pour les employés
-const EmployeForm = ({
-  employe = null,
-  onClose,
-  onSubmit,
-  loading,
-}: {
-  employe?: any
-  onClose: () => void
-  onSubmit: (data: EmployeFormData) => Promise<void>
-  loading: boolean
-}) => {
-  const { personnes } = usePersonne()
-  const { roles } = useRole()
-
-  const [formData, setFormData] = useState<EmployeFormData>({
-    horaire: employe?.horaire || "",
-    dateAffectation: employe?.dateAffectation ? new Date(employe.dateAffectation).toISOString().split("T")[0] : "",
-    specialite: employe?.specialite || "",
-    numOrdre: employe?.numOrdre || "",
-    statut: employe?.statut || "Actif",
-    personneId: employe?.personne?.id || 0,
-    roleIds: employe?.roles?.map((r: any) => r.id) || [],
-  })
-
-  const handleSubmit = useCallback(
-    async (e: React.FormEvent) => {
-      e.preventDefault()
-
-      // Validation côté client
-      if (!formData.horaire.trim()) {
-        alert("L'horaire est requis")
-        return
-      }
-      if (!formData.specialite.trim()) {
-        alert("La spécialité est requise")
-        return
-      }
-      if (!formData.numOrdre.trim()) {
-        alert("Le numéro d'ordre est requis")
-        return
-      }
-      if (!formData.personneId) {
-        alert("Une personne doit être sélectionnée")
-        return
-      }
-
-      await onSubmit(formData)
-    },
-    [formData, onSubmit],
-  )
-
-  const handleInputChange = useCallback((field: keyof EmployeFormData, value: any) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
-  }, [])
-
-  // Filtrer les personnes qui ne sont pas déjà employées
-  const availablePersonnes = useMemo(() => {
-    return personnes.filter((p) => !p.employe || p.id === employe?.personne?.id)
-  }, [personnes, employe])
-
-  return (
-    <form onSubmit={handleSubmit}>
-      <div className="grid gap-4 py-4">
-        <div className="space-y-2">
-          <Label htmlFor="personne">Personne *</Label>
-          <Select
-            value={formData.personneId.toString()}
-            onValueChange={(value) => handleInputChange("personneId", Number.parseInt(value))}
-          >
-            <SelectTrigger className="border-slate-200 focus:border-slate-500 focus:ring-slate-500">
-              <SelectValue placeholder="Sélectionner une personne..." />
-            </SelectTrigger>
-            <SelectContent>
-              {availablePersonnes.map((personne) => (
-                <SelectItem key={personne.id} value={personne.id!.toString()}>
-                  {personne.prenom} {personne.nom} - {personne.email}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="specialite">Spécialité *</Label>
-            <Input
-              id="specialite"
-              value={formData.specialite}
-              onChange={(e) => handleInputChange("specialite", e.target.value)}
-              placeholder="Ex: Médecin généraliste"
-              className="border-slate-200 focus:border-slate-500 focus:ring-slate-500"
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="numOrdre">Numéro d'ordre *</Label>
-            <Input
-              id="numOrdre"
-              value={formData.numOrdre}
-              onChange={(e) => handleInputChange("numOrdre", e.target.value)}
-              placeholder="Ex: ORD001"
-              className="border-slate-200 focus:border-slate-500 focus:ring-slate-500"
-              required
-            />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="horaire">Horaire *</Label>
-            <Input
-              id="horaire"
-              value={formData.horaire}
-              onChange={(e) => handleInputChange("horaire", e.target.value)}
-              placeholder="Ex: 8h-17h"
-              className="border-slate-200 focus:border-slate-500 focus:ring-slate-500"
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="dateAffectation">Date d'affectation *</Label>
-            <Input
-              id="dateAffectation"
-              type="date"
-              value={formData.dateAffectation}
-              onChange={(e) => handleInputChange("dateAffectation", e.target.value)}
-              className="border-slate-200 focus:border-slate-500 focus:ring-slate-500"
-              required
-            />
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="statut">Statut</Label>
-          <Select value={formData.statut} onValueChange={(value) => handleInputChange("statut", value)}>
-            <SelectTrigger className="border-slate-200 focus:border-slate-500 focus:ring-slate-500">
-              <SelectValue placeholder="Sélectionner un statut..." />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Actif">Actif</SelectItem>
-              <SelectItem value="Congé">En congé</SelectItem>
-              <SelectItem value="Absent">Absent</SelectItem>
-              <SelectItem value="Suspendu">Suspendu</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
-          <Label>Rôles</Label>
-          <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto border border-slate-200 rounded-md p-2">
-            {roles.map((role) => (
-              <label key={role.id} className="flex items-center space-x-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={formData.roleIds.includes(role.id!)}
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      handleInputChange("roleIds", [...formData.roleIds, role.id!])
-                    } else {
-                      handleInputChange(
-                        "roleIds",
-                        formData.roleIds.filter((id) => id !== role.id),
-                      )
-                    }
-                  }}
-                  className="rounded border-slate-300"
-                />
-                <span className="text-sm">{role.nom}</span>
-              </label>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <DialogFooter>
-        <Button variant="outline" onClick={onClose} type="button" disabled={loading}>
-          Annuler
-        </Button>
-        <Button
-          type="submit"
-          className="bg-gradient-to-r from-slate-600 to-gray-700 hover:from-slate-700 hover:to-gray-800"
-          disabled={loading}
-        >
-          {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {employe ? "Sauvegarder" : "Ajouter"}
-        </Button>
-      </DialogFooter>
-    </form>
-  )
-}
-
-// Composant pour afficher les détails d'un employé
-const EmployeDetailsModal = ({ employe, isOpen, onClose }: { employe: any; isOpen: boolean; onClose: () => void }) => {
-  if (!employe) return null
-
-  const getSexeLabel = (sexe: string) => {
-    switch (sexe) {
-      case "M":
-        return "Masculin"
-      case "F":
-        return "Féminin"
-      default:
-        return sexe || "Non spécifié"
-    }
-  }
-
-  const getStatutColor = (statut: string) => {
-    switch (statut) {
-      case "Actif":
-        return "bg-green-50 text-green-700 border-green-200"
-      case "Congé":
-        return "bg-yellow-50 text-yellow-700 border-yellow-200"
-      case "Absent":
-        return "bg-orange-50 text-orange-700 border-orange-200"
-      case "Suspendu":
-        return "bg-red-50 text-red-700 border-red-200"
-      default:
-        return "bg-slate-50 text-slate-700 border-slate-200"
-    }
-  }
-
-  return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Briefcase className="h-5 w-5" />
-            Détails de l'employé
-          </DialogTitle>
-          <DialogDescription>
-            Informations complètes de {employe.personne?.prenom} {employe.personne?.nom}
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="space-y-6">
-          {/* Informations personnelles */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">Informations personnelles</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label className="text-sm font-medium text-gray-600">ID Employé</Label>
-                <p className="text-sm text-gray-900 font-mono">{employe.id}</p>
-              </div>
-              <div>
-                <Label className="text-sm font-medium text-gray-600">Nom complet</Label>
-                <p className="text-sm text-gray-900 font-semibold">
-                  {employe.personne?.prenom} {employe.personne?.nom}
-                </p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label className="text-sm font-medium text-gray-600">Email</Label>
-                <p className="text-sm text-gray-900">{employe.personne?.email}</p>
-              </div>
-              <div>
-                <Label className="text-sm font-medium text-gray-600">Téléphone</Label>
-                <p className="text-sm text-gray-900">{employe.personne?.telephone}</p>
-              </div>
-            </div>
-
-            <div>
-              <Label className="text-sm font-medium text-gray-600">Adresse</Label>
-              <p className="text-sm text-gray-900">{employe.personne?.adresse}</p>
-            </div>
-
-            <div className="grid grid-cols-3 gap-4">
-              <div>
-                <Label className="text-sm font-medium text-gray-600">Sexe</Label>
-                <p className="text-sm text-gray-900">{getSexeLabel(employe.personne?.sexe)}</p>
-              </div>
-              <div>
-                <Label className="text-sm font-medium text-gray-600">Date de naissance</Label>
-                <p className="text-sm text-gray-900">
-                  {employe.personne?.dateNaissance
-                    ? new Date(employe.personne.dateNaissance).toLocaleDateString()
-                    : "Non spécifiée"}
-                </p>
-              </div>
-              <div>
-                <Label className="text-sm font-medium text-gray-600">Situation matrimoniale</Label>
-                <p className="text-sm text-gray-900">{employe.personne?.situationMatrimoniale || "Non spécifiée"}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Informations professionnelles */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">Informations professionnelles</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label className="text-sm font-medium text-gray-600">Spécialité</Label>
-                <p className="text-sm text-gray-900 font-medium">{employe.specialite}</p>
-              </div>
-              <div>
-                <Label className="text-sm font-medium text-gray-600">Numéro d'ordre</Label>
-                <p className="text-sm text-gray-900 font-mono">{employe.numOrdre}</p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label className="text-sm font-medium text-gray-600">Horaire</Label>
-                <p className="text-sm text-gray-900">{employe.horaire}</p>
-              </div>
-              <div>
-                <Label className="text-sm font-medium text-gray-600">Date d'affectation</Label>
-                <p className="text-sm text-gray-900">{new Date(employe.dateAffectation).toLocaleDateString()}</p>
-              </div>
-            </div>
-
-            <div>
-              <Label className="text-sm font-medium text-gray-600">Statut</Label>
-              <div className="mt-1">
-                <Badge className={getStatutColor(employe.statut || "Actif")}>{employe.statut || "Actif"}</Badge>
-              </div>
-            </div>
-          </div>
-
-          {/* Rôles */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">Rôles et permissions</h3>
-            <div>
-              <Label className="text-sm font-medium text-gray-600">Rôles assignés</Label>
-              <div className="mt-2 flex flex-wrap gap-2">
-                {employe.roles && employe.roles.length > 0 ? (
-                  employe.roles.map((role: any) => (
-                    <Badge key={role.id} className="bg-blue-50 text-blue-700 border-blue-200">
-                      {role.nom}
-                    </Badge>
-                  ))
-                ) : (
-                  <p className="text-sm text-gray-500">Aucun rôle assigné</p>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Dates importantes */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">Informations système</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label className="text-sm font-medium text-gray-600">Date de création</Label>
-                <p className="text-sm text-gray-900">
-                  {employe.dateCreation ? new Date(employe.dateCreation).toLocaleDateString() : "Non disponible"}
-                </p>
-              </div>
-              <div>
-                <Label className="text-sm font-medium text-gray-600">Dernière modification</Label>
-                <p className="text-sm text-gray-900">
-                  {employe.dateModification
-                    ? new Date(employe.dateModification).toLocaleDateString()
-                    : "Non disponible"}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
-            Fermer
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  )
-}
+import { EmployeDetailsDialog } from "@/components/employe/employe-details"
 
 export default function EmployesPage() {
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
-  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false)
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  const [selectedEmploye, setSelectedEmploye] = useState<any>(null)
-  const [employeToDelete, setEmployeToDelete] = useState<any>(null)
+  const {
+    employes,
+    paginatedData,
+    stats,
+    loading,
+    error,
+    selectedEmploye,
+    fetchAllEmployes,
+    fetchEmployes,
+    fetchStats,
+    createEmploye,
+    editEmploye,
+    removeEmploye,
+    searchBySpecialite,
+    searchByStatut,
+    addRole,
+    removeRole,
+    assignPerson,
+    fetchEmployeById,
+    searchByRole,
+    searchByPersonne,
+  } = useEmploye()
+
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false)
+  const [editingEmploye, setEditingEmploye] = useState<Employe | null>(null)
+  const [viewingEmploye, setViewingEmploye] = useState<Employe | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
+  const [selectedSpecialite, setSelectedSpecialite] = useState("")
+  const [selectedStatut, setSelectedStatut] = useState("")
 
-  const { employes, stats, loading, error, createEmploye, editEmploye, removeEmploye } = useEmploye()
+  // Ajouter la gestion de pagination
+  const [currentPage, setCurrentPage] = useState(0)
+  const [pageSize, setPageSize] = useState(10)
 
-  // Filtrer les employés selon le terme de recherche
-  const filteredEmployes = useMemo(() => {
-    if (!searchTerm) return employes
-    return employes.filter(
-      (employe) =>
-        employe.personne.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        employe.personne.prenom.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        employe.specialite.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        employe.numOrdre.toLowerCase().includes(searchTerm.toLowerCase()),
-    )
-  }, [employes, searchTerm])
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+    fetchEmployes(page, pageSize)
+  }
 
-  const getStatutBadge = useCallback((statut: string) => {
-    const colors = {
-      Actif: "bg-green-50 text-green-700 border-green-200",
-      Congé: "bg-yellow-50 text-yellow-700 border-yellow-200",
-      Absent: "bg-orange-50 text-orange-700 border-orange-200",
-      Suspendu: "bg-red-50 text-red-700 border-red-200",
+  // Ajouter ces nouvelles fonctions
+  const handleSearchByRole = async (roleId: number) => {
+    await searchByRole(roleId)
+  }
+
+  const handleSearchByPersonne = async (personneId: number) => {
+    await searchByPersonne(personneId)
+  }
+
+  const handleAddRole = async (employeId: number, roleId: number) => {
+    await addRole(employeId, roleId)
+  }
+
+  const handleRemoveRole = async (employeId: number, roleId: number) => {
+    await removeRole(employeId, roleId)
+  }
+
+  const handleAssignPerson = async (employeId: number, personneId: number) => {
+    await assignPerson(employeId, personneId)
+  }
+
+  // Statistiques rapides basées sur les données
+  const quickStats = [
+    {
+      title: "Total Employés",
+      value: stats?.totalEmployes?.toString() || "0",
+      change: "+12%",
+      icon: <Users className="h-5 w-5" />,
+      color: "text-blue-600",
+    },
+    {
+      title: "Employés Actifs",
+      value: stats?.employes_actifs?.toString() || "0",
+      change: "+5%",
+      icon: <UserCheck className="h-5 w-5" />,
+      color: "text-green-600",
+    },
+    {
+      title: "En Congé",
+      value: stats?.employes_conge?.toString() || "0",
+      change: "-3%",
+      icon: <UserX className="h-5 w-5" />,
+      color: "text-orange-600",
+    },
+    {
+      title: "Nouveaux ce mois",
+      value: stats?.nouveauxCeMois?.toString() || "0",
+      change: "+8%",
+      icon: <TrendingUp className="h-5 w-5" />,
+      color: "text-purple-600",
+    },
+  ]
+
+  // Statistiques par spécialité
+  const specialiteStats = [
+    { name: "Médecine générale", count: 15, total: 20, color: "bg-blue-500" },
+    { name: "Cardiologie", count: 8, total: 10, color: "bg-red-500" },
+    { name: "Pédiatrie", count: 12, total: 15, color: "bg-green-500" },
+    { name: "Gynécologie", count: 6, total: 8, color: "bg-pink-500" },
+    { name: "Chirurgie", count: 10, total: 12, color: "bg-purple-500" },
+  ]
+
+  // Activités récentes (simulées)
+  const recentActivities = [
+    { time: "09:30", action: "Nouvel employé ajouté", employee: "Dr. Marie Dubois", type: "add" },
+    { time: "09:15", action: "Horaire modifié", employee: "Inf. Jean Martin", type: "update" },
+    { time: "09:00", action: "Congé approuvé", employee: "Dr. Sophie Laurent", type: "leave" },
+    { time: "08:45", action: "Formation terminée", employee: "Tech. Emma Bernard", type: "training" },
+    { time: "08:30", action: "Rôle assigné", employee: "Adm. Pierre Moreau", type: "role" },
+  ]
+
+  const handleSearch = (term: string) => {
+    setSearchTerm(term)
+  }
+
+  const handleSpecialiteFilter = (specialite: string) => {
+    setSelectedSpecialite(specialite)
+    if (specialite && specialite !== "all") {
+      searchBySpecialite(specialite)
+    } else {
+      fetchAllEmployes()
     }
-    return (
-      <Badge className={colors[statut as keyof typeof colors] || "bg-slate-50 text-slate-700 border-slate-200"}>
-        {statut}
-      </Badge>
-    )
-  }, [])
+  }
 
-  const statsData = useMemo(
-    () => [
-      {
-        title: "Total Employés",
-        value: stats?.totalEmployes?.toString() || "0",
-        icon: <Users className="h-5 w-5" />,
-        gradient: "from-slate-500 to-gray-600",
-      },
-      {
-        title: "Employés Actifs",
-        value: stats?.employes_actifs?.toString() || "0",
-        icon: <UserCheck className="h-5 w-5" />,
-        gradient: "from-green-500 to-green-600",
-      },
-      {
-        title: "En Congé",
-        value: stats?.employes_conge?.toString() || "0",
-        icon: <Clock className="h-5 w-5" />,
-        gradient: "from-yellow-500 to-yellow-600",
-      },
-      {
-        title: "Nouveaux ce mois",
-        value: stats?.nouveauxCeMois?.toString() || "0",
-        icon: <Calendar className="h-5 w-5" />,
-        gradient: "from-slate-400 to-gray-500",
-      },
-    ],
-    [stats],
-  )
+  const handleStatutFilter = (statut: string) => {
+    setSelectedStatut(statut)
+    if (statut && statut !== "all") {
+      searchByStatut(statut)
+    } else {
+      fetchAllEmployes()
+    }
+  }
 
-  const handleView = useCallback((employe: any) => {
-    setSelectedEmploye(employe)
-    setIsViewDialogOpen(true)
-  }, [])
+  const handleAddEmploye = () => {
+    setEditingEmploye(null)
+    setIsDialogOpen(true)
+  }
 
-  const handleEdit = useCallback((employe: any) => {
-    setSelectedEmploye(employe)
-    setIsEditDialogOpen(true)
-  }, [])
+  const handleEditEmploye = (employe: Employe) => {
+    setEditingEmploye(employe)
+    setIsDialogOpen(true)
+  }
 
-  const handleDeleteClick = useCallback((employe: any) => {
-    setEmployeToDelete(employe)
-    setIsDeleteDialogOpen(true)
-  }, [])
+  const handleViewEmploye = (employe: Employe) => {
+    setViewingEmploye(employe)
+    setIsDetailsDialogOpen(true)
+  }
 
-  const handleDeleteConfirm = useCallback(async () => {
-    if (!employeToDelete?.id) return
+  const handleDeleteEmploye = async (id: number) => {
+    if (confirm("Êtes-vous sûr de vouloir supprimer cet employé ?")) {
+      await removeEmploye(id)
+    }
+  }
+
+  const handleSaveEmploye = async (data: any) => {
     try {
-      await removeEmploye(employeToDelete.id)
-      setIsDeleteDialogOpen(false)
-      setEmployeToDelete(null)
-    } catch (error) {
-      console.error("Erreur lors de la suppression:", error)
-    }
-  }, [removeEmploye, employeToDelete])
-
-  const handleAddSubmit = useCallback(
-    async (data: EmployeFormData) => {
-      try {
+      if (editingEmploye) {
+        await editEmploye(editingEmploye.id!, data)
+      } else {
         await createEmploye(data)
-        setIsAddDialogOpen(false)
-      } catch (error) {
-        console.error("Erreur lors de l'ajout:", error)
       }
-    },
-    [createEmploye],
-  )
-
-  const handleEditSubmit = useCallback(
-    async (data: EmployeFormData) => {
-      if (!selectedEmploye?.id) return
-      try {
-        await editEmploye(selectedEmploye.id, data)
-        setIsEditDialogOpen(false)
-        setSelectedEmploye(null)
-      } catch (error) {
-        console.error("Erreur lors de la modification:", error)
-      }
-    },
-    [editEmploye, selectedEmploye],
-  )
-
-  const handleSearch = useCallback((value: string) => {
-    setSearchTerm(value)
-  }, [])
+      setIsDialogOpen(false)
+      setEditingEmploye(null)
+    } catch (error) {
+      console.error("Erreur lors de la sauvegarde:", error)
+    }
+  }
 
   return (
-    <DashboardLayout userRole="Directeur">
+    <DashboardLayout>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Gestion des Employés</h1>
-            <p className="text-gray-600 mt-1">Gérez tous les employés de l'hôpital</p>
+            <p className="text-gray-600 mt-1">Gérez le personnel de votre établissement hospitalier</p>
           </div>
-          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-gradient-to-r from-slate-600 to-gray-700 hover:from-slate-700 hover:to-gray-800">
-                <Plus className="h-4 w-4 mr-2" />
-                Nouvel Employé
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Ajouter un nouvel employé</DialogTitle>
-                <DialogDescription>Remplissez les informations de l'employé.</DialogDescription>
-              </DialogHeader>
-              <EmployeForm onClose={() => setIsAddDialogOpen(false)} onSubmit={handleAddSubmit} loading={loading} />
-            </DialogContent>
-          </Dialog>
+          <div className="flex items-center gap-3">
+            <Badge variant="outline" className="text-green-700 border-green-200">
+              <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+              {employes.length} Employés Actifs
+            </Badge>
+            <Button onClick={handleAddEmploye} className="flex items-center gap-2 bg-blue-600 text-white hover:bg-blue-700">
+              <Plus className="h-4 w-4" />
+              Nouvel Employé
+            </Button>
+          </div>
         </div>
 
-        {/* Error Alert */}
-        {error && (
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
-
-        {/* Stats */}
+        {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {statsData.map((stat, index) => (
-            <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-all duration-200">
+          {quickStats.map((stat, index) => (
+            <Card key={index} className="border-0 shadow-lg">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium text-gray-600">{stat.title}</CardTitle>
-                <div className={`bg-gradient-to-r ${stat.gradient} p-2 rounded-lg text-white`}>{stat.icon}</div>
+                <div className={stat.color}>{stat.icon}</div>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
+                <p className="text-xs text-gray-500 flex items-center mt-1">
+                  <TrendingUp className="h-3 w-3 mr-1" />
+                  {stat.change} ce mois
+                </p>
               </CardContent>
             </Card>
           ))}
         </div>
 
-        {/* Filters */}
-        <Card className="border-0 shadow-lg">
-          <CardHeader>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="flex-1">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                  <Input
-                    placeholder="Rechercher un employé..."
-                    className="pl-10 border-slate-200 focus:border-slate-500 focus:ring-slate-500"
-                    value={searchTerm}
-                    onChange={(e) => handleSearch(e.target.value)}
-                  />
-                </div>
-              </div>
-              <Button
-                variant="outline"
-                className="flex items-center gap-2 border-slate-200 hover:bg-slate-50 bg-transparent"
-              >
-                <Filter className="h-4 w-4" />
-                Filtres
-              </Button>
-            </div>
-          </CardHeader>
-        </Card>
+        
 
-        {/* Employes Table */}
+        {/* Search and Filters */}
         <Card className="border-0 shadow-lg">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <div className="bg-gradient-to-r from-slate-500 to-gray-600 p-2 rounded-lg text-white">
-                <Briefcase className="h-5 w-5" />
-              </div>
-              Liste des Employés
+            <CardTitle className="flex items-center gap-2 text-black">
+              <Search className="h-5 w-5 text-blue-600" />
+              Recherche et Filtres
             </CardTitle>
-            <CardDescription>Tous les employés enregistrés dans le système</CardDescription>
+            <CardDescription className="text-black">Trouvez rapidement un employé</CardDescription>
           </CardHeader>
           <CardContent>
-            {loading ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="h-8 w-8 animate-spin text-slate-600" />
-                <span className="ml-2 text-slate-600">Chargement...</span>
-              </div>
-            ) : (
-              <div className="rounded-lg border border-slate-200 overflow-hidden">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="bg-gradient-to-r from-slate-50 to-gray-50 hover:from-slate-100 hover:to-gray-100">
-                      <TableHead className="font-semibold text-slate-900">ID</TableHead>
-                      <TableHead className="font-semibold text-slate-900">Employé</TableHead>
-                      <TableHead className="font-semibold text-slate-900">Contact</TableHead>
-                      <TableHead className="font-semibold text-slate-900">Poste</TableHead>
-                      <TableHead className="font-semibold text-slate-900">Horaire</TableHead>
-                      <TableHead className="font-semibold text-slate-900">Statut</TableHead>
-                      <TableHead className="font-semibold text-slate-900 text-center">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredEmployes.map((employe, index) => (
-                      <TableRow
-                        key={employe.id}
-                        className={`${
-                          index % 2 === 0 ? "bg-white" : "bg-slate-50/50"
-                        } hover:bg-slate-50/50 transition-colors duration-200`}
-                      >
-                        <TableCell className="font-medium text-gray-900">{employe.id}</TableCell>
-                        <TableCell>
-                          <div className="space-y-1">
-                            <div className="font-semibold text-gray-900">
-                              {employe.personne.prenom} {employe.personne.nom}
-                            </div>
-                            <div className="text-sm text-gray-600">N° Ordre: {employe.numOrdre}</div>
-                            <div className="flex items-center gap-2 text-sm text-gray-500">
-                              <Calendar className="h-3 w-3" />
-                              Depuis: {new Date(employe.dateAffectation).toLocaleDateString()}
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="space-y-1">
-                            <div className="flex items-center gap-2 text-sm text-gray-600">
-                              <Mail className="h-3 w-3" />
-                              {employe.personne.email}
-                            </div>
-                            <div className="flex items-center gap-2 text-sm text-gray-600">
-                              <Phone className="h-3 w-3" />
-                              {employe.personne.telephone}
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="space-y-1">
-                            <div className="font-medium text-gray-900">{employe.specialite}</div>
-                            <div className="text-sm text-gray-600">
-                              Rôles: {employe.roles?.map((r) => r.nom).join(", ") || "Aucun"}
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <Clock className="h-3 w-3" />
-                            {employe.horaire}
-                          </div>
-                        </TableCell>
-                        <TableCell>{getStatutBadge(employe.statut || "Actif")}</TableCell>
-                        <TableCell>
-                          <div className="flex items-center justify-center gap-1">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 px-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                              onClick={() => handleView(employe)}
-                            >
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 px-2 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
-                              onClick={() => handleEdit(employe)}
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 px-2 text-red-600 hover:text-red-700 hover:bg-red-50"
-                              onClick={() => handleDeleteClick(employe)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
+            <SearchFilters
+              searchTerm={searchTerm}
+              onSearchChange={handleSearch}
+              selectedSpecialite={selectedSpecialite}
+              onSpecialiteChange={handleSpecialiteFilter}
+              selectedStatut={selectedStatut}
+              onStatutChange={handleStatutFilter}
+            />
           </CardContent>
         </Card>
 
-        {/* View Dialog */}
-        <EmployeDetailsModal
-          employe={selectedEmploye}
-          isOpen={isViewDialogOpen}
-          onClose={() => setIsViewDialogOpen(false)}
+        {/* Employees Table */}
+        <Card className="border-0 shadow-lg text-black">
+          <CardHeader>
+            <CardTitle>Liste des Employés</CardTitle>
+            <CardDescription>
+              {employes.length} employé{employes.length > 1 ? "s" : ""} trouvé{employes.length > 1 ? "s" : ""}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <EmployeTable
+              employes={employes}
+              loading={loading}
+              onEdit={handleEditEmploye}
+              onDelete={handleDeleteEmploye}
+              onView={handleViewEmploye}
+            />
+          </CardContent>
+        </Card>
+
+        {/* Quick Actions */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer group">
+            <CardContent className="p-6 text-center">
+              <div className="bg-blue-100 p-3 rounded-full w-fit mx-auto mb-4 group-hover:bg-blue-200 transition-colors">
+                <Users className="h-6 w-6 text-blue-600" />
+              </div>
+              <h3 className="font-semibold text-gray-900 mb-2">Gestion Personnel</h3>
+              <p className="text-sm text-gray-600">Employés et affectations</p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer group">
+            <CardContent className="p-6 text-center">
+              <div className="bg-green-100 p-3 rounded-full w-fit mx-auto mb-4 group-hover:bg-green-200 transition-colors">
+                <Clock className="h-6 w-6 text-green-600" />
+              </div>
+              <h3 className="font-semibold text-gray-900 mb-2">Planning</h3>
+              <p className="text-sm text-gray-600">Horaires et gardes</p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer group">
+            <CardContent className="p-6 text-center">
+              <div className="bg-purple-100 p-3 rounded-full w-fit mx-auto mb-4 group-hover:bg-purple-200 transition-colors">
+                <UserCheck className="h-6 w-6 text-purple-600" />
+              </div>
+              <h3 className="font-semibold text-gray-900 mb-2">Formations</h3>
+              <p className="text-sm text-gray-600">Certifications et compétences</p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer group">
+            <CardContent className="p-6 text-center">
+              <div className="bg-orange-100 p-3 rounded-full w-fit mx-auto mb-4 group-hover:bg-orange-200 transition-colors">
+                <TrendingUp className="h-6 w-6 text-orange-600" />
+              </div>
+              <h3 className="font-semibold text-gray-900 mb-2">Évaluations</h3>
+              <p className="text-sm text-gray-600">Performance et objectifs</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="grid lg:grid-cols-3 gap-6">
+          {/* Recent Activities */}
+          <Card className="lg:col-span-2 border-0 shadow-lg">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Clock className="h-5 w-5 text-blue-600" />
+                Activités Récentes
+              </CardTitle>
+              <CardDescription>Dernières actions sur les employés</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {recentActivities.map((activity, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center gap-4 p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="text-sm font-medium text-gray-500 min-w-[60px]">{activity.time}</div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-gray-900">{activity.action}</p>
+                      <p className="text-xs text-gray-600">Employé: {activity.employee}</p>
+                    </div>
+                    <Badge variant="outline" className="text-xs">
+                      {activity.type === "add" && <Plus className="h-3 w-3 mr-1" />}
+                      {activity.type === "update" && <Edit className="h-3 w-3 mr-1" />}
+                      {activity.type === "leave" && <UserX className="h-3 w-3 mr-1" />}
+                      {activity.type === "training" && <TrendingUp className="h-3 w-3 mr-1" />}
+                      {activity.type === "role" && <UserCheck className="h-3 w-3 mr-1" />}
+                      {activity.type}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Speciality Distribution */}
+          <Card className="border-0 shadow-lg">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5 text-green-600" />
+                Répartition par Spécialité
+              </CardTitle>
+              <CardDescription>Effectifs par service médical</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {specialiteStats.map((spec, index) => (
+                  <div key={index} className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium text-gray-700">{spec.name}</span>
+                      <span className="text-sm text-gray-500">
+                        {spec.count}/{spec.total}
+                      </span>
+                    </div>
+                    <Progress value={(spec.count / spec.total) * 100} className="h-2" />
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Alerts */}
+        {error && (
+          <Card className="border-l-4 border-l-red-500 bg-red-50 border-0 shadow-lg">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-red-800">
+                <AlertTriangle className="h-5 w-5" />
+                Erreur Système
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-red-800">{error}</span>
+                  <Button variant="outline" size="sm" className="text-red-700 border-red-300 bg-transparent">
+                    Réessayer
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* System Alerts */}
+        <Card className="border-l-4 border-l-yellow-500 bg-yellow-50 border-0 shadow-lg">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-yellow-800">
+              <AlertTriangle className="h-5 w-5" />
+              Alertes Personnel
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-yellow-800">3 employés en fin de contrat ce mois</span>
+                <Button variant="outline" size="sm" className="text-yellow-700 border-yellow-300 bg-transparent">
+                  Voir
+                </Button>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-yellow-800">Formation obligatoire: 5 employés en retard</span>
+                <Button variant="outline" size="sm" className="text-yellow-700 border-yellow-300 bg-transparent">
+                  Détails
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Dialog pour ajouter/modifier un employé */}
+        <EmployeDialog
+          open={isDialogOpen}
+          onOpenChange={setIsDialogOpen}
+          employe={editingEmploye}
+          onSave={handleSaveEmploye}
         />
 
-        {/* Edit Dialog */}
-        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-          <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Modifier l'employé</DialogTitle>
-              <DialogDescription>
-                Modifiez les informations de {selectedEmploye?.personne?.prenom} {selectedEmploye?.personne?.nom}.
-              </DialogDescription>
-            </DialogHeader>
-            <EmployeForm
-              employe={selectedEmploye}
-              onClose={() => setIsEditDialogOpen(false)}
-              onSubmit={handleEditSubmit}
-              loading={loading}
-            />
-          </DialogContent>
-        </Dialog>
-
-        {/* Delete Confirmation Dialog */}
-        <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle className="flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5 text-red-600" />
-                Confirmer la suppression
-              </AlertDialogTitle>
-              <AlertDialogDescription>
-                Êtes-vous sûr de vouloir supprimer l'employé{" "}
-                <span className="font-semibold">
-                  {employeToDelete?.personne?.prenom} {employeToDelete?.personne?.nom}
-                </span>{" "}
-                ? Cette action est irréversible et supprimera toutes les données associées.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Annuler</AlertDialogCancel>
-              <AlertDialogAction
-                onClick={handleDeleteConfirm}
-                className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
-              >
-                Supprimer
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        {/* Dialog pour voir les détails d'un employé */}
+        <EmployeDetailsDialog
+          open={isDetailsDialogOpen}
+          onOpenChange={setIsDetailsDialogOpen}
+          employe={viewingEmploye}
+        />
       </div>
     </DashboardLayout>
   )

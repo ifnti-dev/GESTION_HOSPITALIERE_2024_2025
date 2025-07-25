@@ -127,12 +127,12 @@ export async function searchPersonnesByTelephone(telephone: string): Promise<Per
 
 // Récupérer seulement les employés
 export async function getEmployesOnly(): Promise<Personne[]> {
-  return apiFetch<Personne[]>(API_ENDPOINTS.UTILISATEUR.PERSONNES_SEARCH.EMPLOYES_ONLY)
+  return apiFetch<Personne[]>(API_ENDPOINTS.UTILISATEUR.EMPLOYES_ONLY)
 }
 
 // Récupérer seulement les patients
 export async function getPatientsOnly(): Promise<Personne[]> {
-  return apiFetch<Personne[]>(API_ENDPOINTS.UTILISATEUR.PERSONNES_SEARCH.PATIENTS_ONLY)
+  return apiFetch<Personne[]>(API_ENDPOINTS.UTILISATEUR.PATIENTS_ONLY)
 }
 
 // Récupérer les statistiques des personnes

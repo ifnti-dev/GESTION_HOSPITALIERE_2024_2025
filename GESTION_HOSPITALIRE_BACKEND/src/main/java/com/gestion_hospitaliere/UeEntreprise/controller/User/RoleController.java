@@ -30,12 +30,9 @@ public class RoleController {
 
     // Récupérer tous les rôles
     @GetMapping
-    public ResponseEntity<List<RoleResponse>> getAllRoles() {
+    public ResponseEntity<List<Role>> getAllRoles() {
         List<Role> roles = roleService.obtenirTousLesRoles();
-        List<RoleResponse> response = roles.stream()
-            .map(roleService::toRoleResponse)
-            .collect(Collectors.toList());
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(roles);
     }
 
     // public ResponseEntity<List<Role>> obtenirTousLesRoles() {
@@ -87,5 +84,33 @@ public class RoleController {
     public ResponseEntity<Void> supprimerRole(@PathVariable Long id) {
         roleService.supprimerRole(id);
         return ResponseEntity.noContent().build();
+    }
+
+     // Ajouter une permission à un rôle
+    @PostMapping("/{roleId}/permissions/{permissionId}")
+    public ResponseEntity<Role> addPermissionToRole(@PathVariable Long roleId, @PathVariable Long permissionId) {
+        Role role = roleService.addPermissionToRole(roleId, permissionId);
+        return ResponseEntity.ok(role);
+    }
+
+    // Retirer une permission d'un rôle
+    @DeleteMapping("/{roleId}/permissions/{permissionId}")
+    public ResponseEntity<Role> removePermissionFromRole(@PathVariable Long roleId, @PathVariable Long permissionId) {
+        Role role = roleService.removePermissionFromRole(roleId, permissionId);
+        return ResponseEntity.ok(role);
+    }
+
+
+    // Récupérer le nombre d'employés associés à un rôle
+    @GetMapping("/{id}/employes/count")
+    public ResponseEntity<Integer> getNombreEmployes(@PathVariable Long id) {
+        Optional<Role> role = roleService.obtenirRoleParId(id);
+        return role.map(r -> ResponseEntity.ok(r.getNombreEmployes()))
+                   .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/roles/{id}/count-employes")
+    public ResponseEntity<Integer> countEmployesByRole(@PathVariable Long id) {
+        return ResponseEntity.ok(roleService.getNombreEmployesPourRole(id));
     }
 }
