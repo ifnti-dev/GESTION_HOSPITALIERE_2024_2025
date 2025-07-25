@@ -70,7 +70,6 @@ public class Employe extends Auditable {
 
 	
 	@ManyToMany(fetch = FetchType.LAZY)
-	@JsonIgnore
     @JoinTable(
         name = "employe_roles",
         joinColumns = @JoinColumn(name = "employe_id"),

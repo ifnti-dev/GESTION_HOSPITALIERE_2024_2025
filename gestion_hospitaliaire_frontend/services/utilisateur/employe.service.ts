@@ -28,9 +28,7 @@ export async function addEmploye(newEmploye: EmployeFormData): Promise<Employe> 
     dateAffectation: newEmploye.dateAffectation,
     specialite: newEmploye.specialite,
     numOrdre: newEmploye.numOrdre,
-    personne: {
-      id: newEmploye.personneId,
-    },
+    personne: newEmploye.personne || { id: newEmploye.personneId },
     roles: newEmploye.roleIds.map((roleId) => ({ id: roleId })),
   }
 
@@ -60,21 +58,17 @@ export async function updateEmploye(id: number, updatedEmploye: EmployeFormData)
     dateAffectation: updatedEmploye.dateAffectation,
     specialite: updatedEmploye.specialite,
     numOrdre: updatedEmploye.numOrdre,
-    personne: {
-      id: updatedEmploye.personneId,
-    },
+    personne: updatedEmploye.personne || { id: updatedEmploye.personneId },
     roles: updatedEmploye.roleIds.map((roleId) => ({ id: roleId })),
   }
 
-  const response = await apiFetch<Employe>(`${API_ENDPOINTS.UTILISATEUR.EMPLOYES}/${id}`, {
+  return apiFetch<Employe>(`${API_ENDPOINTS.UTILISATEUR.EMPLOYES}/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(employeData),
   })
-
-  return response
 }
 
 // Supprimer un employé
@@ -110,28 +104,28 @@ export async function searchEmployesByRole(roleId: number): Promise<Employe[]> {
 
 // Ajouter un rôle à un employé
 export async function addRoleToEmploye(employeId: number, roleId: number): Promise<Employe> {
-  return apiFetch<Employe>(`${API_ENDPOINTS.UTILISATEUR.EMPLOYES}/${employeId}/roles/${roleId}`, {
+  return apiFetch<Employe>(API_ENDPOINTS.UTILISATEUR.EMPLOYES_ACTIONS.AJOUTER_ROLE(employeId, roleId), {
     method: "POST",
   })
 }
 
 // Retirer un rôle à un employé
 export async function removeRoleFromEmploye(employeId: number, roleId: number): Promise<Employe> {
-  return apiFetch<Employe>(`${API_ENDPOINTS.UTILISATEUR.EMPLOYES}/${employeId}/roles/${roleId}`, {
+  return apiFetch<Employe>(API_ENDPOINTS.UTILISATEUR.EMPLOYES_ACTIONS.RETIRER_ROLE(employeId, roleId), {
     method: "DELETE",
   })
 }
 
 // Affecter une personne à un employé
 export async function assignPersonToEmploye(employeId: number, personneId: number): Promise<Employe> {
-  return apiFetch<Employe>(`${API_ENDPOINTS.UTILISATEUR.EMPLOYES}/${employeId}/personne/${personneId}`, {
+  return apiFetch<Employe>(API_ENDPOINTS.UTILISATEUR.EMPLOYES_ACTIONS.AFFECTER_PERSONNE(employeId, personneId), {
     method: "PUT",
   })
 }
 
 // Récupérer les statistiques des employés
 export async function getEmployeStats(): Promise<EmployeStats> {
-  return apiFetch<EmployeStats>(`${API_ENDPOINTS.UTILISATEUR.STATS.EMPLOYES}`)
+  return apiFetch<EmployeStats>(API_ENDPOINTS.UTILISATEUR.STATS.EMPLOYES)
 }
 
 // Récupérer les employés par rôle

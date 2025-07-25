@@ -167,6 +167,24 @@ public class EmployeService {
             
             existant.setRoles(managedRoles);
         }
+        // Mise à jour de la personne associée
+        if (updatedEmploye.getPersonne() != null && existant.getPersonne() != null) {
+            Personne personne = existant.getPersonne();
+            
+            // Mise à jour sélective pour éviter l'écrasement complet
+            Optional.ofNullable(updatedEmploye.getPersonne().getNom()).ifPresent(personne::setNom);
+            Optional.ofNullable(updatedEmploye.getPersonne().getPrenom()).ifPresent(personne::setPrenom);
+            Optional.ofNullable(updatedEmploye.getPersonne().getEmail()).ifPresent(personne::setEmail);
+            Optional.ofNullable(updatedEmploye.getPersonne().getTelephone()).ifPresent(personne::setTelephone);
+            Optional.ofNullable(updatedEmploye.getPersonne().getAdresse()).ifPresent(personne::setAdresse);
+            Optional.ofNullable(updatedEmploye.getPersonne().getDateNaissance()).ifPresent(personne::setDateNaissance);
+            Optional.ofNullable(updatedEmploye.getPersonne().getSexe()).ifPresent(personne::setSexe);
+            Optional.ofNullable(updatedEmploye.getPersonne().getSituationMatrimoniale()).ifPresent(personne::setSituationMatrimoniale);
+
+            // [...] autres champs à mettre à jour
+            
+            personneRepository.save(personne); // Sauvegarde explicite recommandée
+        }
 
         // Pas besoin d'appeler save explicitement grâce au contexte de persistance
         return existant;

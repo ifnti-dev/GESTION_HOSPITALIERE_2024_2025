@@ -58,13 +58,18 @@ export interface Employe extends BaseEntity {
     specialite: string
     numOrdre: string
     personne: Personne | number // Relation One-to-One avec Personne
-    roles: Array<{
-      id: number
-      nom?: string
-    }> // Relation Many-to-Many avec Rôles
+    roles: Role[]// Relation Many-to-Many avec Rôles
     // accouchements?: Accouchement[] // Relation One-to-Many avec Accouchements
     // suivisGrossesse?: SuiviGrossesse[] // Relation One-to-Many avec Suivi de Grossesse
     // factures?: Facture[] // Relation One-to-Many avec Factures
+}
+
+// DTO spécifique pour l'affichage avec les rôles inclus
+export interface EmployeWithRoles extends Omit<Employe, "roles"> {
+  roles: Array<{
+    id: number
+    nom: string
+  }>
 }
 
 // Types pour les formulaires (basés sur les validations du service Java)
