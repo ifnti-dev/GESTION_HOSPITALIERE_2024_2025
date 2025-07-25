@@ -261,11 +261,7 @@ public class Personne extends Auditable {
     @JsonIgnore
     private List<SuiviGrossesse> suiviGrossesse = new ArrayList<>();
 
-    @OneToMany(mappedBy = "personne", cascade = CascadeType.ALL)
-    @JsonIgnore
-    private List<Accouchement> accouchements = new ArrayList<>();
-
-  
+    
 
     public Long getId() {
         return id;
@@ -397,13 +393,7 @@ public class Personne extends Auditable {
         this.suiviGrossesse = suiviGrossesse;
     }
 
-    public List<Accouchement> getAccouchements() {
-        return accouchements;
-    }
 
-    public void setAccouchements(List<Accouchement> accouchements) {
-        this.accouchements = accouchements;
-    }
 
     public boolean isPatient() {
         return this.employe == null;
@@ -413,4 +403,5 @@ public class Personne extends Auditable {
         return this.employe != null;
     }
     
+
 }

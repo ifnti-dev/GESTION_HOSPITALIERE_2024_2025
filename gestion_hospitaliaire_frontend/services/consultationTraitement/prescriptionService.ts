@@ -28,9 +28,7 @@ export async function addPrescription(
       consultation: {
         id: newPrescription.consultation.id
       },
-      medicament: {
-        id: newPrescription.medicament.id
-      },
+     
       medicaments: newPrescription.medicaments
     };
 

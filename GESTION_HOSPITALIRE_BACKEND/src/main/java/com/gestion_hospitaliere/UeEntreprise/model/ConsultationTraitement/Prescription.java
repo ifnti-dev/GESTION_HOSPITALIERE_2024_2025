@@ -1,7 +1,6 @@
 package com.gestion_hospitaliere.UeEntreprise.model.ConsultationTraitement;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.gestion_hospitaliere.UeEntreprise.model.pharmacy.Medicament;
 import jakarta.persistence.*;
 
 @Entity
@@ -17,20 +16,24 @@ public class Prescription {
     private String posologie;
 
     private Integer duree;
+ 
+    private String medicaments;
+   
 
-    @ManyToOne
-    @JoinColumn(name = "consultation_prenatale")
-    @JsonIgnore // ou @JsonBackReference si ConsultationPrenatale utilise @JsonManagedReference
-    private ConsultationPrenatale consultationPrenatale;
+    public String getMedicaments() {
+        return medicaments;
+    }
+
+    public void setMedicaments(String medicaments) {
+        this.medicaments = medicaments;
+    }
 
     @ManyToOne
     @JoinColumn(name = "consultation_id")
     @JsonIgnore // ou @JsonBackReference si Consultation utilise @JsonManagedReference
     private Consultation consultation;
 
-    @ManyToOne
-    @JoinColumn(name = "medicament_id", nullable = false)
-    private Medicament medicament;
+    
 
     // === Getters & Setters ===
 
@@ -66,13 +69,7 @@ public class Prescription {
         this.duree = duree;
     }
 
-    public ConsultationPrenatale getConsultationPrenatale() {
-        return consultationPrenatale;
-    }
-
-    public void setConsultationPrenatale(ConsultationPrenatale consultationPrenatale) {
-        this.consultationPrenatale = consultationPrenatale;
-    }
+    
 
     public Consultation getConsultation() {
         return consultation;
@@ -82,11 +79,5 @@ public class Prescription {
         this.consultation = consultation;
     }
 
-    public Medicament getMedicament() {
-        return medicament;
-    }
-
-    public void setMedicament(Medicament medicament) {
-        this.medicament = medicament;
-    }
+    
 }

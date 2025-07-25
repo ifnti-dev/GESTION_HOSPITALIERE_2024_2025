@@ -268,7 +268,9 @@ export const API_ENDPOINTS = {
     HOSPITALISATIONS: "/api/hospitalisations",
   },
     
-        CONSULTATION_PRENATALE: "/api/consultations-prenatales"
+        CONSULTATION_PRENATALE: "/api/consultations-prenatales",
+        ACCOUCHEMENT: "/api/accouchements",
+        PRESCRIPTION_PRENATALE: "/api/prescriptions-prenatales",
   }
 
   // Consultation

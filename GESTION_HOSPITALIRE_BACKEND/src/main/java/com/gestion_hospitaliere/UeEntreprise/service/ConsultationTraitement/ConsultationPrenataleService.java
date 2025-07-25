@@ -37,49 +37,73 @@ public class ConsultationPrenataleService {
     }
 
     public ConsultationPrenatale createConsultation(ConsultationPrenatale consultation) {
-        // Association du dossierGrossesse
-        Long dossierId = consultation.getDossierGrossesse().getId();
-        DossierGrossesse dossier = dossierGrossesseRepository.findById(dossierId)
-            .orElseThrow(() -> new EntityNotFoundException("DossierGrossesse non trouvé avec l'id : " + dossierId));
-        consultation.setDossierGrossesse(dossier);
-
-        // Association du médecin (employe)
-        Long employeId = consultation.getEmploye().getId();
-        Employe employe = employeRepository.findById(employeId)
-            .orElseThrow(() -> new EntityNotFoundException("Employe (médecin) non trouvé avec l'id : " + employeId));
-        consultation.setEmploye(employe);
-
-        return consultationRepository.save(consultation);
+    // Vérification de la présence de l'ID du dossier grossesse
+    if (consultation.getDossierGrossesse() == null || consultation.getDossierGrossesse().getId() == null) {
+        throw new IllegalArgumentException("L'ID du dossier de grossesse est obligatoire.");
     }
 
-    public ConsultationPrenatale updateConsultation(Long id, ConsultationPrenatale consultationDetails) {
+    // Vérification de la présence de l'ID de l'employé (médecin ou sage-femme)
+    if (consultation.getEmploye() == null || consultation.getEmploye().getId() == null) {
+        throw new IllegalArgumentException("L'ID de l'employé (médecin/sage-femme) est obligatoire.");
+    }
+
+    // Récupération et validation du dossier grossesse
+    DossierGrossesse dossier = dossierGrossesseRepository.findById(consultation.getDossierGrossesse().getId())
+        .orElseThrow(() -> new EntityNotFoundException(
+            "Dossier de grossesse non trouvé avec l'ID : " + consultation.getDossierGrossesse().getId()
+        ));
+    consultation.setDossierGrossesse(dossier);
+
+    // Récupération et validation de l'employé
+    Employe employe = employeRepository.findById(consultation.getEmploye().getId())
+        .orElseThrow(() -> new EntityNotFoundException(
+            "Employé non trouvé avec l'ID : " + consultation.getEmploye().getId()
+        ));
+    consultation.setEmploye(employe);
+
+    // Sauvegarde de la consultation prénatale
+    return consultationRepository.save(consultation);
+}
+
+
+    public ConsultationPrenatale updateConsultation(Long id, ConsultationPrenatale details) {
         ConsultationPrenatale consultation = consultationRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Consultation non trouvée avec l'id : " + id));
 
-        consultation.setDateConsultation(consultationDetails.getDateConsultation());
-        consultation.setSemaineAmenorrhee(consultationDetails.getSemaineAmenorrhee());
-        consultation.setPoids(consultationDetails.getPoids());
-        consultation.setTensionArterielle(consultationDetails.getTensionArterielle());
-        consultation.setHauteurUterine(consultationDetails.getHauteurUterine());
-        consultation.setBruitsCardiaquesFoetaux(consultationDetails.getBruitsCardiaquesFoetaux());
-        consultation.setObservations(consultationDetails.getObservations());
-        consultation.setProchainRdv(consultationDetails.getProchainRdv());
-        consultation.setAlerte(consultationDetails.getAlerte());
+        // Mise à jour des champs
+        consultation.setDateConsultation(details.getDateConsultation());
+        consultation.setPoidsMere(details.getPoidsMere());
+        consultation.setHauteurUterine(details.getHauteurUterine());
+        consultation.setBruitsCoeurFoetal(details.getBruitsCoeurFoetal());
+        consultation.setOedemes(details.getOedemes());
+        consultation.setMouvementsFoetus(details.getMouvementsFoetus());
 
-        // Mise à jour du dossierGrossesse si fourni
-        if (consultationDetails.getDossierGrossesse() != null) {
-            Long dossierId = consultationDetails.getDossierGrossesse().getId();
-            DossierGrossesse dossier = dossierGrossesseRepository.findById(dossierId)
-                .orElseThrow(() -> new EntityNotFoundException("DossierGrossesse non trouvé avec l'id : " + dossierId));
-            consultation.setDossierGrossesse(dossier);
+        consultation.setPresenceDiabeteGestationnel(details.getPresenceDiabeteGestationnel());
+        consultation.setPresenceHypertensionGestationnelle(details.getPresenceHypertensionGestationnelle());
+
+        consultation.setResultatsAnalyses(details.getResultatsAnalyses());
+        consultation.setExamensComplementaires(details.getExamensComplementaires());
+
+        consultation.setTraitementsEnCours(details.getTraitementsEnCours());
+        consultation.setObservationsGenerales(details.getObservationsGenerales());
+        consultation.setDecisionMedicale(details.getDecisionMedicale());
+        consultation.setDateProchaineConsultation(details.getDateProchaineConsultation());
+
+        consultation.setDerniereDoseVAT(details.getDerniereDoseVAT());
+        consultation.setDateDerniereDoseVAT(details.getDateDerniereDoseVAT());
+
+        // Mise à jour de l'employé
+        if (details.getEmploye() != null && details.getEmploye().getId() != null) {
+            Employe employe = employeRepository.findById(details.getEmploye().getId())
+                    .orElseThrow(() -> new EntityNotFoundException("Employé non trouvé avec l'id : " + details.getEmploye().getId()));
+            consultation.setEmploye(employe);
         }
 
-        // Mise à jour du médecin (employe) si fourni
-        if (consultationDetails.getEmploye() != null) {
-            Long employeId = consultationDetails.getEmploye().getId();
-            Employe employe = employeRepository.findById(employeId)
-                .orElseThrow(() -> new EntityNotFoundException("Employe (médecin) non trouvé avec l'id : " + employeId));
-            consultation.setEmploye(employe);
+        // Mise à jour du dossier de grossesse
+        if (details.getDossierGrossesse() != null && details.getDossierGrossesse().getId() != null) {
+            DossierGrossesse dossier = dossierGrossesseRepository.findById(details.getDossierGrossesse().getId())
+                    .orElseThrow(() -> new EntityNotFoundException("Dossier de grossesse non trouvé avec l'id : " + details.getDossierGrossesse().getId()));
+            consultation.setDossierGrossesse(dossier);
         }
 
         return consultationRepository.save(consultation);
@@ -88,13 +112,14 @@ public class ConsultationPrenataleService {
     @Transactional
     public void deleteConsultation(Long id) {
         ConsultationPrenatale consultation = consultationRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Consultation non trouvée avec l'id : " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Consultation non trouvée avec l'id : " + id));
 
-        // Détacher le dossierGrossesse et l'employe associés
         consultation.setDossierGrossesse(null);
         consultation.setEmploye(null);
 
-        // Supprimer la consultation
         consultationRepository.delete(consultation);
     }
+    public List<ConsultationPrenatale> getConsultationsByDossierGrossesseId(Long dossierGrossesseId) {
+    return consultationRepository.findByDossierGrossesse_Id(dossierGrossesseId);
+}
 }
