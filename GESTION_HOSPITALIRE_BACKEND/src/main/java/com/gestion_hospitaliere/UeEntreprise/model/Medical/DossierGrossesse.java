@@ -24,24 +24,36 @@ import jakarta.persistence.OneToMany;
 
 @Entity
 public class DossierGrossesse extends Dossier {
+    
+    // Informations partenaire (statiques)
+    private String nomPartenaire;
+    private String prenomsPartenaire;
+    private String professionPartenaire;
+    private String adressePartenaire;
 
-	
+    // Antécédents détaillés (statiques)
+    private String antecedentsMedicaux;
+    private String antecedentsChirurgicaux;
+    private String antecedentsGynecologiques;
+    private String antecedentsObstetricaux;
+
+    // Dates clés (statiques)
     private LocalDate dateOuverture;
-    private Integer nombreGrossesses;
-    private Integer nombreAccouchements;
     private LocalDate dateDerniereRegle;
     private LocalDate datePrevueAccouchement;
-    private String rhesus;
-    private String statutImmunisationRubeole;
-    private String statutImmunisationToxo;
-    private String statutImmunisationHepatiteB;
+    
+	private Integer nombreGrossesses;       // Grossesses totales
+    private Integer nombreAccouchements;    // Accouchements antérieurs
+
+    // Sérologies (statiques après 1er trimestre)
+    private String statutSerologieRubeole;
+    private String statutSerologieToxo;
+    private String statutSerologieHepatiteB;
     private String statutSerologieHiv;
     private String statutSerologieSyphilis;
-    private Boolean presenceDiabeteGestationnel;
-    private Boolean presenceHypertensionGestationnelle;
-    private String observationsGenerales;
 
-	@ManyToOne
+    // Relations
+    @ManyToOne
 	@JoinColumn(name = "personne_id", referencedColumnName = "id", nullable = true) // Important: nullable=true
 	private Personne personne;
     
@@ -58,14 +70,68 @@ public class DossierGrossesse extends Dossier {
 	@JsonIgnore
     private List<ConsultationPrenatale> consultationPrenatale = new ArrayList<>();
 
- // Getters and setters
-    
-	public List<ConsultationPrenatale> getConsultationPrenatale() {
-		return consultationPrenatale;
+    public String getNomPartenaire() {
+		return nomPartenaire;
 	}
 
-	public void setConsultationPrenatale(List<ConsultationPrenatale> consultationPrenatale) {
-		this.consultationPrenatale = consultationPrenatale;
+	public void setNomPartenaire(String nomPartenaire) {
+		this.nomPartenaire = nomPartenaire;
+	}
+
+	public String getPrenomsPartenaire() {
+		return prenomsPartenaire;
+	}
+
+	public void setPrenomsPartenaire(String prenomsPartenaire) {
+		this.prenomsPartenaire = prenomsPartenaire;
+	}
+
+	public String getProfessionPartenaire() {
+		return professionPartenaire;
+	}
+
+	public void setProfessionPartenaire(String professionPartenaire) {
+		this.professionPartenaire = professionPartenaire;
+	}
+
+	public String getAdressePartenaire() {
+		return adressePartenaire;
+	}
+
+	public void setAdressePartenaire(String adressePartenaire) {
+		this.adressePartenaire = adressePartenaire;
+	}
+
+	public String getAntecedentsMedicaux() {
+		return antecedentsMedicaux;
+	}
+
+	public void setAntecedentsMedicaux(String antecedentsMedicaux) {
+		this.antecedentsMedicaux = antecedentsMedicaux;
+	}
+
+	public String getAntecedentsChirurgicaux() {
+		return antecedentsChirurgicaux;
+	}
+
+	public void setAntecedentsChirurgicaux(String antecedentsChirurgicaux) {
+		this.antecedentsChirurgicaux = antecedentsChirurgicaux;
+	}
+
+	public String getAntecedentsGynecologiques() {
+		return antecedentsGynecologiques;
+	}
+
+	public void setAntecedentsGynecologiques(String antecedentsGynecologiques) {
+		this.antecedentsGynecologiques = antecedentsGynecologiques;
+	}
+
+	public String getAntecedentsObstetricaux() {
+		return antecedentsObstetricaux;
+	}
+
+	public void setAntecedentsObstetricaux(String antecedentsObstetricaux) {
+		this.antecedentsObstetricaux = antecedentsObstetricaux;
 	}
 
 	public LocalDate getDateOuverture() {
@@ -74,22 +140,6 @@ public class DossierGrossesse extends Dossier {
 
 	public void setDateOuverture(LocalDate dateOuverture) {
 		this.dateOuverture = dateOuverture;
-	}
-
-	public Integer getNombreGrossesses() {
-		return nombreGrossesses;
-	}
-
-	public void setNombreGrossesses(Integer nombreGrossesses) {
-		this.nombreGrossesses = nombreGrossesses;
-	}
-
-	public Integer getNombreAccouchements() {
-		return nombreAccouchements;
-	}
-
-	public void setNombreAccouchements(Integer nombreAccouchements) {
-		this.nombreAccouchements = nombreAccouchements;
 	}
 
 	public LocalDate getDateDerniereRegle() {
@@ -108,36 +158,44 @@ public class DossierGrossesse extends Dossier {
 		this.datePrevueAccouchement = datePrevueAccouchement;
 	}
 
-	public String getRhesus() {
-		return rhesus;
+	public Integer getNombreGrossesses() {
+		return nombreGrossesses;
 	}
 
-	public void setRhesus(String rhesus) {
-		this.rhesus = rhesus;
+	public void setNombreGrossesses(Integer nombreGrossesses) {
+		this.nombreGrossesses = nombreGrossesses;
 	}
 
-	public String getStatutImmunisationRubeole() {
-		return statutImmunisationRubeole;
+	public Integer getNombreAccouchements() {
+		return nombreAccouchements;
 	}
 
-	public void setStatutImmunisationRubeole(String statutImmunisationRubeole) {
-		this.statutImmunisationRubeole = statutImmunisationRubeole;
+	public void setNombreAccouchements(Integer nombreAccouchements) {
+		this.nombreAccouchements = nombreAccouchements;
 	}
 
-	public String getStatutImmunisationToxo() {
-		return statutImmunisationToxo;
+	public String getStatutSerologieRubeole() {
+		return statutSerologieRubeole;
 	}
 
-	public void setStatutImmunisationToxo(String statutImmunisationToxo) {
-		this.statutImmunisationToxo = statutImmunisationToxo;
+	public void setStatutSerologieRubeole(String statutSerologieRubeole) {
+		this.statutSerologieRubeole = statutSerologieRubeole;
 	}
 
-	public String getStatutImmunisationHepatiteB() {
-		return statutImmunisationHepatiteB;
+	public String getStatutSerologieToxo() {
+		return statutSerologieToxo;
 	}
 
-	public void setStatutImmunisationHepatiteB(String statutImmunisationHepatiteB) {
-		this.statutImmunisationHepatiteB = statutImmunisationHepatiteB;
+	public void setStatutSerologieToxo(String statutSerologieToxo) {
+		this.statutSerologieToxo = statutSerologieToxo;
+	}
+
+	public String getStatutSerologieHepatiteB() {
+		return statutSerologieHepatiteB;
+	}
+
+	public void setStatutSerologieHepatiteB(String statutSerologieHepatiteB) {
+		this.statutSerologieHepatiteB = statutSerologieHepatiteB;
 	}
 
 	public String getStatutSerologieHiv() {
@@ -156,28 +214,12 @@ public class DossierGrossesse extends Dossier {
 		this.statutSerologieSyphilis = statutSerologieSyphilis;
 	}
 
-	public Boolean getPresenceDiabeteGestationnel() {
-		return presenceDiabeteGestationnel;
+	public Personne getPersonne() {
+		return personne;
 	}
 
-	public void setPresenceDiabeteGestationnel(Boolean presenceDiabeteGestationnel) {
-		this.presenceDiabeteGestationnel = presenceDiabeteGestationnel;
-	}
-
-	public Boolean getPresenceHypertensionGestationnelle() {
-		return presenceHypertensionGestationnelle;
-	}
-
-	public void setPresenceHypertensionGestationnelle(Boolean presenceHypertensionGestationnelle) {
-		this.presenceHypertensionGestationnelle = presenceHypertensionGestationnelle;
-	}
-
-	public String getObservationsGenerales() {
-		return observationsGenerales;
-	}
-
-	public void setObservationsGenerales(String observationsGenerales) {
-		this.observationsGenerales = observationsGenerales;
+	public void setPersonne(Personne personne) {
+		this.personne = personne;
 	}
 
 	public List<SuiviGrossesse> getSuivisGrossesse() {
@@ -196,14 +238,12 @@ public class DossierGrossesse extends Dossier {
 		this.accouchements = accouchements;
 	}
 
-	public Personne getPersonne() {
-		return personne;
+	public List<ConsultationPrenatale> getConsultationPrenatale() {
+		return consultationPrenatale;
 	}
 
-	public void setPersonne(Personne personne) {
-		this.personne = personne;
+	public void setConsultationPrenatale(List<ConsultationPrenatale> consultationPrenatale) {
+		this.consultationPrenatale = consultationPrenatale;
 	}
-    
-    
-    
+
 }

@@ -212,11 +212,7 @@ public class Personne {
     @JsonIgnore
     private List<SuiviGrossesse> suiviGrossesse = new ArrayList<>();
 
-    @OneToMany(mappedBy = "personne", cascade = CascadeType.ALL)
-    @JsonIgnore
-    private List<Accouchement> accouchements = new ArrayList<>();
-
-  
+    
 
     public Long getId() {
         return id;
@@ -348,12 +344,5 @@ public class Personne {
         this.suiviGrossesse = suiviGrossesse;
     }
 
-    public List<Accouchement> getAccouchements() {
-        return accouchements;
-    }
-
-    public void setAccouchements(List<Accouchement> accouchements) {
-        this.accouchements = accouchements;
-    }
-    
+   
 }

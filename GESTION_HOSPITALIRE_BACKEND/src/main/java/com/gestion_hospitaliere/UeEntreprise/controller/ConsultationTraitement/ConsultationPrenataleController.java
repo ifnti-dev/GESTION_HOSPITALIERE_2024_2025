@@ -30,6 +30,12 @@ public class ConsultationPrenataleController {
         return ResponseEntity.ok(consultationService.getConsultationById(id));
     }
 
+    @GetMapping("/dossier-grossesse/{dossierGrossesseId}")
+public ResponseEntity<List<ConsultationPrenatale>> getConsultationsByDossierGrossesseId(@PathVariable Long dossierGrossesseId) {
+    List<ConsultationPrenatale> consultations = consultationService.getConsultationsByDossierGrossesseId(dossierGrossesseId);
+    return ResponseEntity.ok(consultations);
+}
+
     @PostMapping
     public ResponseEntity<ConsultationPrenatale> createConsultation(@RequestBody ConsultationPrenatale dto) {
         ConsultationPrenatale createdDto = consultationService.createConsultation(dto);

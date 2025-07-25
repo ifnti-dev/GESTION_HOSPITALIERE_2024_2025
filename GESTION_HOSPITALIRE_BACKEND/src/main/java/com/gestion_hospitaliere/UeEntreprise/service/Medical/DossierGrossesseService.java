@@ -46,8 +46,8 @@ public class DossierGrossesseService {
 
         dossier.setPersonne(personne);
 
-        // Validation des champs
-
+        // Validation des champs STATIQUES uniquement
+        // ----------------------------------------------------
         if (dossier.getDateOuverture() == null || dossier.getDateOuverture().isAfter(LocalDate.now())) {
             throw new IllegalArgumentException(
                     "La date d'ouverture doit être renseignée et ne peut pas être dans le futur.");
@@ -78,36 +78,31 @@ public class DossierGrossesseService {
                     "La date prévue d'accouchement doit être renseignée et être après la date de la dernière règle.");
         }
 
-        // Contrôle du rhesus (doit être "+" ou "-")
-        if (dossier.getRhesus() == null || (!dossier.getRhesus().equals("+") && !dossier.getRhesus().equals("-"))) {
-            throw new IllegalArgumentException("Le rhésus doit être '+' ou '-'.");
+        // Validation groupe sanguin (inclut Rh)
+        List<String> groupesValides = List.of("A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-");
+        if (dossier.getGroupeSanguin() == null || !groupesValides.contains(dossier.getGroupeSanguin())) {
+            throw new IllegalArgumentException("Le groupe sanguin est invalide. Valeurs acceptées: " + groupesValides);
         }
 
-        // Pour les statuts immunisations et sérologies, on peut contrôler qu'ils ne
-        // sont pas nuls
-        // ou qu'ils appartiennent à une liste fixe (exemple ici : "Positive",
-        // "Négative", "Inconnue", "Non fait")
-        // Listes de valeurs valides
+        // Validation des sérologies (valeurs fixes)
+        List<String> valeursSerologie = List.of("Positif", "Négatif", "Inconnue", "Non fait");
         List<String> valeursImmunisation = List.of("Immunisé", "Non immunisé");
-        List<String> valeursSerologie = List.of("Négatif", "Positif", "Inconnue", "Non fait");
 
-        // Vérifications des statuts d'immunisation
-        if (dossier.getStatutImmunisationRubeole() == null
-                || !valeursImmunisation.contains(dossier.getStatutImmunisationRubeole())) {
-            throw new IllegalArgumentException("Statut immunisation rubéole invalide.");
+        if (dossier.getStatutSerologieRubeole() == null
+                || !valeursImmunisation.contains(dossier.getStatutSerologieRubeole())) {
+            throw new IllegalArgumentException("Statut sérologie rubéole invalide.");
         }
 
-        if (dossier.getStatutImmunisationToxo() == null
-                || !valeursImmunisation.contains(dossier.getStatutImmunisationToxo())) {
-            throw new IllegalArgumentException("Statut immunisation toxoplasmose invalide.");
+        if (dossier.getStatutSerologieToxo() == null
+                || !valeursImmunisation.contains(dossier.getStatutSerologieToxo())) {
+            throw new IllegalArgumentException("Statut sérologie toxoplasmose invalide.");
         }
 
-        if (dossier.getStatutImmunisationHepatiteB() == null
-                || !valeursImmunisation.contains(dossier.getStatutImmunisationHepatiteB())) {
-            throw new IllegalArgumentException("Statut immunisation hépatite B invalide.");
+        if (dossier.getStatutSerologieHepatiteB() == null
+                || !valeursSerologie.contains(dossier.getStatutSerologieHepatiteB())) {
+            throw new IllegalArgumentException("Statut sérologie hépatite B invalide.");
         }
 
-        // Vérifications des statuts de sérologie
         if (dossier.getStatutSerologieHiv() == null
                 || !valeursSerologie.contains(dossier.getStatutSerologieHiv())) {
             throw new IllegalArgumentException("Statut sérologie HIV invalide.");
@@ -118,33 +113,19 @@ public class DossierGrossesseService {
             throw new IllegalArgumentException("Statut sérologie syphilis invalide.");
         }
 
-        // Booleans peuvent être nuls ou vrais/faux, à toi de décider s'ils sont
-        // obligatoires ou pas
-        // Exemples d'obligation:
-        if (dossier.getPresenceDiabeteGestationnel() == null) {
-            throw new IllegalArgumentException("Le champ présence diabète gestationnel doit être renseigné.");
-        }
-        if (dossier.getPresenceHypertensionGestationnelle() == null) {
-            throw new IllegalArgumentException("Le champ présence hypertension gestationnelle doit être renseigné.");
+        // Validation des nouveaux champs STATIQUES
+        
+
+        // Validation longueur des textes (antécédents détaillés)
+        if (dossier.getAntecedentsMedicaux() != null && dossier.getAntecedentsMedicaux().length() > 2000) {
+            throw new IllegalArgumentException("Les antécédents médicaux sont trop longs (max 2000 caractères).");
         }
 
-        // Ici tu peux aussi faire des contrôles sur la taille des textes (antecedents,
-        // allergies, traitementsEnCours, observationsGenerales)
-        // Par exemple pour éviter des textes trop longs (ex: >1000 caractères)
-        if (dossier.getAntecedents() != null && dossier.getAntecedents().length() > 1000) {
-            throw new IllegalArgumentException("Les antécédents sont trop longs.");
-        }
-        if (dossier.getAllergies() != null && dossier.getAllergies().length() > 1000) {
-            throw new IllegalArgumentException("Les allergies sont trop longues.");
-        }
-        if (dossier.getTraitementsEnCours() != null && dossier.getTraitementsEnCours().length() > 1000) {
-            throw new IllegalArgumentException("Les traitements en cours sont trop longs.");
-        }
-        if (dossier.getObservationsGenerales() != null && dossier.getObservationsGenerales().length() > 2000) {
-            throw new IllegalArgumentException("Les observations générales sont trop longues.");
-        }
-
-        // Tu peux ajouter d'autres contrôles métier spécifiques si besoin
+        // SUPPRIMER LES VALIDATIONS POUR LES CHAMPS DYNAMIQUES QUI ONT ÉTÉ DÉPLACÉS :
+        // - presenceDiabeteGestationnel
+        // - presenceHypertensionGestationnelle
+        // - observationsGenerales
+        // - traitementsEnCours (maintenant dans ConsultationPrenatale)
 
         return dossierGrossesseRepository.save(dossier);
     }
@@ -158,17 +139,13 @@ public class DossierGrossesseService {
         Personne personne = personneRepository.findById(personneId)
                 .orElseThrow(() -> new RuntimeException("Patient non trouvé avec l'id: " + personneId));
 
-        // Vérification que la personne est une femme
         if (personne.getSexe() == null || !personne.getSexe().equalsIgnoreCase("F")) {
             throw new IllegalArgumentException(
                     "Le dossier de grossesse ne peut être mis à jour que pour une personne de sexe féminin.");
         }
 
-        // Assignations
         updated.setId(id);
         updated.setPersonne(personne);
-
-        // Validation des champs
 
         if (updated.getDateOuverture() == null || updated.getDateOuverture().isAfter(LocalDate.now())) {
             throw new IllegalArgumentException(
@@ -200,34 +177,31 @@ public class DossierGrossesseService {
                     "La date prévue d'accouchement doit être renseignée et être après la date de la dernière règle.");
         }
 
-        // Contrôle du rhesus (doit être "+" ou "-")
-        if (updated.getRhesus() == null || (!updated.getRhesus().equals("+") && !updated.getRhesus().equals("-"))) {
-            throw new IllegalArgumentException("Le rhésus doit être '+' ou '-'.");
+        // Validation groupe sanguin (inclut Rh)
+        List<String> groupesValides = List.of("A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-");
+        if (updated.getGroupeSanguin() == null || !groupesValides.contains(updated.getGroupeSanguin())) {
+            throw new IllegalArgumentException("Le groupe sanguin est invalide. Valeurs acceptées: " + groupesValides);
         }
 
-        // Statuts immunisation et sérologie valides
-
-        // Listes de valeurs valides
-        List<String> valeursImmunisation = List.of("Immunisé", "Non immunisé");
+        // Validation des sérologies (valeurs fixes)
         List<String> valeursSerologie = List.of("Positif", "Négatif", "Inconnue", "Non fait");
+        List<String> valeursImmunisation = List.of("Immunisé", "Non immunisé");
 
-        // Vérifications des statuts d'immunisation
-        if (updated.getStatutImmunisationRubeole() == null
-                || !valeursImmunisation.contains(updated.getStatutImmunisationRubeole())) {
-            throw new IllegalArgumentException("Statut immunisation rubéole invalide.");
+        if (updated.getStatutSerologieRubeole() == null
+                || !valeursImmunisation.contains(updated.getStatutSerologieRubeole())) {
+            throw new IllegalArgumentException("Statut sérologie rubéole invalide.");
         }
 
-        if (updated.getStatutImmunisationToxo() == null
-                || !valeursImmunisation.contains(updated.getStatutImmunisationToxo())) {
-            throw new IllegalArgumentException("Statut immunisation toxoplasmose invalide.");
+        if (updated.getStatutSerologieToxo() == null
+                || !valeursImmunisation.contains(updated.getStatutSerologieToxo())) {
+            throw new IllegalArgumentException("Statut sérologie toxoplasmose invalide.");
         }
 
-        if (updated.getStatutImmunisationHepatiteB() == null
-                || !valeursImmunisation.contains(updated.getStatutImmunisationHepatiteB())) {
-            throw new IllegalArgumentException("Statut immunisation hépatite B invalide.");
+        if (updated.getStatutSerologieHepatiteB() == null
+                || !valeursSerologie.contains(updated.getStatutSerologieHepatiteB())) {
+            throw new IllegalArgumentException("Statut sérologie hépatite B invalide.");
         }
 
-        // Vérifications des statuts de sérologie
         if (updated.getStatutSerologieHiv() == null
                 || !valeursSerologie.contains(updated.getStatutSerologieHiv())) {
             throw new IllegalArgumentException("Statut sérologie HIV invalide.");
@@ -238,29 +212,14 @@ public class DossierGrossesseService {
             throw new IllegalArgumentException("Statut sérologie syphilis invalide.");
         }
 
-        // Obligations sur les booleans
-        if (updated.getPresenceDiabeteGestationnel() == null) {
-            throw new IllegalArgumentException("Le champ présence diabète gestationnel doit être renseigné.");
-        }
-        if (updated.getPresenceHypertensionGestationnelle() == null) {
-            throw new IllegalArgumentException("Le champ présence hypertension gestationnelle doit être renseigné.");
+        // Validation des nouveaux champs STATIQUES
+        
+
+        // Validation longueur des textes (antécédents détaillés)
+        if (updated.getAntecedentsMedicaux() != null && updated.getAntecedentsMedicaux().length() > 2000) {
+            throw new IllegalArgumentException("Les antécédents médicaux sont trop longs (max 2000 caractères).");
         }
 
-        // Limite taille textes
-        if (updated.getAntecedents() != null && updated.getAntecedents().length() > 1000) {
-            throw new IllegalArgumentException("Les antécédents sont trop longs.");
-        }
-        if (updated.getAllergies() != null && updated.getAllergies().length() > 1000) {
-            throw new IllegalArgumentException("Les allergies sont trop longues.");
-        }
-        if (updated.getTraitementsEnCours() != null && updated.getTraitementsEnCours().length() > 1000) {
-            throw new IllegalArgumentException("Les traitements en cours sont trop longs.");
-        }
-        if (updated.getObservationsGenerales() != null && updated.getObservationsGenerales().length() > 2000) {
-            throw new IllegalArgumentException("Les observations générales sont trop longues.");
-        }
-
-        // Autres contrôles spécifiques si besoin
 
         return dossierGrossesseRepository.save(updated);
     }

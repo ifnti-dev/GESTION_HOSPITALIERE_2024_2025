@@ -64,63 +64,31 @@ export function SageFemmeSidebar({ children }: SageFemmeSidebarProps) {
       title: "Mes Patientes",
       icon: <Users className="h-5 w-5" />,
       href: "/dashboard/sage-femme/patientes",
-      badge: "15",
+      
       gradient: "from-rose-500 to-purple-500",
     },
     {
       title: "Dossiers Grossesse",
       icon: <Heart className="h-5 w-5" />,
       href: "/dashboard/sage-femme/grossesses",
-      badge: "12",
+      
       gradient: "from-pink-500 to-rose-500",
     },
     {
       title: "Consultations Prénatales",
       icon: <Stethoscope className="h-5 w-5" />,
       href: "/dashboard/sage-femme/consultations",
-      badge: "8",
+      
       gradient: "from-rose-600 to-pink-600",
     },
     {
       title: "Accouchements",
       icon: <Baby className="h-5 w-5" />,
       href: "/dashboard/sage-femme/accouchements",
-      badge: "3",
+      
       gradient: "from-purple-500 to-rose-500",
     },
-    {
-      title: "Suivi Post-natal",
-      icon: <Shield className="h-5 w-5" />,
-      href: "/dashboard/sage-femme/suivi-postnatal",
-      badge: "7",
-      gradient: "from-pink-500 to-purple-600",
-    },
-    {
-      title: "Complications",
-      icon: <AlertTriangle className="h-5 w-5" />,
-      href: "/dashboard/sage-femme/complications",
-      badge: "2",
-      gradient: "from-red-500 to-rose-500",
-    },
-    {
-      title: "Nouveau-nés",
-      icon: <UserCheck className="h-5 w-5" />,
-      href: "/dashboard/sage-femme/nouveau-nes",
-      badge: "5",
-      gradient: "from-blue-500 to-purple-500",
-    },
-    {
-      title: "Planning",
-      icon: <Calendar className="h-5 w-5" />,
-      href: "/dashboard/sage-femme/planning",
-      gradient: "from-rose-500 to-purple-600",
-    },
-    {
-      title: "Dossiers Maternité",
-      icon: <FileText className="h-5 w-5" />,
-      href: "/dashboard/sage-femme/dossiers",
-      gradient: "from-pink-600 to-rose-600",
-    },
+    
   ]
 
   const closeSidebar = () => {
@@ -204,51 +172,7 @@ export function SageFemmeSidebar({ children }: SageFemmeSidebarProps) {
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-rose-100 bg-gradient-to-r from-rose-50/50 to-pink-50/50">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                className="w-full p-4 h-auto hover:bg-rose-100/50 rounded-xl transition-all duration-300 group"
-              >
-                <div className="flex items-center space-x-4">
-                  <div className="relative">
-                    <Avatar className="h-12 w-12 ring-4 ring-rose-200 shadow-lg">
-                      <AvatarImage src="/images/user.png" />
-                      <AvatarFallback className="bg-gradient-to-r from-rose-600 to-pink-600 text-white font-bold text-lg">
-                        SF
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white shadow-sm"></div>
-                  </div>
-                  <div className="flex-1 text-left">
-                    <p className="text-sm font-bold text-gray-900 group-hover:text-rose-700 transition-colors">
-                      Sophie Martin
-                    </p>
-                    <p className="text-xs text-rose-600 font-medium">Sage-femme</p>
-                  </div>
-                </div>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 shadow-xl border-rose-100">
-              <DropdownMenuLabel>Mon Compte</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="hover:bg-rose-50">
-                <User className="mr-2 h-4 w-4" />
-                Profil
-              </DropdownMenuItem>
-              <DropdownMenuItem className="hover:bg-rose-50">
-                <Settings className="mr-2 h-4 w-4" />
-                Paramètres
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-red-600 hover:bg-red-50">
-                <LogOut className="mr-2 h-4 w-4" />
-                Déconnexion
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+        
       </div>
 
       {/* Mobile Overlay */}
@@ -262,13 +186,15 @@ export function SageFemmeSidebar({ children }: SageFemmeSidebarProps) {
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* TopBar */}
-        <TopBar
+        {/* <TopBar
           userRole="Sage-femme"
           userName="Sophie Martin"
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}
           isMobile={isMobile}
-        />
+        /> */}
+        <TopBar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} isMobile={isMobile} />
+        
 
         {/* Page Content */}
         <main className="flex-1 overflow-auto p-6 bg-gray-50">{children}</main>

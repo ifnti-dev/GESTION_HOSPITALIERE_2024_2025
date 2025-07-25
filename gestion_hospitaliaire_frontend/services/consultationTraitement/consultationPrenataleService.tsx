@@ -100,4 +100,16 @@ export const consultationPrenataleService = {
       throw error
     }
   },
+
+  /**
+   * Récupère toutes les consultations prénatales d'un dossier de grossesse donné.
+   * @param dossierGrossesseId L'ID du dossier de grossesse.
+   * @returns Une promesse qui résout en un tableau de ConsultationPrenatale.
+   */
+  getConsultationsByDossier: async (dossierGrossesseId: number): Promise<ConsultationPrenatale[]> => {
+    console.log(`🔍 Fetching consultations for dossierGrossesseId: ${dossierGrossesseId}`)
+    return apiClient.get<ConsultationPrenatale[]>(
+      `${CONSULTATION_PRENATALE_API_URL}/dossier-grossesse/${dossierGrossesseId}`
+    )
+  },
 }

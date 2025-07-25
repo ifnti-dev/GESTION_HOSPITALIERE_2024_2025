@@ -57,7 +57,7 @@ export function AddPrescriptionModal({
     posologie: "",
     duree: 7,
     consultation: { id: consultationId },
-    medicament: { id: 0 },
+    medicaments: "",
   })
 
   const [listeMedicaments, setListeMedicaments] = useState<Medicament[]>([])
@@ -82,7 +82,7 @@ export function AddPrescriptionModal({
         posologie: "",
         duree: 7,
         consultation: { id: consultationId },
-        medicament: { id: 0 },
+        medicaments: "",
       })
     }
   }, [isOpen, consultationId])
@@ -103,16 +103,32 @@ export function AddPrescriptionModal({
     if (isOpen) fetchMedicaments()
   }, [isOpen, showErrorToast])
 
+  const handleMedicamentChange = (value: string) => {
+    // Chercher le médicament correspondant dans la liste
+    const selectedMedicament = listeMedicaments.find(med => med.nom === value)
+    
+    setNewPrescription({
+      ...newPrescription,
+      medicaments: value,
+    })
+  }
+
   const handleSubmit = useCallback(async () => {
-    if (!newPrescription.medicament.id) {
-      showErrorToast("Veuillez sélectionner un médicament")
+    if (!newPrescription.medicaments || newPrescription.medicaments.trim() === "") {
+      showErrorToast("Veuillez saisir un nom de médicament")
       return
     }
 
     setIsSubmitting(true)
 
     try {
-      const createdPrescription = await addPrescription(newPrescription)
+      // Si l'ID n'est pas défini (médicament saisi manuellement), on l'envoie quand même avec le nom
+      const prescriptionData = {
+        ...newPrescription,
+        medicaments: newPrescription.medicaments,
+      }
+
+      const createdPrescription = await addPrescription(prescriptionData)
 
       onSuccess(createdPrescription)
       onClose()
@@ -159,7 +175,7 @@ export function AddPrescriptionModal({
             <Label htmlFor="posologie">Posologie</Label>
             <Textarea
               id="posologie"
-              placeholder="posologie pour le patient"
+              placeholder="Posologie pour le patient"
               value={newPrescription.posologie}
               onChange={(e) =>
                 setNewPrescription({
@@ -188,26 +204,19 @@ export function AddPrescriptionModal({
 
           <div className="space-y-2 col-span-2">
             <Label htmlFor="medicament">Médicament *</Label>
-            <Select
-              value={newPrescription.medicament.id.toString()}
-              onValueChange={(value) =>
-                setNewPrescription({
-                  ...newPrescription,
-                  medicament: { id: parseInt(value) },
-                })
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Sélectionner un médicament" />
-              </SelectTrigger>
-              <SelectContent>
-                {listeMedicaments.map((med) => (
-                  <SelectItem key={med.id} value={med.id.toString()}>
-                    {med.nom}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Input
+              id="medicament"
+              placeholder="Saisir le nom du médicament"
+              value={newPrescription.medicaments || ''}
+              onChange={(e) => handleMedicamentChange(e.target.value)}
+              list="medicaments-suggestions"
+            />
+            {/* Liste de suggestions pour l'autocomplétion */}
+            <datalist id="medicaments-suggestions">
+              {listeMedicaments.map((med) => (
+                <option key={med.id} value={med.nom} />
+              ))}
+            </datalist>
           </div>
         </div>
 

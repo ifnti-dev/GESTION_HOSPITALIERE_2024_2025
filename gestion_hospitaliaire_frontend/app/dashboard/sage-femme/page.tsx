@@ -1,480 +1,544 @@
+"use client"
+
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useState, useEffect, useMemo } from "react"
+import { dossierGrossesseService } from "@/services/medical/dossier-grossesse.service"
+import type { DossierGrossesse } from "@/types/medical"
+import { useRouter } from "next/navigation"
 import {
-  Baby,
   Heart,
-  Calendar,
-  AlertTriangle,
-  Activity,
-  FileText,
+  Search,
   Plus,
   Eye,
+  Activity,
+  Calendar,
+  Baby,
   TrendingUp,
-  Stethoscope,
-  UserCheck,
+  AlertTriangle,
+  Users,
+  Phone,
+  MapPin,
+  FileText,
+  TestTube,
+  User,
 } from "lucide-react"
+import { formatDate, calculateGestationalAge, calculateTrimestre } from "@/lib/utils"
+import { CreatePatientModal } from "@/components/modals/medical/create-patiente"
 
-export default function SageFemmeDashboard() {
-  const maternityStats = [
-    {
-      title: "Grossesses Suivies",
-      value: "45",
-      thisMonth: "+3",
-      icon: <Heart className="h-5 w-5" />,
-      color: "text-pink-600",
-    },
-    {
-      title: "Accouchements ce Mois",
-      value: "12",
-      planned: "8",
-      icon: <Baby className="h-5 w-5" />,
-      color: "text-pink-600",
-    },
-    {
-      title: "Consultations Prénatales",
-      value: "18",
-      today: "6",
-      icon: <Calendar className="h-5 w-5" />,
-      color: "text-pink-600",
-    },
-    {
-      title: "Urgences Obstétricales",
-      value: "2",
-      status: "En cours",
-      icon: <AlertTriangle className="h-5 w-5" />,
-      color: "text-red-600",
-    },
-  ]
+export default function SageFemmePatientesPage() {
+  const router = useRouter()
+  const [searchTerm, setSearchTerm] = useState("")
+  const [trimesterFilter, setTrimesterFilter] = useState("all")
+  const [statusFilter, setStatusFilter] = useState("all")
+  const [dossiers, setDossiers] = useState<DossierGrossesse[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+ // État pour contrôler le modal
 
-  const pregnancyFollowUp = [
-    {
-      name: "Emma Bernard",
-      gestationalAge: "38 SA + 2j",
-      nextAppointment: "Aujourd'hui 14:00",
-      riskLevel: "normal",
-      lastVisit: "Il y a 1 semaine",
-      complications: false,
-    },
-    {
-      name: "Claire Rousseau",
-      gestationalAge: "32 SA + 5j",
-      nextAppointment: "Demain 10:30",
-      riskLevel: "surveillance",
-      lastVisit: "Il y a 2 semaines",
-      complications: true,
-    },
-    {
-      name: "Sophie Martin",
-      gestationalAge: "28 SA + 1j",
-      nextAppointment: "Dans 3 jours",
-      riskLevel: "normal",
-      lastVisit: "Il y a 1 semaine",
-      complications: false,
-    },
-    {
-      name: "Marie Dubois",
-      gestationalAge: "39 SA + 4j",
-      nextAppointment: "Aujourd'hui 16:00",
-      riskLevel: "terme",
-      lastVisit: "Il y a 3 jours",
-      complications: false,
-    },
-  ]
+  // Enhanced stats calculation
+  const stats = useMemo(() => {
+    const totalDossiers = dossiers.length
+    const trimester1 = dossiers.filter((d) => calculateTrimestre(d.dateDerniereRegle) === 1).length
+    const trimester2 = dossiers.filter((d) => calculateTrimestre(d.dateDerniereRegle) === 2).length
+    const trimester3 = dossiers.filter((d) => calculateTrimestre(d.dateDerniereRegle) === 3).length
 
-  const todayAppointments = [
-    {
-      time: "09:00",
-      patient: "Emma Bernard",
-      type: "Consultation prénatale",
-      gestationalAge: "38 SA",
-      priority: "normal",
-    },
-    {
-      time: "10:30",
-      patient: "Lisa Petit",
-      type: "Première consultation",
-      gestationalAge: "12 SA",
-      priority: "normal",
-    },
-    {
-      time: "14:00",
-      patient: "Marie Dubois",
-      type: "Consultation terme",
-      gestationalAge: "39 SA",
-      priority: "important",
-    },
-    {
-      time: "15:30",
-      patient: "Anna Laurent",
-      type: "Suivi post-natal",
-      gestationalAge: "Post-partum J+7",
-      priority: "normal",
-    },
-  ]
+    return [
+      {
+        title: "Patientes Suivies",
+        value: totalDossiers.toString(),
+        change: "Grossesses actives",
+        icon: <Heart className="h-5 w-5" />,
+        color: "text-rose-600",
+        bgColor: "bg-rose-50",
+        borderColor: "border-rose-200",
+      },
+      {
+        title: "1er Trimestre",
+        value: trimester1.toString(),
+        change: "Nouvelles grossesses",
+        icon: <Activity className="h-5 w-5" />,
+        color: "text-blue-600",
+        bgColor: "bg-blue-50",
+        borderColor: "border-blue-200",
+      },
+      {
+        title: "2ème Trimestre",
+        value: trimester2.toString(),
+        change: "Suivi régulier",
+        icon: <Baby className="h-5 w-5" />,
+        color: "text-green-600",
+        bgColor: "bg-green-50",
+        borderColor: "border-green-200",
+      },
+      {
+        title: "3ème Trimestre",
+        value: trimester3.toString(),
+        change: "Proche du terme",
+        icon: <Calendar className="h-5 w-5" />,
+        color: "text-purple-600",
+        bgColor: "bg-purple-50",
+        borderColor: "border-purple-200",
+      },
+    ]
+  }, [dossiers])
 
-  const recentBirths = [
-    {
-      mother: "Julie Moreau",
-      baby: "Léo Moreau",
-      birthDate: "15/01/2024",
-      birthTime: "14:30",
-      weight: "3.2 kg",
-      complications: false,
-      status: "Excellent",
-    },
-    {
-      mother: "Sarah Blanc",
-      baby: "Emma Blanc",
-      birthDate: "14/01/2024",
-      birthTime: "22:15",
-      weight: "2.9 kg",
-      complications: false,
-      status: "Bon",
-    },
-    {
-      mother: "Camille Roux",
-      baby: "Hugo Roux",
-      birthDate: "13/01/2024",
-      birthTime: "08:45",
-      weight: "3.5 kg",
-      complications: true,
-      status: "Surveillance",
-    },
-  ]
+  // Helper function to check for risk factors
+  const hasRiskFactors = (dossier: DossierGrossesse) => {
+    return (
+      dossier.antecedentsMedicaux?.toLowerCase().includes("diabète") ||
+      dossier.antecedentsMedicaux?.toLowerCase().includes("hypertension") ||
+      dossier.antecedentsObstetricaux?.toLowerCase().includes("césarienne") ||
+      dossier.antecedentsChirurgicaux?.length > 0 ||
+      dossier.statutSerologieHiv === "Positif" ||
+      dossier.statutSerologieSyphilis === "Positif" ||
+      dossier.nombreGrossesses > 5 ||
+      new Date().getFullYear() - new Date(dossier.personne?.dateNaissance || "").getFullYear() > 35
+    )
+  }
 
-  const postnatalCare = [
-    {
-      mother: "Julie Moreau",
-      baby: "Léo Moreau",
-      dayPostPartum: "J+2",
-      motherStatus: "Bon",
-      babyStatus: "Excellent",
-      breastfeeding: true,
-      nextVisit: "Demain",
-    },
-    {
-      mother: "Sarah Blanc",
-      baby: "Emma Blanc",
-      dayPostPartum: "J+3",
-      motherStatus: "Bon",
-      babyStatus: "Bon",
-      breastfeeding: true,
-      nextVisit: "Dans 2 jours",
-    },
-    {
-      mother: "Anna Laurent",
-      baby: "Tom Laurent",
-      dayPostPartum: "J+7",
-      motherStatus: "Excellent",
-      babyStatus: "Excellent",
-      breastfeeding: false,
-      nextVisit: "Aujourd'hui 15:30",
-    },
-  ]
+  // Fetch data
+  const fetchData = async () => {
+    setIsLoading(true)
+    setError(null)
+    try {
+      const dossiersData = await dossierGrossesseService.getAllDossiersGrossesse()
+      setDossiers(dossiersData)
+    } catch (err) {
+      setError("Erreur lors de la récupération des données.")
+      console.error(err)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchData()
+  }, [])
+
+  // Enhanced filter dossiers
+  const filteredDossiers = useMemo(() => {
+    return dossiers.filter((dossier) => {
+      const matchesSearch =
+        dossier.personne?.nom?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        dossier.personne?.prenom?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        dossier.nomPartenaire?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        dossier.prenomsPartenaire?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        dossier.id?.toString().includes(searchTerm)
+
+      const matchesTrimester =
+        trimesterFilter === "all" || calculateTrimestre(dossier.dateDerniereRegle).toString() === trimesterFilter
+
+      const matchesStatus =
+        statusFilter === "all" ||
+        (statusFilter === "risk" && hasRiskFactors(dossier)) ||
+        (statusFilter === "normal" && !hasRiskFactors(dossier))
+
+      return matchesSearch && matchesTrimester && matchesStatus
+    })
+  }, [dossiers, searchTerm, trimesterFilter, statusFilter])
+
+  // Get status badge based on risk factors and gestational age
+  const getStatutBadge = (dossier: DossierGrossesse) => {
+    const hasRisks = hasRiskFactors(dossier)
+    const weeks = calculateGestationalAge(dossier.dateDerniereRegle).split(" ")[0]
+    const weeksNum = Number.parseInt(weeks)
+
+    if (hasRisks) {
+      return (
+        <Badge variant="destructive" className="text-xs">
+          <AlertTriangle className="w-3 h-3 mr-1" />
+          Surveillance
+        </Badge>
+      )
+    }
+
+    if (weeksNum < 14) {
+      return (
+        <Badge variant="outline" className="text-blue-700 border-blue-200 bg-blue-50 text-xs">
+          Début
+        </Badge>
+      )
+    }
+    if (weeksNum < 28) {
+      return (
+        <Badge variant="outline" className="text-green-700 border-green-200 bg-green-50 text-xs">
+          Normal
+        </Badge>
+      )
+    }
+    if (weeksNum < 37) {
+      return (
+        <Badge variant="outline" className="text-orange-700 border-orange-200 bg-orange-50 text-xs">
+          Surveillance
+        </Badge>
+      )
+    }
+    return (
+      <Badge variant="outline" className="text-purple-700 border-purple-200 bg-purple-50 text-xs">
+        À terme
+      </Badge>
+    )
+  }
+
+  const getTrimestreBadge = (trimestre: number) => {
+    const colors = {
+      1: "text-blue-700 border-blue-200 bg-blue-50",
+      2: "text-green-700 border-green-200 bg-green-50",
+      3: "text-purple-700 border-purple-200 bg-purple-50",
+    }
+    return (
+      <Badge variant="outline" className={`text-xs ${colors[trimestre as keyof typeof colors]}`}>
+        T{trimestre}
+      </Badge>
+    )
+  }
+
+  // Get risk factors display
+  const getRiskFactorsDisplay = (dossier: DossierGrossesse) => {
+    const risks = []
+
+    if (dossier.antecedentsMedicaux?.toLowerCase().includes("diabète")) {
+      risks.push("Diabète")
+    }
+    if (dossier.antecedentsMedicaux?.toLowerCase().includes("hypertension")) {
+      risks.push("HTA")
+    }
+    if (dossier.statutSerologieHiv === "Positif") {
+      risks.push("VIH+")
+    }
+    if (dossier.nombreGrossesses > 5) {
+      risks.push("Grande multipare")
+    }
+    if (new Date().getFullYear() - new Date(dossier.personne?.dateNaissance || "").getFullYear() > 35) {
+      risks.push("Âge maternel")
+    }
+
+    return risks
+  }
+
+  // Handle patient card click
+  const handlePatientClick = (dossierId: number) => {
+    router.push(`/dashboard/sage-femme/patientes/${dossierId}`)
+  }
+
+  if (isLoading) {
+    return (
+      <DashboardLayout >
+        <div className="flex h-full items-center justify-center">
+          <div className="text-center">
+            <Activity className="h-12 w-12 animate-spin text-rose-500 mx-auto mb-4" />
+            <p className="text-gray-600">Chargement des patientes...</p>
+          </div>
+        </div>
+      </DashboardLayout>
+    )
+  }
+
+  if (error) {
+    return (
+      <DashboardLayout>
+        <div className="text-center p-8">
+          <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+          <p className="text-red-500 text-lg font-medium">{error}</p>
+          <Button onClick={() => window.location.reload()} className="mt-4" variant="outline">
+            Réessayer
+          </Button>
+        </div>
+      </DashboardLayout>
+    )
+  }
 
   return (
-    <DashboardLayout userRole="Sage-femme">
+    <DashboardLayout >
       <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Tableau de Bord Sage-femme</h1>
-            <p className="text-gray-600 mt-1">Service Maternité - Suivi Périnatal</p>
+            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+              <Users className="h-8 w-8 text-rose-600" />
+              Mes Patientes
+            </h1>
+            <p className="text-gray-600 mt-1">Suivi des grossesses et dossiers médicaux</p>
           </div>
           <div className="flex items-center gap-3">
-            <Badge variant="outline" className="text-pink-700 border-pink-200">
-              <Heart className="w-2 h-2 mr-2" />
-              Service Maternité
+            <Badge variant="outline" className="text-rose-700 border-rose-200 bg-rose-50">
+              <Heart className="w-3 h-3 mr-2" />
+              {dossiers.length} Patientes suivies
             </Badge>
-            <Button className="bg-pink-600 hover:bg-pink-700">
+            <Button 
+              className="bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-700 hover:to-pink-700 shadow-lg"
+              onClick={() => setIsCreateModalOpen(true)}
+            >
               <Plus className="h-4 w-4 mr-2" />
-              Nouvelle Grossesse
+              Nouvelle Patiente
             </Button>
           </div>
         </div>
 
-        {/* Quick Stats */}
+        {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {maternityStats.map((stat, index) => (
-            <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-all duration-200">
+          {stats.map((stat, index) => (
+            <Card
+              key={index}
+              className={`border-0 shadow-lg hover:shadow-xl transition-all duration-300 ${stat.borderColor} border-l-4`}
+            >
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium text-gray-600">{stat.title}</CardTitle>
-                <div className={stat.color}>{stat.icon}</div>
+                <div className={`p-3 rounded-lg ${stat.bgColor} shadow-sm`}>
+                  <div className={stat.color}>{stat.icon}</div>
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
-                <div className="flex items-center gap-2 mt-1">
-                  {stat.thisMonth && (
-                    <p className="text-xs text-green-600 flex items-center">
-                      <TrendingUp className="h-3 w-3 mr-1" />
-                      {stat.thisMonth} ce mois
-                    </p>
-                  )}
-                  {stat.planned && <p className="text-xs text-gray-500">{stat.planned} programmés</p>}
-                  {stat.today && (
-                    <Badge variant="secondary" className="text-xs">
-                      {stat.today} aujourd'hui
-                    </Badge>
-                  )}
-                  {stat.status && (
-                    <Badge variant="destructive" className="text-xs">
-                      {stat.status}
-                    </Badge>
-                  )}
-                </div>
+                <div className="text-3xl font-bold text-gray-900 mb-1">{stat.value}</div>
+                <p className="text-xs text-gray-500 flex items-center">
+                  <TrendingUp className="h-3 w-3 mr-1" />
+                  {stat.change}
+                </p>
               </CardContent>
             </Card>
           ))}
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Rendez-vous du Jour */}
-          <Card className="lg:col-span-2 border-0 shadow-lg">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-green-600" />
-                Consultations du Jour
-              </CardTitle>
-              <CardDescription>Planning des consultations prénatales</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {todayAppointments.map((appointment, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center gap-4 p-4 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
-                  >
-                    <div className="text-sm font-medium text-gray-500 min-w-[60px]">{appointment.time}</div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <p className="font-medium text-gray-900">{appointment.patient}</p>
-                        {appointment.priority === "important" && (
-                          <Badge variant="secondary" className="text-xs">
-                            Important
-                          </Badge>
+        {/* Filters and Search */}
+        <Card className="border-0 shadow-lg">
+          <CardHeader className="bg-gradient-to-r from-rose-50 to-pink-50">
+            <CardTitle className="flex items-center gap-2">
+              <Search className="h-5 w-5 text-rose-600" />
+              Recherche et Filtres
+            </CardTitle>
+            <CardDescription>Filtrez et recherchez parmi {dossiers.length} patientes</CardDescription>
+          </CardHeader>
+          <CardContent className="pt-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="md:col-span-1">
+                <Input
+                  placeholder="Rechercher par nom, prénom, partenaire..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full"
+                />
+              </div>
+              <Select value={trimesterFilter} onValueChange={setTrimesterFilter}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Filtrer par trimestre" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tous les trimestres</SelectItem>
+                  <SelectItem value="1">1er Trimestre</SelectItem>
+                  <SelectItem value="2">2ème Trimestre</SelectItem>
+                  <SelectItem value="3">3ème Trimestre</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Filtrer par statut" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tous les statuts</SelectItem>
+                  <SelectItem value="normal">Grossesses normales</SelectItem>
+                  <SelectItem value="risk">Grossesses à risque</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Patientes Cards */}
+        <div className="space-y-4">
+          {filteredDossiers.map((dossier) => {
+            const riskFactors = getRiskFactorsDisplay(dossier)
+            const trimestre = calculateTrimestre(dossier.dateDerniereRegle)
+            const gestationalAge = calculateGestationalAge(dossier.dateDerniereRegle)
+
+            return (
+              <Card
+                key={dossier.id}
+                className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer group"
+                onClick={() => handlePatientClick(dossier.id!)}
+              >
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    {/* Left Section - Patient Info */}
+                    <div className="flex items-center space-x-6">
+                      {/* Avatar */}
+                      <div className="w-16 h-16 bg-gradient-to-br from-rose-100 to-pink-100 rounded-full flex items-center justify-center shadow-md">
+                        <User className="h-8 w-8 text-rose-600" />
+                      </div>
+
+                      {/* Patient Details */}
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-3">
+                          <h3 className="text-xl font-bold text-gray-900 group-hover:text-rose-600 transition-colors">
+                            {dossier.personne?.prenom} {dossier.personne?.nom}
+                          </h3>
+                          <div className="flex gap-2">
+                            {getTrimestreBadge(trimestre)}
+                            {getStatutBadge(dossier)}
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-4 text-sm text-gray-600">
+                          <div className="flex items-center gap-1">
+                            <Calendar className="h-4 w-4" />
+                            <span>
+                              {dossier.personne?.dateNaissance
+                                ? `${new Date().getFullYear() - new Date(dossier.personne.dateNaissance).getFullYear()} ans`
+                                : "Âge non renseigné"}
+                            </span>
+                          </div>
+                          {dossier.personne?.telephone && (
+                            <div className="flex items-center gap-1">
+                              <Phone className="h-4 w-4" />
+                              <span>{dossier.personne.telephone}</span>
+                            </div>
+                          )}
+                          <div className="flex items-center gap-1">
+                            <FileText className="h-4 w-4" />
+                            <span>DG-{dossier.id}</span>
+                          </div>
+                        </div>
+
+                        {dossier.personne?.adresse && (
+                          <div className="flex items-center gap-1 text-sm text-gray-500">
+                            <MapPin className="h-4 w-4" />
+                            <span className="truncate max-w-md">{dossier.personne.adresse}</span>
+                          </div>
                         )}
                       </div>
-                      <p className="text-sm text-gray-600">{appointment.type}</p>
-                      <p className="text-xs text-gray-500">{appointment.gestationalAge}</p>
                     </div>
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm">
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button size="sm" className="bg-pink-600 hover:bg-pink-700">
-                        Consulter
+
+                    {/* Center Section - Pregnancy Info */}
+                    <div className="flex flex-col items-center space-y-3">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-purple-600">{gestationalAge}</div>
+                        <div className="text-sm text-gray-500">Âge gestationnel</div>
+                      </div>
+
+                      <div className="flex items-center gap-4">
+                        <div className="text-center">
+                          <div className="text-lg font-semibold text-blue-600">
+                            G{dossier.nombreGrossesses}P{dossier.nombreAccouchements}
+                          </div>
+                          <div className="text-xs text-gray-500">Parité</div>
+                        </div>
+
+                        <div className="text-center">
+                          <div className="text-lg font-semibold text-green-600">
+                            {Math.ceil(
+                              (new Date(dossier.datePrevueAccouchement).getTime() - new Date().getTime()) /
+                                (1000 * 60 * 60 * 24),
+                            )}
+                          </div>
+                          <div className="text-xs text-gray-500">Jours restants</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right Section - Medical Info & Actions */}
+                    <div className="flex flex-col items-end space-y-3">
+                      {/* Medical Info */}
+                      <div className="text-right space-y-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-gray-500">DDR:</span>
+                          <span className="text-sm font-medium">{formatDate(dossier.dateDerniereRegle)}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-gray-500">DPA:</span>
+                          <span className="text-sm font-medium">{formatDate(dossier.datePrevueAccouchement)}</span>
+                        </div>
+                        {dossier.groupeSanguin && (
+                          <div className="flex items-center gap-2">
+                            <TestTube className="h-4 w-4 text-red-500" />
+                            <Badge variant="outline" className="text-xs">
+                              {dossier.groupeSanguin}
+                              {dossier.rhesus}
+                            </Badge>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Risk Factors */}
+                      {riskFactors.length > 0 && (
+                        <div className="flex flex-wrap gap-1 justify-end max-w-xs">
+                          {riskFactors.slice(0, 2).map((risk, index) => (
+                            <Badge key={index} variant="destructive" className="text-xs">
+                              {risk}
+                            </Badge>
+                          ))}
+                          {riskFactors.length > 2 && (
+                            <Badge variant="outline" className="text-xs">
+                              +{riskFactors.length - 2}
+                            </Badge>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Action Button */}
+                      <Button
+                        size="sm"
+                        className="bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-700 hover:to-pink-700 shadow-md"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handlePatientClick(dossier.id!)
+                        }}
+                      >
+                        <Eye className="h-4 w-4 mr-2" />
+                        Voir Dossier
                       </Button>
                     </div>
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
 
-          {/* Actions Rapides */}
-          <Card className="border-0 shadow-lg">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Activity className="h-5 w-5 text-blue-600" />
-                Actions Rapides
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <Button variant="outline" className="w-full justify-start hover:bg-pink-50 hover:border-pink-200">
-                <Heart className="h-4 w-4 mr-2 text-pink-600" />
-                Nouveau Dossier Grossesse
-              </Button>
-              <Button variant="outline" className="w-full justify-start hover:bg-pink-50 hover:border-pink-200">
-                <Baby className="h-4 w-4 mr-2 text-pink-600" />
-                Enregistrer Accouchement
-              </Button>
-              <Button variant="outline" className="w-full justify-start hover:bg-pink-50 hover:border-pink-200">
-                <Calendar className="h-4 w-4 mr-2 text-pink-600" />
-                Planifier Consultation
-              </Button>
-              <Button variant="outline" className="w-full justify-start hover:bg-pink-50 hover:border-pink-200">
-                <Stethoscope className="h-4 w-4 mr-2 text-pink-600" />
-                Suivi Post-natal
-              </Button>
-              <Button variant="outline" className="w-full justify-start hover:bg-pink-50 hover:border-pink-200">
-                <FileText className="h-4 w-4 mr-2 text-pink-600" />
-                Rapport de Naissance
-              </Button>
-            </CardContent>
-          </Card>
+                  {/* Partner Info (if available) */}
+                  {(dossier.nomPartenaire || dossier.prenomsPartenaire) && (
+                    <div className="mt-4 pt-4 border-t border-gray-100">
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <Users className="h-4 w-4" />
+                        <span>
+                          Partenaire: {dossier.prenomsPartenaire} {dossier.nomPartenaire}
+                        </span>
+                        {dossier.professionPartenaire && <span>• {dossier.professionPartenaire}</span>}
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )
+          })}
+
+          {filteredDossiers.length === 0 && (
+            <Card className="border-0 shadow-lg">
+              <CardContent className="text-center py-12">
+                <div className="text-gray-500">
+                  <Users className="h-16 w-16 mx-auto mb-4 opacity-50" />
+                  <p className="text-xl font-medium">Aucune patiente trouvée</p>
+                  <p className="text-sm mt-2">
+                    {searchTerm || trimesterFilter !== "all" || statusFilter !== "all"
+                      ? "Essayez de modifier vos critères de recherche"
+                      : "Commencez par créer un nouveau dossier de grossesse"}
+                  </p>
+                  
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
-
-        {/* Tabs pour Suivi */}
-        <Tabs defaultValue="pregnancy" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="pregnancy">Suivi Grossesses</TabsTrigger>
-            <TabsTrigger value="births">Accouchements Récents</TabsTrigger>
-            <TabsTrigger value="postnatal">Soins Post-nataux</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="pregnancy">
-            <Card className="border-0 shadow-lg">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Heart className="h-5 w-5 text-pink-600" />
-                  Grossesses en Cours de Suivi
-                </CardTitle>
-                <CardDescription>Patientes enceintes suivies</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {pregnancyFollowUp.map((pregnancy, index) => (
-                    <div
-                      key={index}
-                      className={`flex items-center justify-between p-4 rounded-lg border transition-colors ${
-                        pregnancy.riskLevel === "terme"
-                          ? "border-orange-200 bg-orange-50"
-                          : pregnancy.complications
-                            ? "border-red-200 bg-red-50"
-                            : "border-gray-200 bg-gray-50 hover:bg-gray-100"
-                      }`}
-                    >
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <p className="font-medium text-gray-900">{pregnancy.name}</p>
-                          {pregnancy.complications && (
-                            <Badge variant="destructive" className="text-xs">
-                              <AlertTriangle className="h-3 w-3 mr-1" />
-                              Complications
-                            </Badge>
-                          )}
-                          {pregnancy.riskLevel === "terme" && (
-                            <Badge variant="secondary" className="text-xs">
-                              À terme
-                            </Badge>
-                          )}
-                          {pregnancy.riskLevel === "surveillance" && (
-                            <Badge variant="outline" className="text-xs">
-                              Surveillance
-                            </Badge>
-                          )}
-                        </div>
-                        <p className="text-sm text-gray-600">{pregnancy.gestationalAge}</p>
-                        <p className="text-xs text-gray-500">Dernière visite: {pregnancy.lastVisit}</p>
-                        <p className="text-xs font-medium text-blue-600">Prochain RDV: {pregnancy.nextAppointment}</p>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button variant="outline" size="sm">
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button size="sm" className="bg-pink-600 hover:bg-pink-700">
-                          Consulter
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="births">
-            <Card className="border-0 shadow-lg">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Baby className="h-5 w-5 text-blue-600" />
-                  Accouchements Récents
-                </CardTitle>
-                <CardDescription>Naissances des derniers jours</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {recentBirths.map((birth, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
-                    >
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <p className="font-medium text-gray-900">{birth.baby}</p>
-                          {birth.complications && (
-                            <Badge variant="destructive" className="text-xs">
-                              Complications
-                            </Badge>
-                          )}
-                        </div>
-                        <p className="text-sm text-gray-600">Mère: {birth.mother}</p>
-                        <p className="text-xs text-gray-500">
-                          {birth.birthDate} à {birth.birthTime} • {birth.weight}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <Badge
-                          variant={
-                            birth.status === "Excellent"
-                              ? "outline"
-                              : birth.status === "Surveillance"
-                                ? "destructive"
-                                : "secondary"
-                          }
-                          className="text-xs"
-                        >
-                          {birth.status}
-                        </Badge>
-                        <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
-                          <Eye className="h-4 w-4 mr-1" />
-                          Voir
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="postnatal">
-            <Card className="border-0 shadow-lg">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <UserCheck className="h-5 w-5 text-green-600" />
-                  Soins Post-nataux
-                </CardTitle>
-                <CardDescription>Suivi mère-enfant après accouchement</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {postnatalCare.map((care, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
-                    >
-                      <div>
-                        <p className="font-medium text-gray-900">
-                          {care.mother} & {care.baby}
-                        </p>
-                        <p className="text-sm text-gray-600">{care.dayPostPartum}</p>
-                        <div className="flex items-center gap-4 mt-1">
-                          <p className="text-xs text-gray-500">
-                            Mère: {care.motherStatus} • Bébé: {care.babyStatus}
-                          </p>
-                          {care.breastfeeding && (
-                            <Badge variant="outline" className="text-xs">
-                              Allaitement
-                            </Badge>
-                          )}
-                        </div>
-                        <p className="text-xs font-medium text-green-600">Prochaine visite: {care.nextVisit}</p>
-                      </div>
-                      <Button size="sm" className="bg-pink-600 hover:bg-pink-700">
-                        Consulter
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
       </div>
+
+      {/* Modal de création de patiente */}
+      <CreatePatientModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSuccess={() => {
+          setIsCreateModalOpen(false)
+          fetchData() // Recharge les données après création
+        }}
+      />
     </DashboardLayout>
   )
 }
