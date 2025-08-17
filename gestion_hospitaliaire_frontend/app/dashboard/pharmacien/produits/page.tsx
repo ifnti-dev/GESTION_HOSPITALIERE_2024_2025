@@ -1,38 +1,8 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Badge } from "@/components/ui/badge"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import {
-  Package2,
-  Plus,
-  Search,
-  Edit,
-  Trash2,
-  Filter,
-  Eye,
-  Loader2,
-  Pill,
-  BookOpen,
-  ShoppingCart,
-  TrendingUp,
-  AlertTriangle,
-} from "lucide-react"
 import { PharmacienSidebar } from "@/components/sidebars/pharmacien-sidebar"
 import {
   useMedicamentReferences,
@@ -43,6 +13,7 @@ import { useMedicaments } from "@/hooks/pharmacie/useMedicaments"
 import { useReferences } from "@/hooks/pharmacie/useReferences"
 import type { MedicamentReference } from "@/types/pharmacie"
 import { toast } from "sonner"
+import { Package2, Plus, Search, Edit, Trash2, Loader2, Eye } from "lucide-react"
 
 export default function ProduitsPage() {
   const [searchTerm, setSearchTerm] = useState("")
@@ -83,7 +54,6 @@ export default function ProduitsPage() {
 
   useEffect(() => {
     if (searchTerm) {
-      // Recherche globale - on peut améliorer plus tard
       const timer = setTimeout(() => {
         // Pour l'instant, on filtre côté client
       }, 300)
@@ -93,12 +63,12 @@ export default function ProduitsPage() {
 
   const getQuantiteStatus = (quantite: number) => {
     if (quantite === 0) {
-      return <Badge className="bg-red-100 text-red-800 hover:bg-red-100">Épuisé</Badge>
+      return <span className="px-2 py-1 bg-red-100 text-red-800 rounded text-sm">Épuisé</span>
     }
     if (quantite < 5) {
-      return <Badge className="bg-orange-100 text-orange-800 hover:bg-orange-100">Stock Faible</Badge>
+      return <span className="px-2 py-1 bg-orange-100 text-orange-800 rounded text-sm">Stock Faible</span>
     }
-    return <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Disponible</Badge>
+    return <span className="px-2 py-1 bg-green-100 text-green-800 rounded text-sm">Disponible</span>
   }
 
   const handleEdit = (produit: MedicamentReference) => {
@@ -158,51 +128,25 @@ export default function ProduitsPage() {
     setIsDetailDialogOpen(true)
   }
 
-  const handleDelete = async () => {
-    if (!produitToDelete?.id) return
-
-    try {
-      await deleteMedicamentReference(produitToDelete.id)
-      setIsDeleteConfirmationOpen(false)
-      setProduitToDelete(null)
-      refetch()
-      toast.success("Produit supprimé avec succès!")
-    } catch (err: any) {
-      toast.error(`Erreur lors de la suppression du produit: ${err?.message || "Inconnue"}`)
-    }
-  }
-
   return (
     <PharmacienSidebar>
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="p-6">
+        <div className="flex justify-between items-center mb-6">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-              <div className="p-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl shadow-lg">
-                <Package2 className="h-8 w-8 text-white" />
-              </div>
+            <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <Package2 className="h-6 w-6 text-gray-600" />
               Produits Finaux
             </h1>
-            <p className="text-gray-600 mt-2">Gérez vos produits finaux (Médicament + Référence) prêts pour commande</p>
+            <p className="text-gray-600 mt-1">Gérez vos produits finaux (Médicament + Référence)</p>
           </div>
-          <Button
+          <button
             onClick={handleAdd}
-            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg"
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded flex items-center gap-2"
             disabled={mutationLoading}
           >
-            {mutationLoading ? (
-              <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Chargement...
-              </>
-            ) : (
-              <>
-                <Plus className="h-4 w-4 mr-2" />
-                Nouveau Produit
-              </>
-            )}
-          </Button>
+            <Plus className="h-4 w-4" />
+            Nouveau Produit
+          </button>
         </div>
 
         {loading ? (
@@ -213,364 +157,248 @@ export default function ProduitsPage() {
           <div className="text-red-500">Erreur: {error}</div>
         ) : (
           <>
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              <Card className="border-0 shadow-lg bg-gradient-to-br from-purple-50 to-pink-50">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-purple-700">Total Produits</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-purple-900">{medicamentReferences?.length || 0}</div>
-                  <p className="text-xs text-purple-600 mt-1">Produits finaux</p>
-                </CardContent>
-              </Card>
-              <Card className="border-0 shadow-lg bg-gradient-to-br from-green-50 to-teal-50">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-green-700">Quantité Totale</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-green-900">
-                    {medicamentReferences?.reduce((sum, p) => sum + p.quantite, 0) || 0}
-                  </div>
-                  <p className="text-xs text-green-600 mt-1">Unités disponibles</p>
-                </CardContent>
-              </Card>
-              <Card className="border-0 shadow-lg bg-gradient-to-br from-orange-50 to-red-50">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-orange-700">Stock Faible</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-orange-900">
-                    {medicamentReferences?.filter((p) => p.quantite < 5 && p.quantite > 0).length || 0}
-                  </div>
-                  <p className="text-xs text-orange-600 mt-1">À réapprovisionner</p>
-                </CardContent>
-              </Card>
-              <Card className="border-0 shadow-lg bg-gradient-to-br from-red-50 to-orange-50">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-red-700">Épuisés</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-red-900">
-                    {medicamentReferences?.filter((p) => p.quantite === 0).length || 0}
-                  </div>
-                  <p className="text-xs text-red-600 mt-1">Rupture de stock</p>
-                </CardContent>
-              </Card>
+            <div className="bg-white p-4 mb-6">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <input
+                    type="text"
+                    placeholder="Rechercher un produit..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <select
+                  value={selectedMedicamentId}
+                  onChange={(e) => setSelectedMedicamentId(e.target.value)}
+                  className="w-48 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="all">Tous les médicaments</option>
+                  {medicaments?.map((med) => (
+                    <option key={med.id} value={med.id?.toString() || ""}>
+                      {med.nom}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  value={selectedReferenceId}
+                  onChange={(e) => setSelectedReferenceId(e.target.value)}
+                  className="w-48 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="all">Toutes les références</option>
+                  {references?.map((ref) => (
+                    <option key={ref.id} value={ref.id?.toString() || ""}>
+                      {ref.nom}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
-            {/* Search and Filters */}
-            <Card className="border-0 shadow-lg">
-              <CardHeader>
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                    <Input
-                      placeholder="Rechercher un produit..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10 border-purple-200 focus:border-purple-500 focus:ring-purple-500"
-                    />
-                  </div>
-                  <Select value={selectedMedicamentId} onValueChange={setSelectedMedicamentId}>
-                    <SelectTrigger className="w-48 border-purple-200 focus:border-purple-500 focus:ring-purple-500">
-                      <SelectValue placeholder="Médicament" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white">
-                      <SelectItem value="all">Tous les médicaments</SelectItem>
-                      {medicaments?.map((med) => (
-                        <SelectItem key={med.id} value={med.id?.toString() || ""}>
-                          {med.nom}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Select value={selectedReferenceId} onValueChange={setSelectedReferenceId}>
-                    <SelectTrigger className="w-48 border-purple-200 focus:border-purple-500 focus:ring-purple-500">
-                      <SelectValue placeholder="Référence" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white">
-                      <SelectItem value="all">Toutes les références</SelectItem>
-                      {references?.map((ref) => (
-                        <SelectItem key={ref.id} value={ref.id?.toString() || ""}>
-                          {ref.nom}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Button variant="outline" className="border-purple-200 text-purple-700 hover:bg-purple-50">
-                    <Filter className="h-4 w-4 mr-2" />
-                    Filtres
-                  </Button>
-                </div>
-              </CardHeader>
-            </Card>
-
-            {/* Produits Table */}
-            <Card className="border-0 shadow-lg">
-              <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 border-b border-purple-100">
-                <CardTitle className="flex items-center gap-2 text-purple-800">
-                  <ShoppingCart className="h-5 w-5 text-purple-600" />
-                  Liste des Produits Finaux
-                </CardTitle>
-                <CardDescription className="text-purple-600">
-                  {filteredProduits.length} produit(s) trouvé(s)
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="bg-gray-50/50 hover:bg-gray-50/50">
-                        <TableHead className="font-semibold text-gray-700 py-4">Médicament</TableHead>
-                        <TableHead className="font-semibold text-gray-700 py-4">Référence</TableHead>
-                        <TableHead className="font-semibold text-gray-700 py-4">Quantité</TableHead>
-                        <TableHead className="font-semibold text-gray-700 py-4">Statut</TableHead>
-                        <TableHead className="text-right font-semibold text-gray-700 py-4">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredProduits.map((produit, index) => (
-                        <TableRow
-                          key={produit.id}
-                          className={`
-                        hover:bg-purple-50/50 transition-all duration-200 border-b border-gray-100
-                        ${index % 2 === 0 ? "bg-white" : "bg-gray-50/30"}
-                      `}
-                        >
-                          <TableCell className="py-4">
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 bg-gradient-to-br from-teal-100 to-cyan-100 rounded-lg flex items-center justify-center">
-                                <Pill className="h-5 w-5 text-teal-600" />
-                              </div>
-                              <div>
-                                <div className="font-medium text-gray-900">{produit.medicament?.nom}</div>
-                                <div className="text-sm text-gray-500">{produit.medicament?.categorie?.nom}</div>
-                              </div>
+            <div className="bg-white">
+              <div className="p-4">
+                <h2 className="text-lg font-semibold text-gray-900">Liste des Produits ({filteredProduits.length})</h2>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Médicament</th>
+                      <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Référence</th>
+                      <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Quantité</th>
+                      <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Statut</th>
+                      <th className="px-4 py-3 text-right text-sm font-medium text-gray-700">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredProduits.map((produit, index) => (
+                      <tr key={produit.id} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                        <td className="px-4 py-3">
+                          <div>
+                            <div className="font-medium text-gray-900">{produit.medicament?.nom}</div>
+                            <div className="text-sm text-gray-500">{produit.medicament?.categorie?.nom}</div>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div>
+                            <div className="font-medium text-gray-900">{produit.reference?.nom}</div>
+                            <div className="text-sm text-gray-500 truncate max-w-xs">
+                              {produit.reference?.description}
                             </div>
-                          </TableCell>
-                          <TableCell className="py-4">
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-lg flex items-center justify-center">
-                                <BookOpen className="h-5 w-5 text-blue-600" />
-                              </div>
-                              <div>
-                                <div className="font-medium text-gray-900">{produit.reference?.nom}</div>
-                                <div className="text-sm text-gray-500 truncate max-w-xs">
-                                  {produit.reference?.description}
-                                </div>
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell className="py-4">
-                            <div className="flex items-center gap-2">
-                              <span className="font-bold text-lg text-gray-900">{produit.quantite}</span>
-                              <TrendingUp
-                                className={`h-4 w-4 ${
-                                  produit.quantite > 10
-                                    ? "text-green-500"
-                                    : produit.quantite > 0
-                                      ? "text-orange-500"
-                                      : "text-red-500"
-                                }`}
-                              />
-                            </div>
-                          </TableCell>
-                          <TableCell className="py-4">{getQuantiteStatus(produit.quantite)}</TableCell>
-                          <TableCell className="text-right py-4">
-                            <div className="flex items-center justify-end gap-1">
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => handleViewDetails(produit)}
-                                className="h-8 w-8 p-0 hover:bg-green-100 hover:text-green-700 transition-all duration-200"
-                                title="Voir les détails"
-                              >
-                                <Eye className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => handleEdit(produit)}
-                                className="h-8 w-8 p-0 hover:bg-blue-100 hover:text-blue-700 transition-all duration-200"
-                              >
-                                <Edit className="h-3 w-3 mr-1" />
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => handleDeleteConfirmation(produit)}
-                                className="h-8 w-8 p-0 hover:bg-red-100 hover:text-red-700 transition-all duration-200"
-                                disabled={mutationLoading}
-                              >
-                                {mutationLoading ? (
-                                  <Loader2 className="h-3 w-3 mr-1 animate-spin" />
-                                ) : (
-                                  <>
-                                    <Trash2 className="h-3 w-3 mr-1" />
-                                  </>
-                                )}
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              </CardContent>
-            </Card>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className="font-semibold text-gray-900">{produit.quantite}</span>
+                        </td>
+                        <td className="px-4 py-3">{getQuantiteStatus(produit.quantite)}</td>
+                        <td className="px-4 py-3 text-right">
+                          <div className="flex items-center justify-end gap-1">
+                            <button
+                              onClick={() => handleViewDetails(produit)}
+                              className="p-2 text-green-600 hover:bg-green-100 rounded"
+                              title="Voir détails"
+                            >
+                              <Eye className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={() => handleEdit(produit)}
+                              className="p-2 text-blue-600 hover:bg-blue-100 rounded"
+                              title="Modifier"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteConfirmation(produit)}
+                              className="p-2 text-red-600 hover:bg-red-100 rounded"
+                              title="Supprimer"
+                              disabled={mutationLoading}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </>
         )}
 
-        {/* Add/Edit Dialog */}
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogContent className="sm:max-w-[600px]">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <Package2 className="h-5 w-5 text-purple-600" />
-                {editingProduit ? "Modifier le Produit" : "Nouveau Produit Final"}
-              </DialogTitle>
-              <DialogDescription>
-                {editingProduit
-                  ? "Modifiez les informations du produit final."
-                  : "Créez un nouveau produit final en associant un médicament et une référence."}
-              </DialogDescription>
-            </DialogHeader>
-            <ProduitForm
-              produit={editingProduit}
-              medicaments={medicaments || []}
-              references={references || []}
-              onClose={() => setIsDialogOpen(false)}
-              onSubmit={editingProduit ? handleUpdate : handleCreate}
-              loading={mutationLoading}
-            />
-          </DialogContent>
-        </Dialog>
+        {isDialogOpen && (
+          <div className="fixed inset-0 bg-black/70 bg-opacity-10 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+              <div className="p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <Package2 className="h-5 w-5 text-gray-600" />
+                  <h2 className="text-xl font-semibold">
+                    {editingProduit ? "Modifier le Produit" : "Nouveau Produit Final"}
+                  </h2>
+                </div>
+                <ProduitForm
+                  produit={editingProduit}
+                  medicaments={medicaments || []}
+                  references={references || []}
+                  onClose={() => setIsDialogOpen(false)}
+                  onSubmit={editingProduit ? handleUpdate : handleCreate}
+                  loading={mutationLoading}
+                />
+              </div>
+            </div>
+          </div>
+        )}
 
-        {/* Delete Confirmation Dialog */}
-        <Dialog open={isDeleteConfirmationOpen} onOpenChange={setIsDeleteConfirmationOpen}>
-          <DialogContent className="sm:max-w-[400px]">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2 text-red-600">
-                <AlertTriangle className="h-5 w-5" />
-                Confirmer la suppression
-              </DialogTitle>
-              <DialogDescription>
-                Êtes-vous sûr de vouloir supprimer ce produit final ?
-                <br />
-                <span className="text-red-600 font-medium">Cette action est irréversible.</span>
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter className="gap-2">
-              <Button variant="outline" onClick={() => setIsDeleteConfirmationOpen(false)} disabled={mutationLoading}>
-                Annuler
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={confirmDelete}
-                disabled={mutationLoading}
-                className="bg-red-600 hover:bg-red-700"
-              >
-                {mutationLoading ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Suppression...
-                  </>
-                ) : (
-                  <>
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Supprimer
-                  </>
-                )}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        {isDeleteConfirmationOpen && (
+          <div className="fixed inset-0 bg-black/70 bg-opacity-10 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg shadow-lg max-w-md w-full mx-4">
+              <div className="p-6">
+                <div className="flex items-center gap-2 mb-4 text-red-600">
+                  <Trash2 className="h-5 w-5" />
+                  <h2 className="text-xl font-semibold">Confirmer la suppression</h2>
+                </div>
+                <p className="text-gray-600 mb-6">
+                  Êtes-vous sûr de vouloir supprimer ce produit final ?
+                  <br />
+                  <span className="text-red-600 font-medium">Cette action est irréversible.</span>
+                </p>
+                <div className="flex gap-2 justify-end">
+                  <button
+                    onClick={() => setIsDeleteConfirmationOpen(false)}
+                    className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50"
+                    disabled={mutationLoading}
+                  >
+                    Annuler
+                  </button>
+                  <button
+                    onClick={confirmDelete}
+                    className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 flex items-center gap-2"
+                    disabled={mutationLoading}
+                  >
+                    {mutationLoading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Suppression...
+                      </>
+                    ) : (
+                      <>
+                        <Trash2 className="h-4 w-4" />
+                        Supprimer
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
-        {/* Details Dialog */}
-        <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
-          <DialogContent className="sm:max-w-[700px]">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2 text-purple-600">
-                <Package2 className="h-5 w-5" />
-                Détails du produit final
-              </DialogTitle>
-            </DialogHeader>
-            {selectedProduit && (
-              <div className="space-y-6">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium text-gray-500">ID</Label>
-                    <p className="text-lg font-semibold">#{selectedProduit.id}</p>
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium text-gray-500">Quantité</Label>
-                    <div className="bg-purple-50 p-3 rounded-lg">
-                      <div className="flex items-center gap-2">
-                        <TrendingUp className="h-5 w-5 text-purple-600" />
-                        <span className="text-2xl font-bold text-purple-800">{selectedProduit.quantite}</span>
-                        <span className="text-purple-600">unités</span>
-                      </div>
-                    </div>
-                  </div>
+        {isDetailDialogOpen && selectedProduit && (
+          <div className="fixed inset-0 bg-black/70 bg-opacity-10 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+              <div className="p-6">
+                <div className="flex items-center gap-2 mb-6">
+                  <Package2 className="h-5 w-5 text-gray-600" />
+                  <h2 className="text-xl font-semibold">Détails du produit final</h2>
                 </div>
 
                 <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium text-gray-500">Médicament</Label>
-                    <div className="bg-teal-50 p-4 rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-teal-100 to-cyan-100 rounded-lg flex items-center justify-center">
-                          <Pill className="h-5 w-5 text-teal-600" />
-                        </div>
-                        <div>
-                          <p className="font-semibold text-teal-800">{selectedProduit.medicament?.nom}</p>
-                          <p className="text-sm text-teal-600">{selectedProduit.medicament?.categorie?.nom}</p>
-                        </div>
-                      </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium text-gray-500">ID</label>
+                      <p className="text-lg font-semibold">#{selectedProduit.id}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-500">Quantité</label>
+                      <p className="text-lg font-semibold">{selectedProduit.quantite} unités</p>
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium text-gray-500">Référence</Label>
-                    <div className="bg-blue-50 p-4 rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-lg flex items-center justify-center">
-                          <BookOpen className="h-5 w-5 text-blue-600" />
-                        </div>
-                        <div>
-                          <p className="font-semibold font-mono text-blue-800">{selectedProduit.reference?.nom}</p>
-                          <p className="text-sm text-blue-600">{selectedProduit.reference?.description}</p>
-                        </div>
-                      </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-500">Médicament</label>
+                    <div className="bg-gray-50 p-3 rounded mt-1">
+                      <p className="font-semibold">{selectedProduit.medicament?.nom}</p>
+                      <p className="text-sm text-gray-600">{selectedProduit.medicament?.categorie?.nom}</p>
                     </div>
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium text-gray-500">Référence</label>
+                    <div className="bg-gray-50 p-3 rounded mt-1">
+                      <p className="font-semibold">{selectedProduit.reference?.nom}</p>
+                      <p className="text-sm text-gray-600">{selectedProduit.reference?.description}</p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium text-gray-500">Statut</label>
+                    <div className="mt-1">{getQuantiteStatus(selectedProduit.quantite)}</div>
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-500">Statut</Label>
-                  <div className="pt-2">{getQuantiteStatus(selectedProduit.quantite)}</div>
+                <div className="flex gap-2 justify-end mt-6">
+                  <button
+                    onClick={() => setIsDetailDialogOpen(false)}
+                    className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50"
+                  >
+                    Fermer
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsDetailDialogOpen(false)
+                      if (selectedProduit) handleEdit(selectedProduit)
+                    }}
+                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 flex items-center gap-2"
+                  >
+                    <Edit className="h-4 w-4" />
+                    Modifier
+                  </button>
                 </div>
               </div>
-            )}
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsDetailDialogOpen(false)}>
-                Fermer
-              </Button>
-              <Button
-                onClick={() => {
-                  setIsDetailDialogOpen(false)
-                  if (selectedProduit) handleEdit(selectedProduit)
-                }}
-                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
-              >
-                <Edit className="h-4 w-4 mr-2" />
-                Modifier
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+            </div>
+          </div>
+        )}
       </div>
     </PharmacienSidebar>
   )
@@ -615,69 +443,65 @@ const ProduitForm: React.FC<ProduitFormProps> = ({ produit, medicaments, referen
   }
 
   return (
-    <div className="grid gap-4 py-4">
+    <div className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
-        <div className="grid gap-2">
+        <div>
           <Label htmlFor="medicament">Médicament *</Label>
-          <Select value={medicamentId} onValueChange={setMedicamentId} required>
-            <SelectTrigger className="border-purple-200 focus:border-purple-500 focus:ring-purple-500 bg-white">
-              <SelectValue placeholder="Sélectionner un médicament" />
-            </SelectTrigger>
-            <SelectContent className="bg-white">
-              {medicaments.map((med) => (
-                <SelectItem key={med.id} value={med.id?.toString() || ""}>
-                  <div className="flex flex-col">
-                    <span className="font-medium">{med.nom}</span>
-                    <span className="text-xs text-gray-500">{med.categorie?.nom}</span>
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <select
+            value={medicamentId}
+            onChange={(e) => setMedicamentId(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          >
+            <option value="">Sélectionner un médicament</option>
+            {medicaments.map((med) => (
+              <option key={med.id} value={med.id?.toString() || ""}>
+                {med.nom} - {med.categorie?.nom}
+              </option>
+            ))}
+          </select>
         </div>
-        <div className="grid gap-2">
+        <div>
           <Label htmlFor="reference">Référence *</Label>
-          <Select value={referenceId} onValueChange={setReferenceId} required>
-            <SelectTrigger className="border-purple-200 focus:border-purple-500 focus:ring-purple-500 bg-white">
-              <SelectValue placeholder="Sélectionner une référence" />
-            </SelectTrigger>
-            <SelectContent className="bg-white">
-              {references.map((ref) => (
-                <SelectItem key={ref.id} value={ref.id?.toString() || ""}>
-                  <div className="flex flex-col">
-                    <span className="font-medium">{ref.nom}</span>
-                    <span className="text-xs text-gray-500 truncate max-w-xs">{ref.description}</span>
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <select
+            value={referenceId}
+            onChange={(e) => setReferenceId(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          >
+            <option value="">Sélectionner une référence</option>
+            {references.map((ref) => (
+              <option key={ref.id} value={ref.id?.toString() || ""}>
+                {ref.nom}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
-      <div className="grid gap-2">
+      <div>
         <Label htmlFor="quantite">Quantité</Label>
-        <Input
+        <input
           id="quantite"
           type="number"
           value={quantite}
           onChange={(e) => setQuantite(e.target.value)}
           placeholder="0"
-          className="border-purple-200 focus:border-purple-500 focus:ring-purple-500"
+          className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           min="0"
         />
       </div>
-      <DialogFooter>
-        <Button variant="outline" onClick={onClose}>
+      <div className="flex gap-2 justify-end">
+        <button onClick={onClose} className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50">
           Annuler
-        </Button>
-        <Button
-          className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+        </button>
+        <button
           onClick={handleSubmit}
+          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 flex items-center gap-2"
           disabled={loading}
         >
           {loading ? (
             <>
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              <Loader2 className="h-4 w-4 animate-spin" />
               Enregistrement...
             </>
           ) : produit ? (
@@ -685,8 +509,8 @@ const ProduitForm: React.FC<ProduitFormProps> = ({ produit, medicaments, referen
           ) : (
             "Créer"
           )}
-        </Button>
-      </DialogFooter>
+        </button>
+      </div>
     </div>
   )
 }

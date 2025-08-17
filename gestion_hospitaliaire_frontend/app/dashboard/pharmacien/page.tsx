@@ -122,8 +122,8 @@ export default function PharmacienDashboard() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-              <div className="p-3 bg-gradient-to-r from-teal-500 to-cyan-500 rounded-xl shadow-lg">
-                <BarChart3 className="h-8 w-8 text-white" />
+              <div className="p-3 bg-gray-100 border rounded-lg">
+                <BarChart3 className="h-8 w-8 text-gray-700" />
               </div>
               Dashboard Pharmacie
             </h1>
@@ -207,9 +207,9 @@ export default function PharmacienDashboard() {
 
         {/* KPIs principaux */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card className="border-0 shadow-lg bg-gradient-to-br from-teal-50 to-cyan-50 hover:shadow-xl transition-shadow">
+          <Card className="border">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-teal-700 flex items-center justify-between">
+              <CardTitle className="text-sm font-medium text-gray-700 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <DollarSign className="h-4 w-4" />
                   Ventes Aujourd'hui
@@ -222,65 +222,65 @@ export default function PharmacienDashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-teal-900">{formatPrice(stats.ventesAujourdhui)}</div>
+              <div className="text-2xl font-bold text-gray-900">{formatPrice(stats.ventesAujourdhui)}</div>
               <div className="flex items-center mt-1">
                 <span className={`text-xs ${stats.ventesEvolution >= 0 ? "text-green-600" : "text-red-600"}`}>
                   {stats.ventesEvolution >= 0 ? "+" : ""}
                   {stats.ventesEvolution.toFixed(1)}% vs hier
                 </span>
               </div>
-              <p className="text-xs text-teal-600 mt-1">{stats.commandesAujourdhui} commandes</p>
+              <p className="text-xs text-gray-600 mt-1">{stats.commandesAujourdhui} commandes</p>
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-50 to-indigo-50 hover:shadow-xl transition-shadow">
+          <Card className="border">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-blue-700 flex items-center gap-2">
+              <CardTitle className="text-sm font-medium text-gray-700 flex items-center gap-2">
                 <Package className="h-4 w-4" />
                 Valeur Stock Total
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-blue-900">{formatPrice(stats.valeurTotalStock)}</div>
+              <div className="text-2xl font-bold text-gray-900">{formatPrice(stats.valeurTotalStock)}</div>
               <div className="flex items-center mt-1">
-                <Target className="h-3 w-3 text-blue-600 mr-1" />
-                <span className="text-xs text-blue-600">Rotation: {stats.tauxRotationStock}%</span>
+                <Target className="h-3 w-3 text-gray-600 mr-1" />
+                <span className="text-xs text-gray-600">Rotation: {stats.tauxRotationStock}%</span>
               </div>
-              <p className="text-xs text-blue-600 mt-1">{stats.totalLots} lots actifs</p>
+              <p className="text-xs text-gray-600 mt-1">{stats.totalLots} lots actifs</p>
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-lg bg-gradient-to-br from-green-50 to-emerald-50 hover:shadow-xl transition-shadow">
+          <Card className="border">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-green-700 flex items-center gap-2">
+              <CardTitle className="text-sm font-medium text-gray-700 flex items-center gap-2">
                 <Pill className="h-4 w-4" />
                 Produits Actifs
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-900">{stats.totalMedicaments.toLocaleString()}</div>
+              <div className="text-2xl font-bold text-gray-900">{stats.totalMedicaments.toLocaleString()}</div>
               <div className="flex items-center mt-1">
-                <Users className="h-3 w-3 text-green-600 mr-1" />
-                <span className="text-xs text-green-600">{stats.nombreFournisseurs} fournisseurs</span>
+                <Users className="h-3 w-3 text-gray-600 mr-1" />
+                <span className="text-xs text-gray-600">{stats.nombreFournisseurs} fournisseurs</span>
               </div>
-              <p className="text-xs text-green-600 mt-1">Marge: {stats.margeGlobale}%</p>
+              <p className="text-xs text-gray-600 mt-1">Marge: {stats.margeGlobale}%</p>
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-lg bg-gradient-to-br from-orange-50 to-red-50 hover:shadow-xl transition-shadow">
+          <Card className="border">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-orange-700 flex items-center gap-2">
+              <CardTitle className="text-sm font-medium text-gray-700 flex items-center gap-2">
                 <AlertTriangle className="h-4 w-4" />
                 Alertes Actives
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-orange-900">{stats.alertesStock}</div>
+              <div className="text-2xl font-bold text-gray-900">{stats.alertesStock}</div>
               <div className="flex items-center mt-1">
-                <Zap className="h-3 w-3 text-orange-600 mr-1" />
-                <span className="text-xs text-orange-600">{stats.lotsExpirantBientot} expirent bientôt</span>
+                <Zap className="h-3 w-3 text-gray-600 mr-1" />
+                <span className="text-xs text-gray-600">{stats.lotsExpirantBientot} expirent bientôt</span>
               </div>
-              <p className="text-xs text-orange-600 mt-1">{stats.lotsExpires} lots expirés</p>
+              <p className="text-xs text-gray-600 mt-1">{stats.lotsExpires} lots expirés</p>
             </CardContent>
           </Card>
         </div>
@@ -288,10 +288,10 @@ export default function PharmacienDashboard() {
         {/* Graphiques principaux */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Évolution des ventes */}
-          <Card className="border-0 shadow-lg">
+          <Card className="border">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-teal-600" />
+                <TrendingUp className="h-5 w-5 text-gray-600" />
                 Évolution des Ventes (7 jours)
               </CardTitle>
               <CardDescription>Ventes quotidiennes et nombre de commandes</CardDescription>
@@ -326,10 +326,10 @@ export default function PharmacienDashboard() {
           </Card>
 
           {/* Répartition du stock par catégorie */}
-          <Card className="border-0 shadow-lg">
+          <Card className="border">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <RechartsPieChart className="h-5 w-5 text-blue-600" />
+                <RechartsPieChart className="h-5 w-5 text-gray-600" />
                 Stock par Catégorie
               </CardTitle>
               <CardDescription>Répartition de la valeur du stock</CardDescription>
@@ -376,10 +376,10 @@ export default function PharmacienDashboard() {
         {/* Graphiques secondaires */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Top produits */}
-          <Card className="border-0 shadow-lg">
+          <Card className="border">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="h-5 w-5 text-green-600" />
+                <BarChart3 className="h-5 w-5 text-gray-600" />
                 Top Produits
               </CardTitle>
               <CardDescription>Produits les plus performants</CardDescription>
@@ -414,10 +414,10 @@ export default function PharmacienDashboard() {
           </Card>
 
           {/* Alertes par type */}
-          <Card className="border-0 shadow-lg">
+          <Card className="border">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <AlertCircle className="h-5 w-5 text-orange-600" />
+                <AlertCircle className="h-5 w-5 text-gray-600" />
                 Alertes par Type
               </CardTitle>
               <CardDescription>Distribution des alertes actives</CardDescription>
@@ -445,10 +445,10 @@ export default function PharmacienDashboard() {
         </div>
 
         {/* Évolution du stock */}
-        <Card className="border-0 shadow-lg">
+        <Card className="border">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Activity className="h-5 w-5 text-purple-600" />
+              <Activity className="h-5 w-5 text-gray-600" />
               Évolution du Stock (6 mois)
             </CardTitle>
             <CardDescription>Mouvements d'entrées et sorties de stock</CardDescription>
@@ -494,10 +494,10 @@ export default function PharmacienDashboard() {
         {/* Activité récente et actions rapides */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Produits à stock faible */}
-          <Card className="border-0 shadow-lg">
+          <Card className="border">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Package className="h-5 w-5 text-orange-600" />
+                <Package className="h-5 w-5 text-gray-600" />
                 Stock Critique
               </CardTitle>
               <CardDescription>Produits nécessitant un réapprovisionnement</CardDescription>
@@ -565,7 +565,7 @@ export default function PharmacienDashboard() {
           </Card>
 
           {/* Actions rapides */}
-          <Card className="border-0 shadow-lg">
+          <Card className="border">
             <CardHeader>
               <CardTitle>Actions Rapides</CardTitle>
               <CardDescription>Accès rapide aux fonctionnalités principales</CardDescription>
@@ -573,26 +573,26 @@ export default function PharmacienDashboard() {
             <CardContent>
               <div className="grid grid-cols-2 gap-4">
                 <Link href="/dashboard/pharmacien/stock">
-                  <Button variant="outline" className="w-full h-20 flex-col hover:bg-teal-50 bg-transparent">
-                    <Package className="h-6 w-6 mb-2 text-teal-600" />
+                  <Button variant="outline" className="w-full h-20 flex-col bg-transparent">
+                    <Package className="h-6 w-6 mb-2 text-gray-600" />
                     <span className="text-sm">Gérer Stock</span>
                   </Button>
                 </Link>
                 <Link href="/dashboard/pharmacien/commandes">
-                  <Button variant="outline" className="w-full h-20 flex-col hover:bg-blue-50 bg-transparent">
-                    <ShoppingCart className="h-6 w-6 mb-2 text-blue-600" />
+                  <Button variant="outline" className="w-full h-20 flex-col bg-transparent">
+                    <ShoppingCart className="h-6 w-6 mb-2 text-gray-600" />
                     <span className="text-sm">Commandes</span>
                   </Button>
                 </Link>
                 <Link href="/dashboard/pharmacien/rapports">
-                  <Button variant="outline" className="w-full h-20 flex-col hover:bg-green-50 bg-transparent">
-                    <BarChart3 className="h-6 w-6 mb-2 text-green-600" />
+                  <Button variant="outline" className="w-full h-20 flex-col bg-transparent">
+                    <BarChart3 className="h-6 w-6 mb-2 text-gray-600" />
                     <span className="text-sm">Rapports</span>
                   </Button>
                 </Link>
                 <Link href="/dashboard/pharmacien/notifications">
-                  <Button variant="outline" className="w-full h-20 flex-col relative hover:bg-orange-50 bg-transparent">
-                    <Bell className="h-6 w-6 mb-2 text-orange-600" />
+                  <Button variant="outline" className="w-full h-20 flex-col relative bg-transparent">
+                    <Bell className="h-6 w-6 mb-2 text-gray-600" />
                     <span className="text-sm">Notifications</span>
                     {stats.notificationsNonLues > 0 && (
                       <Badge className="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1.5 py-0.5">
@@ -606,13 +606,13 @@ export default function PharmacienDashboard() {
               {/* Métriques supplémentaires */}
               <div className="mt-6 pt-4 border-t">
                 <div className="grid grid-cols-2 gap-4 text-center">
-                  <div className="p-3 bg-gradient-to-r from-teal-50 to-cyan-50 rounded-lg">
-                    <div className="text-lg font-bold text-teal-800">{formatPercentage(stats.tauxRotationStock)}</div>
-                    <div className="text-xs text-teal-600">Taux de rotation</div>
+                  <div className="p-3 bg-gray-50 border rounded-lg">
+                    <div className="text-lg font-bold text-gray-800">{formatPercentage(stats.tauxRotationStock)}</div>
+                    <div className="text-xs text-gray-600">Taux de rotation</div>
                   </div>
-                  <div className="p-3 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg">
-                    <div className="text-lg font-bold text-green-800">{formatPercentage(stats.margeGlobale)}</div>
-                    <div className="text-xs text-green-600">Marge globale</div>
+                  <div className="p-3 bg-gray-50 border rounded-lg">
+                    <div className="text-lg font-bold text-gray-800">{formatPercentage(stats.margeGlobale)}</div>
+                    <div className="text-xs text-gray-600">Marge globale</div>
                   </div>
                 </div>
               </div>

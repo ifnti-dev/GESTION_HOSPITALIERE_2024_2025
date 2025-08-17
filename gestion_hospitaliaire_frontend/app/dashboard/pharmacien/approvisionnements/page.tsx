@@ -1,36 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Badge } from "@/components/ui/badge"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import { Separator } from "@/components/ui/separator"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import {
-  Truck,
   Plus,
   Search,
   Edit,
@@ -41,9 +12,7 @@ import {
   ChevronDown,
   X,
   AlertTriangle,
-  ShoppingCart,
-  Calculator,
-  FileText,
+  Truck,
 } from "lucide-react"
 import { PharmacienSidebar } from "@/components/sidebars/pharmacien-sidebar"
 import { useApprovisionnements } from "@/hooks/pharmacie/useApprovisionnements"
@@ -345,215 +314,152 @@ export default function ApprovisionnementPage() {
 
   return (
     <PharmacienSidebar>
-      <div className="space-y-6">
-        {/* Header */}
+      <div className="p-6 space-y-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-              <div className="p-2 bg-gradient-to-r from-teal-500 to-cyan-500 rounded-xl shadow-lg">
-                <Truck className="h-8 w-8 text-white" />
+              <div className="p-2 bg-gray-200 rounded">
+                <Truck className="h-8 w-8 text-gray-600" />
               </div>
               Gestion des Approvisionnements
             </h1>
             <p className="text-gray-600 mt-2">Gérez les livraisons et leurs lignes d'approvisionnement</p>
           </div>
-          <Button
+          <button
             onClick={handleAddApprovisionnement}
-            className="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 shadow-lg"
+            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center gap-2"
           >
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="h-4 w-4" />
             Nouvel Approvisionnement
-          </Button>
+          </button>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <Card className="border-0 shadow-lg bg-gradient-to-br from-teal-50 to-cyan-50">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-teal-700">Total Approvisionnements</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-teal-900">{approvisionnements.length}</div>
-              <p className="text-xs text-teal-600 mt-1">Ce mois</p>
-            </CardContent>
-          </Card>
-          <Card className="border-0 shadow-lg bg-gradient-to-br from-green-50 to-teal-50">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-green-700">Lignes Sélectionnées</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-900">{lignes.length}</div>
-              <p className="text-xs text-green-600 mt-1">Produits</p>
-            </CardContent>
-          </Card>
-          <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-50 to-teal-50">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-blue-700">Quantité Totale</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-blue-900">
-                {lignes.reduce((sum, ligne) => sum + ligne.quantite, 0)}
-              </div>
-              <p className="text-xs text-blue-600 mt-1">Unités</p>
-            </CardContent>
-          </Card>
-          <Card className="border-0 shadow-lg bg-gradient-to-br from-purple-50 to-teal-50">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-purple-700">Valeur Totale</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-purple-900">{totalMontant.toFixed(2)} FCFA</div>
-              <p className="text-xs text-purple-600 mt-1">Montant</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Search and Filters */}
-        <Card className="border-0 shadow-lg">
-          <CardHeader>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input
-                  placeholder="Rechercher un approvisionnement..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 border-teal-200 focus:border-teal-500 focus:ring-teal-500"
-                />
-              </div>
-              <Select value={selectedFournisseur} onValueChange={setSelectedFournisseur}>
-                <SelectTrigger className="w-48 border-teal-200 focus:border-teal-500 focus:ring-teal-500">
-                  <SelectValue placeholder="Fournisseur" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Tous les fournisseurs</SelectItem>
-                  {fournisseurs.map((fournisseur) => (
-                    <SelectItem key={fournisseur} value={fournisseur}>
-                      {fournisseur}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+        <div className="bg-white p-4">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <input
+                type="text"
+                placeholder="Rechercher un approvisionnement..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 bg-gray-50 rounded"
+              />
             </div>
-          </CardHeader>
-        </Card>
+            <select
+              value={selectedFournisseur}
+              onChange={(e) => setSelectedFournisseur(e.target.value)}
+              className="w-48 px-3 py-2 bg-gray-50 rounded"
+            >
+              <option value="all">Tous les fournisseurs</option>
+              {fournisseurs.map((fournisseur) => (
+                <option key={fournisseur} value={fournisseur}>
+                  {fournisseur}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
 
-        {/* Main Content - Split Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Left Panel - Approvisionnements List */}
-          <Card className="border-0 shadow-lg">
-            <CardHeader className="bg-gradient-to-r from-teal-50 to-cyan-50 border-b border-teal-100">
-              <CardTitle className="flex items-center gap-2 text-teal-800">
-                <Package className="h-5 w-5 text-teal-600" />
+          <div className="bg-white">
+            <div className="bg-gray-100 p-4">
+              <h3 className="font-medium text-gray-800 flex items-center gap-2">
+                <Package className="h-5 w-5 text-gray-600" />
                 Liste des Approvisionnements
-              </CardTitle>
-              <CardDescription className="text-teal-600">
-                {filteredAppros.length} approvisionnement(s) trouvé(s)
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="p-0">
-              <ScrollArea className="h-[600px]">
-                <div className="space-y-2 p-4">
-                  {approError ? (
-                    <div className="p-8 text-center text-red-600">
-                      <AlertTriangle className="h-8 w-8 mx-auto mb-2" />
-                      <p>Erreur: {approError}</p>
-                    </div>
-                  ) : filteredAppros.length === 0 ? (
-                    <div className="p-8 text-center text-gray-500">
-                      <Package className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                      <p>Aucun approvisionnement trouvé</p>
-                    </div>
-                  ) : (
-                    filteredAppros.map((appro) => (
-                      <div
-                        key={appro.id}
-                        className={`
-                          p-4 rounded-lg border cursor-pointer transition-all duration-200
-                          ${
-                            selectedApprovisionnement?.id === appro.id
-                              ? "border-teal-500 bg-teal-50 shadow-md"
-                              : "border-gray-200 hover:border-teal-300 hover:bg-gray-50"
-                          }
-                        `}
-                        onClick={() => handleSelectApprovisionnement(appro)}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <Calendar className="h-4 w-4 text-teal-600" />
-                              <span className="font-medium text-gray-900">#{appro.id}</span>
-                              <Badge variant="outline" className="bg-cyan-50 text-cyan-700 border-cyan-200">
-                                {appro.fournisseur}
-                              </Badge>
-                            </div>
-                            <div className="text-sm text-gray-600">
-                              {new Date(appro.dateAppro).toLocaleDateString("fr-FR")}
-                            </div>
+              </h3>
+              <p className="text-gray-600 text-sm">{filteredAppros.length} approvisionnement(s) trouvé(s)</p>
+            </div>
+            <div className="h-[600px] overflow-y-auto">
+              <div className="space-y-2 p-4">
+                {approError ? (
+                  <div className="p-8 text-center text-red-600">
+                    <AlertTriangle className="h-8 w-8 mx-auto mb-2" />
+                    <p>Erreur: {approError}</p>
+                  </div>
+                ) : filteredAppros.length === 0 ? (
+                  <div className="p-8 text-center text-gray-500">
+                    <Package className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                    <p>Aucun approvisionnement trouvé</p>
+                  </div>
+                ) : (
+                  filteredAppros.map((appro) => (
+                    <div
+                      key={appro.id}
+                      className={`
+                        p-4 rounded cursor-pointer transition-all duration-200
+                        ${selectedApprovisionnement?.id === appro.id ? "bg-blue-50" : "bg-gray-50 hover:bg-gray-100"}
+                      `}
+                      onClick={() => handleSelectApprovisionnement(appro)}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Calendar className="h-4 w-4 text-gray-600" />
+                            <span className="font-medium text-gray-900">#{appro.id}</span>
+                            <span className="bg-gray-200 text-gray-700 px-2 py-1 rounded text-xs">
+                              {appro.fournisseur}
+                            </span>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                handleEditApprovisionnement(appro)
-                              }}
-                              className="h-8 w-8 p-0 hover:bg-blue-100 hover:text-blue-700"
-                            >
-                              <Edit className="h-3 w-3" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                if (appro.id) {
-                                  setDeleteApproId(appro.id)
-                                }
-                              }}
-                              className="h-8 w-8 p-0 hover:bg-red-100 hover:text-red-700"
-                            >
-                              <Trash2 className="h-3 w-3" />
-                            </Button>
-                            {selectedApprovisionnement?.id === appro.id ? (
-                              <ChevronDown className="h-4 w-4 text-teal-600" />
-                            ) : (
-                              <ChevronRight className="h-4 w-4 text-gray-400" />
-                            )}
+                          <div className="text-sm text-gray-600">
+                            {new Date(appro.dateAppro).toLocaleDateString("fr-FR")}
                           </div>
                         </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleEditApprovisionnement(appro)
+                            }}
+                            className="p-1 hover:bg-blue-100 rounded"
+                          >
+                            <Edit className="h-4 w-4 text-blue-600" />
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              if (appro.id) {
+                                setDeleteApproId(appro.id)
+                              }
+                            }}
+                            className="p-1 hover:bg-red-100 rounded"
+                          >
+                            <Trash2 className="h-4 w-4 text-red-600" />
+                          </button>
+                          {selectedApprovisionnement?.id === appro.id ? (
+                            <ChevronDown className="h-4 w-4 text-gray-600" />
+                          ) : (
+                            <ChevronRight className="h-4 w-4 text-gray-400" />
+                          )}
+                        </div>
                       </div>
-                    ))
-                  )}
-                </div>
-              </ScrollArea>
-            </CardContent>
-          </Card>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
 
           {/* Right Panel - Lignes d'Approvisionnement */}
-          <Card className="border-0 shadow-lg">
-            <CardHeader className="bg-gradient-to-r from-cyan-50 to-blue-50 border-b border-cyan-100">
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="flex items-center gap-2 text-cyan-800">
-                    <Package className="h-5 w-5 text-cyan-600" />
-                    Lignes d'Approvisionnement
-                  </CardTitle>
-                  <CardDescription className="text-cyan-600">
-                    {selectedApprovisionnement
-                      ? `Approvisionnement #${selectedApprovisionnement.id} - ${selectedApprovisionnement.fournisseur}`
-                      : "Sélectionnez un approvisionnement"}
-                  </CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="p-0">
+          <div className="bg-white">
+            <div className="bg-gray-100 p-4">
+              <h3 className="font-medium text-gray-800 flex items-center gap-2">
+                <Package className="h-5 w-5 text-gray-600" />
+                Lignes d'Approvisionnement
+              </h3>
+              <p className="text-gray-600 text-sm">
+                {selectedApprovisionnement
+                  ? `Approvisionnement #${selectedApprovisionnement.id} - ${selectedApprovisionnement.fournisseur}`
+                  : "Sélectionnez un approvisionnement"}
+              </p>
+            </div>
+            <div className="h-[600px] overflow-y-auto">
               {selectedApprovisionnement ? (
-                <ScrollArea className="h-[600px]">
+                <>
                   {lignesLoading ? (
                     <div className="flex items-center justify-center h-32">
-                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-cyan-600"></div>
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-600"></div>
                     </div>
                   ) : lignesError ? (
                     <div className="p-8 text-center text-red-600">
@@ -565,14 +471,16 @@ export default function ApprovisionnementPage() {
                       {lignes.map((ligne) => (
                         <div
                           key={ligne.id}
-                          className="p-4 border border-gray-200 rounded-lg hover:border-cyan-300 hover:bg-cyan-50/30 transition-all duration-200"
+                          className="p-4 bg-gray-50 rounded hover:bg-gray-100 transition-all duration-200"
                         >
                           <div className="flex items-center justify-between mb-3">
                             <div className="flex items-center gap-2">
-                              <Badge className="bg-blue-100 text-blue-800">Lot: {ligne.numeroLot}</Badge>
-                              <Badge variant="outline" className="text-xs">
+                              <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">
+                                Lot: {ligne.numeroLot}
+                              </span>
+                              <span className="bg-gray-200 text-gray-700 px-2 py-1 rounded text-xs">
                                 Qté: {ligne.quantite}
-                              </Badge>
+                              </span>
                             </div>
                           </div>
 
@@ -601,7 +509,7 @@ export default function ApprovisionnementPage() {
                             </div>
                           </div>
 
-                          <Separator className="my-3" />
+                          <hr className="my-3" />
 
                           <div className="flex items-center justify-between text-sm">
                             <span className="text-gray-600">Total ligne:</span>
@@ -618,7 +526,7 @@ export default function ApprovisionnementPage() {
                       <p>Aucune ligne d'approvisionnement</p>
                     </div>
                   )}
-                </ScrollArea>
+                </>
               ) : (
                 <div className="flex flex-col items-center justify-center h-[600px] text-gray-500">
                   <Truck className="h-12 w-12 mb-4 opacity-50" />
@@ -626,401 +534,361 @@ export default function ApprovisionnementPage() {
                   <p className="text-sm">Choisissez un approvisionnement dans la liste de gauche</p>
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
 
-        {/* Dialog pour Approvisionnement Complet - Version Améliorée */}
-        <Dialog open={isApproDialogOpen} onOpenChange={setIsApproDialogOpen}>
-          <DialogContent className="sm:max-w-[1400px] max-h-[90vh] p-0">
-            <DialogHeader className="p-6 pb-0">
-              <DialogTitle className="flex items-center gap-2">
-                <Truck className="h-5 w-5 text-teal-600" />
-                {editingAppro ? "Modifier l'Approvisionnement" : "Nouvel Approvisionnement"}
-              </DialogTitle>
-              <DialogDescription>
-                {editingAppro
-                  ? "Modifiez les informations de l'approvisionnement."
-                  : "Créez un nouvel approvisionnement avec ses lignes de produits."}
-              </DialogDescription>
-            </DialogHeader>
+        {isApproDialogOpen && (
+          <div className="fixed inset-0 bg-black/70 bg-opacity-10 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg shadow-lg max-w-6xl w-full max-h-[90vh] overflow-hidden">
+              <div className="p-6 border-b">
+                <h2 className="text-xl font-semibold flex items-center gap-2">
+                  <Truck className="h-5 w-5 text-gray-600" />
+                  {editingAppro ? "Modifier l'Approvisionnement" : "Nouvel Approvisionnement"}
+                </h2>
+                <p className="text-gray-600 text-sm">
+                  {editingAppro
+                    ? "Modifiez les informations de l'approvisionnement."
+                    : "Créez un nouvel approvisionnement avec ses lignes de produits."}
+                </p>
+              </div>
 
-            <div className="flex-1 overflow-hidden">
-              <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
-                <div className="px-6">
-                  <TabsList className="grid w-full grid-cols-3">
-                    <TabsTrigger value="info" className="flex items-center gap-2">
-                      <FileText className="h-4 w-4" />
+              <div className="flex-1 overflow-hidden">
+                <div className="p-6">
+                  <div className="flex gap-4 mb-6">
+                    <button
+                      onClick={() => setActiveTab("info")}
+                      className={`px-4 py-2 rounded ${activeTab === "info" ? "bg-blue-500 text-white" : "bg-gray-200"}`}
+                    >
                       Informations
-                    </TabsTrigger>
-                    <TabsTrigger value="lignes" className="flex items-center gap-2">
-                      <ShoppingCart className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => setActiveTab("lignes")}
+                      className={`px-4 py-2 rounded ${activeTab === "lignes" ? "bg-blue-500 text-white" : "bg-gray-200"}`}
+                    >
                       Lignes ({formLignes.length})
-                    </TabsTrigger>
-                    <TabsTrigger value="resume" className="flex items-center gap-2">
-                      <Calculator className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => setActiveTab("resume")}
+                      className={`px-4 py-2 rounded ${activeTab === "resume" ? "bg-blue-500 text-white" : "bg-gray-200"}`}
+                    >
                       Résumé
-                    </TabsTrigger>
-                  </TabsList>
-                </div>
+                    </button>
+                  </div>
 
-                <div className="flex-1 overflow-hidden">
-                  {/* Onglet Informations */}
-                  <TabsContent value="info" className="h-full m-0 p-6">
-                    <Card className="border-teal-200 h-full">
-                      <CardHeader>
-                        <CardTitle className="text-lg text-teal-800">Informations Générales</CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-6">
-                        <div className="grid gap-2">
-                          <Label htmlFor="fournisseur">Fournisseur *</Label>
-                          <Input
-                            id="fournisseur"
-                            value={fournisseur}
-                            onChange={(e) => setFournisseur(e.target.value)}
-                            placeholder="Nom du fournisseur"
-                            className="border-teal-200 focus:border-teal-500 focus:ring-teal-500"
-                            required
-                          />
-                        </div>
-                        <div className="grid gap-2">
-                          <Label>Date d'Approvisionnement</Label>
-                          <Input
-                            value={new Date().toLocaleDateString("fr-FR")}
-                            disabled
-                            className="bg-gray-50 text-gray-600"
-                          />
-                          <p className="text-xs text-gray-500">La date est générée automatiquement</p>
-                        </div>
-                        <div className="flex justify-end">
-                          <Button
-                            onClick={() => setActiveTab("lignes")}
-                            className="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700"
-                          >
-                            Suivant: Ajouter des lignes
-                            <ChevronRight className="h-4 w-4 ml-2" />
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </TabsContent>
+                  {activeTab === "info" && (
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Fournisseur *</label>
+                        <input
+                          type="text"
+                          value={fournisseur}
+                          onChange={(e) => setFournisseur(e.target.value)}
+                          placeholder="Nom du fournisseur"
+                          className="w-full px-3 py-2 bg-gray-50 rounded"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Date d'Approvisionnement</label>
+                        <input
+                          type="text"
+                          value={new Date().toLocaleDateString("fr-FR")}
+                          disabled
+                          className="w-full px-3 py-2 bg-gray-100 text-gray-600 rounded"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">La date est générée automatiquement</p>
+                      </div>
+                      <div className="flex justify-end">
+                        <button
+                          onClick={() => setActiveTab("lignes")}
+                          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center gap-2"
+                        >
+                          Suivant: Ajouter des lignes
+                          <ChevronRight className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
 
-                  {/* Onglet Lignes - Version Tableau Scrollable */}
-                  <TabsContent value="lignes" className="h-full m-0 p-6">
-                    <Card className="border-cyan-200 h-full flex flex-col">
-                      <CardHeader className="flex-shrink-0">
-                        <div className="flex items-center justify-between">
-                          <CardTitle className="text-lg text-cyan-800">Lignes d'Approvisionnement</CardTitle>
-                          <Button
-                            type="button"
+                  {activeTab === "lignes" && (
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-lg font-medium text-gray-800">Lignes d'Approvisionnement</h3>
+                        <button
+                          onClick={addFormLigne}
+                          className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center gap-2"
+                        >
+                          <Plus className="h-4 w-4" />
+                          Ajouter Ligne
+                        </button>
+                      </div>
+
+                      {formLignes.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center h-64 text-gray-500">
+                          <Package className="h-12 w-12 mb-4 opacity-50" />
+                          <p className="text-lg font-medium">Aucune ligne ajoutée</p>
+                          <p className="text-sm mb-4">Cliquez sur "Ajouter Ligne" pour commencer</p>
+                          <button
                             onClick={addFormLigne}
-                            size="sm"
-                            className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700"
+                            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center gap-2"
                           >
-                            <Plus className="h-4 w-4 mr-2" />
-                            Ajouter Ligne
-                          </Button>
+                            <Plus className="h-4 w-4" />
+                            Première Ligne
+                          </button>
                         </div>
-                      </CardHeader>
-                      <CardContent className="flex-1 overflow-hidden p-0">
-                        {formLignes.length === 0 ? (
-                          <div className="flex flex-col items-center justify-center h-full text-gray-500">
-                            <Package className="h-12 w-12 mb-4 opacity-50" />
-                            <p className="text-lg font-medium">Aucune ligne ajoutée</p>
-                            <p className="text-sm mb-4">Cliquez sur "Ajouter Ligne" pour commencer</p>
-                            <Button
-                              onClick={addFormLigne}
-                              className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700"
-                            >
-                              <Plus className="h-4 w-4 mr-2" />
-                              Première Ligne
-                            </Button>
-                          </div>
-                        ) : (
-                          <div className="h-[400px] border rounded-lg m-4">
-                            <ScrollArea className="h-full w-full">
-                              <div className="min-w-[1200px]">
-                                <Table>
-                                  <TableHeader className="sticky top-0 bg-white z-10 border-b">
-                                    <TableRow>
-                                      <TableHead className="w-[250px] font-semibold">Médicament</TableHead>
-                                      <TableHead className="w-[100px] font-semibold">Quantité</TableHead>
-                                      <TableHead className="w-[120px] font-semibold">Prix Achat (FCFA)</TableHead>
-                                      <TableHead className="w-[120px] font-semibold">Prix Vente (FCFA)</TableHead>
-                                      <TableHead className="w-[140px] font-semibold">Date Réception</TableHead>
-                                      <TableHead className="w-[140px] font-semibold">Date Expiration</TableHead>
-                                      <TableHead className="w-[140px] font-semibold">N° Lot</TableHead>
-                                      <TableHead className="w-[120px] font-semibold">Total</TableHead>
-                                      <TableHead className="w-[60px]"></TableHead>
-                                    </TableRow>
-                                  </TableHeader>
-                                  <TableBody>
-                                    {formLignes.map((ligne, index) => (
-                                      <TableRow key={ligne.id} className="hover:bg-gray-50">
-                                        <TableCell className="p-2">
-                                          <Select
-                                            value={ligne.medicamentReferenceId?.toString() || ""}
-                                            onValueChange={(value) =>
-                                              updateFormLigne(ligne.id, "medicamentReferenceId", Number.parseInt(value))
-                                            }
-                                          >
-                                            <SelectTrigger className="w-full h-9">
-                                              <SelectValue placeholder="Sélectionner" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                              {medicamentReferences.map((ref) => (
-                                                <SelectItem key={ref.id} value={ref.id!.toString()}>
-                                                  <div className="flex flex-col">
-                                                    <span className="font-medium">{ref.medicament?.nom}</span>
-                                                    <span className="text-xs text-gray-500">{ref.reference?.nom}</span>
-                                                  </div>
-                                                </SelectItem>
-                                              ))}
-                                            </SelectContent>
-                                          </Select>
-                                        </TableCell>
-                                        <TableCell className="p-2">
-                                          <Input
-                                            type="number"
-                                            min="1"
-                                            max="9999"
-                                            value={ligne.quantite}
-                                            onChange={(e) => {
-                                              const value = Number.parseInt(e.target.value) || 1
-                                              updateFormLigne(ligne.id, "quantite", Math.max(1, value))
-                                            }}
-                                            onKeyDown={(e) => {
-                                              // Empêcher la saisie du signe moins
-                                              if (e.key === "-" || e.key === "e" || e.key === "E") {
-                                                e.preventDefault()
-                                              }
-                                            }}
-                                            className="w-full h-9 text-center"
-                                          />
-                                        </TableCell>
-                                        <TableCell className="p-2">
-                                          <Input
-                                            type="number"
-                                            step="0.01"
-                                            min="0"
-                                            value={ligne.prixUnitaireAchat}
-                                            onChange={(e) => {
-                                              const value = Number.parseFloat(e.target.value) || 0
-                                              updateFormLigne(ligne.id, "prixUnitaireAchat", Math.max(0, value))
-                                            }}
-                                            onKeyDown={(e) => {
-                                              // Empêcher la saisie du signe moins
-                                              if (e.key === "-" || e.key === "e" || e.key === "E") {
-                                                e.preventDefault()
-                                              }
-                                            }}
-                                            className="w-full h-9"
-                                          />
-                                        </TableCell>
-                                        <TableCell className="p-2">
-                                          <Input
-                                            type="number"
-                                            step="0.01"
-                                            min="0"
-                                            value={ligne.prixUnitaireVente}
-                                            onChange={(e) => {
-                                              const value = Number.parseFloat(e.target.value) || 0
-                                              updateFormLigne(ligne.id, "prixUnitaireVente", Math.max(0, value))
-                                            }}
-                                            onKeyDown={(e) => {
-                                              // Empêcher la saisie du signe moins
-                                              if (e.key === "-" || e.key === "e" || e.key === "E") {
-                                                e.preventDefault()
-                                              }
-                                            }}
-                                            className="w-full h-9"
-                                          />
-                                        </TableCell>
-                                        <TableCell className="p-2">
-                                          <Input
-                                            type="date"
-                                            value={ligne.dateReception}
-                                            onChange={(e) => updateFormLigne(ligne.id, "dateReception", e.target.value)}
-                                            className="w-full h-9"
-                                          />
-                                        </TableCell>
-                                        <TableCell className="p-2">
-                                          <Input
-                                            type="date"
-                                            value={ligne.dateExpiration}
-                                            onChange={(e) =>
-                                              updateFormLigne(ligne.id, "dateExpiration", e.target.value)
-                                            }
-                                            className="w-full h-9"
-                                          />
-                                        </TableCell>
-                                        <TableCell className="p-2">
-                                          <Input
-                                            value={ligne.numeroLot}
-                                            onChange={(e) => updateFormLigne(ligne.id, "numeroLot", e.target.value)}
-                                            placeholder="Auto-généré"
-                                            className="w-full h-9"
-                                          />
-                                        </TableCell>
-                                        <TableCell className="p-2">
-                                          <Badge variant="outline" className="bg-purple-50 text-purple-700 font-medium">
-                                            {(ligne.quantite * ligne.prixUnitaireVente).toFixed(2)} FCFA
-                                          </Badge>
-                                        </TableCell>
-                                        <TableCell className="p-2">
-                                          <Button
-                                            type="button"
-                                            onClick={() => removeFormLigne(ligne.id)}
-                                            size="sm"
-                                            variant="ghost"
-                                            className="h-8 w-8 p-0 hover:bg-red-100 hover:text-red-700"
-                                          >
-                                            <X className="h-4 w-4" />
-                                          </Button>
-                                        </TableCell>
-                                      </TableRow>
-                                    ))}
-                                  </TableBody>
-                                </Table>
-                              </div>
-                            </ScrollArea>
-                          </div>
-                        )}
-                      </CardContent>
-                    </Card>
-                  </TabsContent>
-
-                  {/* Onglet Résumé */}
-                  <TabsContent value="resume" className="h-full m-0 p-6">
-                    <Card className="border-purple-200 h-full">
-                      <CardHeader>
-                        <CardTitle className="text-lg text-purple-800">Résumé de l'Approvisionnement</CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-6">
-                        <div className="grid grid-cols-2 gap-6">
-                          <div>
-                            <h3 className="font-medium text-gray-900 mb-3">Informations Générales</h3>
-                            <div className="space-y-2 text-sm">
-                              <div className="flex justify-between">
-                                <span className="text-gray-600">Fournisseur:</span>
-                                <span className="font-medium">{fournisseur || "Non renseigné"}</span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span className="text-gray-600">Date:</span>
-                                <span className="font-medium">{new Date().toLocaleDateString("fr-FR")}</span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span className="text-gray-600">Nombre de lignes:</span>
-                                <span className="font-medium">{formLignes.length}</span>
-                              </div>
-                            </div>
-                          </div>
-                          <div>
-                            <h3 className="font-medium text-gray-900 mb-3">Totaux</h3>
-                            <div className="space-y-2 text-sm">
-                              <div className="flex justify-between">
-                                <span className="text-gray-600">Quantité totale:</span>
-                                <span className="font-medium">
-                                  {formLignes.reduce((sum, ligne) => sum + ligne.quantite, 0)} unités
-                                </span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span className="text-gray-600">Coût d'achat:</span>
-                                <span className="font-medium text-green-700">
-                                  {formLignes
-                                    .reduce((sum, ligne) => sum + ligne.quantite * ligne.prixUnitaireAchat, 0)
-                                    .toFixed(2)}{" "}
-                                  FCFA
-                                </span>
-                              </div>
-                              <div className="flex justify-between text-lg font-bold">
-                                <span className="text-purple-800">Valeur de vente:</span>
-                                <span className="text-purple-900">{totalFormulaire.toFixed(2)} FCFA</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        {formLignes.length > 0 && (
-                          <div>
-                            <h3 className="font-medium text-gray-900 mb-3">Détail des Lignes</h3>
-                            <ScrollArea className="h-48 border rounded-lg">
-                              <div className="p-3 space-y-2">
-                                {formLignes.map((ligne, index) => (
-                                  <div
-                                    key={ligne.id}
-                                    className="flex justify-between items-center text-sm p-2 bg-gray-50 rounded"
-                                  >
-                                    <span>Ligne {index + 1}</span>
-                                    <span className="font-medium">
-                                      {ligne.quantite} × {ligne.prixUnitaireVente.toFixed(2)} FCFA ={" "}
+                      ) : (
+                        <div className="h-96 overflow-auto">
+                          <table className="w-full">
+                            <thead className="bg-gray-100 sticky top-0">
+                              <tr>
+                                <th className="p-2 text-left">Médicament</th>
+                                <th className="p-2 text-left">Quantité</th>
+                                <th className="p-2 text-left">Prix Achat</th>
+                                <th className="p-2 text-left">Prix Vente</th>
+                                <th className="p-2 text-left">Date Réception</th>
+                                <th className="p-2 text-left">Date Expiration</th>
+                                <th className="p-2 text-left">N° Lot</th>
+                                <th className="p-2 text-left">Total</th>
+                                <th className="p-2"></th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {formLignes.map((ligne, index) => (
+                                <tr key={ligne.id} className="hover:bg-gray-50">
+                                  <td className="p-2">
+                                    <select
+                                      value={ligne.medicamentReferenceId?.toString() || ""}
+                                      onChange={(e) =>
+                                        updateFormLigne(
+                                          ligne.id,
+                                          "medicamentReferenceId",
+                                          Number.parseInt(e.target.value),
+                                        )
+                                      }
+                                      className="w-full px-2 py-1 bg-gray-50 rounded"
+                                    >
+                                      <option value="">Sélectionner</option>
+                                      {medicamentReferences.map((ref) => (
+                                        <option key={ref.id} value={ref.id!.toString()}>
+                                          {ref.medicament?.nom} - {ref.reference?.nom}
+                                        </option>
+                                      ))}
+                                    </select>
+                                  </td>
+                                  <td className="p-2">
+                                    <input
+                                      type="number"
+                                      min="1"
+                                      value={ligne.quantite}
+                                      onChange={(e) => {
+                                        const value = Number.parseInt(e.target.value) || 1
+                                        updateFormLigne(ligne.id, "quantite", Math.max(1, value))
+                                      }}
+                                      className="w-full px-2 py-1 bg-gray-50 rounded text-center"
+                                    />
+                                  </td>
+                                  <td className="p-2">
+                                    <input
+                                      type="number"
+                                      step="0.01"
+                                      min="0"
+                                      value={ligne.prixUnitaireAchat}
+                                      onChange={(e) => {
+                                        const value = Number.parseFloat(e.target.value) || 0
+                                        updateFormLigne(ligne.id, "prixUnitaireAchat", Math.max(0, value))
+                                      }}
+                                      className="w-full px-2 py-1 bg-gray-50 rounded"
+                                    />
+                                  </td>
+                                  <td className="p-2">
+                                    <input
+                                      type="number"
+                                      step="0.01"
+                                      min="0"
+                                      value={ligne.prixUnitaireVente}
+                                      onChange={(e) => {
+                                        const value = Number.parseFloat(e.target.value) || 0
+                                        updateFormLigne(ligne.id, "prixUnitaireVente", Math.max(0, value))
+                                      }}
+                                      className="w-full px-2 py-1 bg-gray-50 rounded"
+                                    />
+                                  </td>
+                                  <td className="p-2">
+                                    <input
+                                      type="date"
+                                      value={ligne.dateReception}
+                                      onChange={(e) => updateFormLigne(ligne.id, "dateReception", e.target.value)}
+                                      className="w-full px-2 py-1 bg-gray-50 rounded"
+                                    />
+                                  </td>
+                                  <td className="p-2">
+                                    <input
+                                      type="date"
+                                      value={ligne.dateExpiration}
+                                      onChange={(e) => updateFormLigne(ligne.id, "dateExpiration", e.target.value)}
+                                      className="w-full px-2 py-1 bg-gray-50 rounded"
+                                    />
+                                  </td>
+                                  <td className="p-2">
+                                    <input
+                                      type="text"
+                                      value={ligne.numeroLot}
+                                      onChange={(e) => updateFormLigne(ligne.id, "numeroLot", e.target.value)}
+                                      placeholder="Auto-généré"
+                                      className="w-full px-2 py-1 bg-gray-50 rounded"
+                                    />
+                                  </td>
+                                  <td className="p-2">
+                                    <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded text-xs">
                                       {(ligne.quantite * ligne.prixUnitaireVente).toFixed(2)} FCFA
                                     </span>
-                                  </div>
-                                ))}
-                              </div>
-                            </ScrollArea>
+                                  </td>
+                                  <td className="p-2">
+                                    <button
+                                      onClick={() => removeFormLigne(ligne.id)}
+                                      className="p-1 hover:bg-red-100 rounded"
+                                    >
+                                      <X className="h-4 w-4 text-red-600" />
+                                    </button>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {activeTab === "resume" && (
+                    <div className="space-y-6">
+                      <h3 className="text-lg font-medium text-gray-800">Résumé de l'Approvisionnement</h3>
+                      <div className="grid grid-cols-2 gap-6">
+                        <div>
+                          <h4 className="font-medium text-gray-900 mb-3">Informations Générales</h4>
+                          <div className="space-y-2 text-sm">
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Fournisseur:</span>
+                              <span className="font-medium">{fournisseur || "Non renseigné"}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Date:</span>
+                              <span className="font-medium">{new Date().toLocaleDateString("fr-FR")}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Nombre de lignes:</span>
+                              <span className="font-medium">{formLignes.length}</span>
+                            </div>
                           </div>
-                        )}
-                      </CardContent>
-                    </Card>
-                  </TabsContent>
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-gray-900 mb-3">Totaux</h4>
+                          <div className="space-y-2 text-sm">
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Quantité totale:</span>
+                              <span className="font-medium">
+                                {formLignes.reduce((sum, ligne) => sum + ligne.quantite, 0)} unités
+                              </span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Coût d'achat:</span>
+                              <span className="font-medium text-green-700">
+                                {formLignes
+                                  .reduce((sum, ligne) => sum + ligne.quantite * ligne.prixUnitaireAchat, 0)
+                                  .toFixed(2)}{" "}
+                                FCFA
+                              </span>
+                            </div>
+                            <div className="flex justify-between text-lg font-bold">
+                              <span className="text-purple-800">Valeur de vente:</span>
+                              <span className="text-purple-900">{totalFormulaire.toFixed(2)} FCFA</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {formLignes.length > 0 && (
+                        <div>
+                          <h4 className="font-medium text-gray-900 mb-3">Détail des Lignes</h4>
+                          <div className="h-48 overflow-auto bg-gray-50 rounded p-3">
+                            <div className="space-y-2">
+                              {formLignes.map((ligne, index) => (
+                                <div
+                                  key={ligne.id}
+                                  className="flex justify-between items-center text-sm p-2 bg-white rounded"
+                                >
+                                  <span>Ligne {index + 1}</span>
+                                  <span className="font-medium">
+                                    {ligne.quantite} × {ligne.prixUnitaireVente.toFixed(2)} FCFA ={" "}
+                                    {(ligne.quantite * ligne.prixUnitaireVente).toFixed(2)} FCFA
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
-              </Tabs>
+              </div>
+
+              <div className="p-6 border-t flex justify-end gap-4">
+                <button
+                  onClick={() => setIsApproDialogOpen(false)}
+                  disabled={isSubmitting}
+                  className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded"
+                >
+                  Annuler
+                </button>
+                <button
+                  onClick={handleSaveApprovisionnement}
+                  disabled={isSubmitting || formLignes.length === 0 || !fournisseur.trim()}
+                  className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2 inline-block"></div>
+                      Sauvegarde...
+                    </>
+                  ) : (
+                    <>{editingAppro ? "Modifier" : "Créer"} Approvisionnement</>
+                  )}
+                </button>
+              </div>
             </div>
+          </div>
+        )}
 
-            <DialogFooter className="p-6 pt-0">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setIsApproDialogOpen(false)}
-                disabled={isSubmitting}
-              >
-                Annuler
-              </Button>
-              <Button
-                type="button"
-                onClick={handleSaveApprovisionnement}
-                disabled={isSubmitting || formLignes.length === 0 || !fournisseur.trim()}
-                className="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700"
-              >
-                {isSubmitting ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Sauvegarde...
-                  </>
-                ) : (
-                  <>{editingAppro ? "Modifier" : "Créer"} Approvisionnement</>
-                )}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-
-        {/* Dialog de confirmation de suppression */}
-        <AlertDialog open={deleteApproId !== null} onOpenChange={() => setDeleteApproId(null)}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle className="flex items-center gap-2">
+        {deleteApproId !== null && (
+          <div className="fixed inset-0 bg-black/70 bg-opacity-10 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6">
+              <div className="flex items-center gap-2 mb-4">
                 <AlertTriangle className="h-5 w-5 text-red-600" />
-                Confirmer la suppression
-              </AlertDialogTitle>
-              <AlertDialogDescription>
+                <h3 className="text-lg font-semibold">Confirmer la suppression</h3>
+              </div>
+              <p className="text-gray-600 mb-6">
                 Êtes-vous sûr de vouloir supprimer cet approvisionnement ? Cette action est irréversible et supprimera
                 également toutes les lignes d'approvisionnement associées.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Annuler</AlertDialogCancel>
-              <AlertDialogAction
-                onClick={handleDeleteApprovisionnement}
-                className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
-              >
-                Supprimer
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+              </p>
+              <div className="flex justify-end gap-4">
+                <button
+                  onClick={() => setDeleteApproId(null)}
+                  className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded"
+                >
+                  Annuler
+                </button>
+                <button
+                  onClick={handleDeleteApprovisionnement}
+                  className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
+                >
+                  Supprimer
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </PharmacienSidebar>
   )

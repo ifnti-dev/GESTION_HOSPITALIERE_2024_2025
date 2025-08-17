@@ -1,28 +1,12 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Badge } from "@/components/ui/badge"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Tags, Plus, Search, Edit, Trash2, Package, Filter, Loader2, AlertCircle, Eye } from "lucide-react"
 import { PharmacienSidebar } from "@/components/sidebars/pharmacien-sidebar"
 import { useCategories, useCategorieMutations, useCategorieSearch } from "@/hooks/pharmacie/useCategories"
 import { toast } from "sonner"
 import type { Categorie } from "@/types/pharmacie"
+import { Edit, Trash2 } from "lucide-react"
 
 export default function CategoriesPage() {
   const [searchTerm, setSearchTerm] = useState("")
@@ -31,8 +15,6 @@ export default function CategoriesPage() {
   const [formData, setFormData] = useState({ nom: "", description: "" })
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [categoryToDelete, setCategoryToDelete] = useState<{ id: number; nom: string } | null>(null)
-  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false)
-  const [selectedCategory, setSelectedCategory] = useState<Categorie | null>(null)
 
   // Hooks pour l'API
   const { categories: allCategories, loading: loadingAll, error: errorAll, refetch } = useCategories()
@@ -51,7 +33,7 @@ export default function CategoriesPage() {
           nom: searchTerm,
           description: searchTerm,
         })
-      }, 300) // Debounce de 300ms
+      }, 300)
 
       return () => clearTimeout(timeoutId)
     }
@@ -91,7 +73,7 @@ export default function CategoriesPage() {
 
       setIsDialogOpen(false)
       setFormData({ nom: "", description: "" })
-      refetch() // Recharger la liste
+      refetch()
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Une erreur est survenue")
     }
@@ -116,31 +98,16 @@ export default function CategoriesPage() {
     }
   }
 
-  const handleViewDetails = (category: Categorie) => {
-    setSelectedCategory(category)
-    setIsDetailDialogOpen(true)
-  }
-
-  // Calcul des statistiques
-  const totalCategories = allCategories.length
-  const totalMedicaments = allCategories.reduce((sum, cat) => sum + (cat.medicaments?.length || 0), 0)
-  const moyenneMedicaments = totalCategories > 0 ? Math.round(totalMedicaments / totalCategories) : 0
-  const categorieImportante = allCategories.reduce(
-    (max, cat) => ((cat.medicaments?.length || 0) > (max.medicaments?.length || 0) ? cat : max),
-    allCategories[0] || { nom: "Aucune", medicaments: [] },
-  )
-
   if (errorAll) {
     return (
       <PharmacienSidebar>
-        <div className="flex items-center justify-center h-64">
+        <div className="p-6">
           <div className="text-center">
-            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Erreur de chargement</h3>
             <p className="text-gray-600 mb-4">{errorAll}</p>
-            <Button onClick={refetch} variant="outline">
+            <button onClick={refetch} className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
               Réessayer
-            </Button>
+            </button>
           </div>
         </div>
       </PharmacienSidebar>
@@ -149,341 +116,171 @@ export default function CategoriesPage() {
 
   return (
     <PharmacienSidebar>
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-              <div className="p-2 bg-gradient-to-r from-teal-500 to-cyan-500 rounded-xl shadow-lg">
-                <Tags className="h-8 w-8 text-white" />
-              </div>
-              Gestion des Catégories
-            </h1>
-            <p className="text-gray-600 mt-2">Organisez et gérez les catégories de médicaments</p>
-          </div>
-          <Button
+      <div className="p-6">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Gestion des Catégories</h1>
+          <p className="text-gray-600">Organisez et gérez les catégories de médicaments</p>
+        </div>
+
+        <div className="mb-6 flex gap-4">
+          <input
+            type="text"
+            placeholder="Rechercher une catégorie..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
+          />
+          <button
             onClick={handleAdd}
             disabled={mutationLoading}
-            className="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 shadow-lg"
+            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:opacity-50"
           >
-            {mutationLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Plus className="h-4 w-4 mr-2" />}
             Nouvelle Catégorie
-          </Button>
+          </button>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <Card className="border-0 shadow-lg bg-gradient-to-br from-teal-50 to-cyan-50">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-teal-700">Total Catégories</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-teal-900">{totalCategories}</div>
-              <p className="text-xs text-teal-600 mt-1">Catégories actives</p>
-            </CardContent>
-          </Card>
-          <Card className="border-0 shadow-lg bg-gradient-to-br from-cyan-50 to-blue-50">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-cyan-700">Médicaments Total</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-cyan-900">{totalMedicaments}</div>
-              <p className="text-xs text-cyan-600 mt-1">Tous médicaments</p>
-            </CardContent>
-          </Card>
-          <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-50 to-teal-50">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-blue-700">Moyenne/Catégorie</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-blue-900">{moyenneMedicaments}</div>
-              <p className="text-xs text-blue-600 mt-1">Médicaments par catégorie</p>
-            </CardContent>
-          </Card>
-          <Card className="border-0 shadow-lg bg-gradient-to-br from-teal-50 to-blue-50">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-teal-700">Plus Importante</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-lg font-bold text-teal-900">{categorieImportante.nom}</div>
-              <p className="text-xs text-teal-600 mt-1">{categorieImportante.medicaments?.length || 0} médicaments</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Search and Filters */}
-        <Card className="border-0 shadow-lg">
-          <CardHeader>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input
-                  placeholder="Rechercher une catégorie..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 border-teal-200 focus:border-teal-500 focus:ring-teal-500"
-                />
-              </div>
-              <Button variant="outline" className="border-teal-200 text-teal-700 hover:bg-teal-50">
-                <Filter className="h-4 w-4 mr-2" />
-                Filtres
-              </Button>
-            </div>
-          </CardHeader>
-        </Card>
-
-        {/* Categories Table */}
-        <Card className="border-0 shadow-lg">
-          <CardHeader className="bg-gradient-to-r from-teal-50 to-cyan-50 border-b border-teal-100">
-            <CardTitle className="flex items-center gap-2 text-teal-800">
-              <Package className="h-5 w-5 text-teal-600" />
-              Liste des Catégories
-            </CardTitle>
-            <CardDescription className="text-teal-600">
+        <div className="bg-white border border-gray-300 rounded">
+          <div className="p-4 border-b border-gray-300">
+            <h2 className="text-lg font-semibold text-gray-900">Liste des Catégories</h2>
+            <p className="text-gray-600">
               {loading ? "Chargement..." : `${categories.length} catégorie(s) trouvée(s)`}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="p-0">
-            {loading ? (
-              <div className="flex items-center justify-center h-64">
-                <Loader2 className="h-8 w-8 animate-spin text-teal-600" />
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="bg-gray-50/50 hover:bg-gray-50/50">
-                      <TableHead className="font-semibold text-gray-700 py-4">ID</TableHead>
-                      <TableHead className="font-semibold text-gray-700 py-4">Nom</TableHead>
-                      <TableHead className="font-semibold text-gray-700 py-4">Description</TableHead>
-                      <TableHead className="font-semibold text-gray-700 py-4">Médicaments</TableHead>
-                      <TableHead className="text-right font-semibold text-gray-700 py-4">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {categories.map((category, index) => (
-                      <TableRow
-                        key={category.id}
-                        className={`
-                          hover:bg-teal-50/50 transition-all duration-200 border-b border-gray-100
-                          ${index % 2 === 0 ? "bg-white" : "bg-gray-50/30"}
-                        `}
-                      >
-                        <TableCell className="font-medium text-gray-900 py-4">#{category.id}</TableCell>
-                        <TableCell className="font-medium text-gray-900 py-4">
-                          <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-teal-500 rounded-full"></div>
-                            {category.nom}
-                          </div>
-                        </TableCell>
-                        <TableCell className="max-w-xs truncate text-gray-600 py-4">{category.description}</TableCell>
-                        <TableCell className="py-4">
-                          <Badge variant="outline" className="bg-teal-50 text-teal-700 border-teal-200 font-medium">
-                            {category.medicaments?.length || 0} médicaments
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-right py-4">
-                          <div className="flex items-center justify-end gap-1">
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => handleViewDetails(category)}
-                              className="h-8 w-8 p-0 hover:bg-green-100 hover:text-green-700 transition-all duration-200"
-                              title="Voir les détails"
-                            >
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => handleEdit(category)}
-                              disabled={mutationLoading}
-                              className="h-8 w-8 p-0 hover:bg-blue-100 hover:text-blue-700 transition-all duration-200"
-                              title="Modifier la catégorie"
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => handleDelete(category.id!, category.nom)}
-                              disabled={mutationLoading}
-                              className="h-8 w-8 p-0 hover:bg-red-100 hover:text-red-700 transition-all duration-200"
-                              title="Supprimer la catégorie"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+            </p>
+          </div>
 
-        {/* Add/Edit Dialog */}
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogContent className="sm:max-w-[425px]">
-            <form onSubmit={handleSubmit}>
-              <DialogHeader>
-                <DialogTitle className="flex items-center gap-2">
-                  <Tags className="h-5 w-5 text-teal-600" />
-                  {editingCategory ? "Modifier la Catégorie" : "Nouvelle Catégorie"}
-                </DialogTitle>
-                <DialogDescription>
-                  {editingCategory
-                    ? "Modifiez les informations de la catégorie."
-                    : "Ajoutez une nouvelle catégorie de médicaments."}
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="nom">Nom de la catégorie *</Label>
-                  <Input
-                    id="nom"
+          {loading ? (
+            <div className="p-8 text-center">
+              <p>Chargement...</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-4 py-3 text-left font-semibold text-gray-700">ID</th>
+                    <th className="px-4 py-3 text-left font-semibold text-gray-700">Nom</th>
+                    <th className="px-4 py-3 text-left font-semibold text-gray-700">Description</th>
+                    <th className="px-4 py-3 text-left font-semibold text-gray-700">Médicaments</th>
+                    <th className="px-4 py-3 text-right font-semibold text-gray-700">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {categories.map((category, index) => (
+                    <tr key={category.id} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                      <td className="px-4 py-3 font-medium text-gray-900">#{category.id}</td>
+                      <td className="px-4 py-3 font-medium text-gray-900">{category.nom}</td>
+                      <td className="px-4 py-3 text-gray-600">{category.description}</td>
+                      <td className="px-4 py-3">
+                        <span className="px-2 py-1 bg-gray-200 text-gray-700 rounded text-sm">
+                          {category.medicaments?.length || 0} médicaments
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <div className="flex justify-end gap-2">
+                          <button
+                            onClick={() => handleEdit(category)}
+                            disabled={mutationLoading}
+                            className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
+                            title="Modifier"
+                          >
+                            <Edit size={16} />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(category.id!, category.nom)}
+                            disabled={mutationLoading}
+                            className="p-2 bg-red-500 text-white rounded hover:bg-red-600 disabled:opacity-50"
+                            title="Supprimer"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
+        {isDialogOpen && (
+          <div className="fixed inset-0 bg-black/70 bg-opacity-10 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded w-full max-w-md border border-gray-300 shadow-lg">
+              <h2 className="text-lg font-semibold mb-4">
+                {editingCategory ? "Modifier la Catégorie" : "Nouvelle Catégorie"}
+              </h2>
+              <form onSubmit={handleSubmit}>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Nom de la catégorie *</label>
+                  <input
+                    type="text"
                     value={formData.nom}
                     onChange={(e) => setFormData({ ...formData, nom: e.target.value })}
                     placeholder="Ex: Antalgiques"
-                    className="border-teal-200 focus:border-teal-500 focus:ring-teal-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
                     required
                   />
                 </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="description">Description *</Label>
-                  <Textarea
-                    id="description"
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Description *</label>
+                  <textarea
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     placeholder="Description de la catégorie..."
-                    className="border-teal-200 focus:border-teal-500 focus:ring-teal-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
                     rows={3}
                     required
                   />
                 </div>
-              </div>
-              <DialogFooter>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setIsDialogOpen(false)}
-                  disabled={mutationLoading}
-                >
-                  Annuler
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={mutationLoading}
-                  className="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700"
-                >
-                  {mutationLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
-                  {editingCategory ? "Modifier" : "Créer"}
-                </Button>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
+                <div className="flex justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsDialogOpen(false)}
+                    disabled={mutationLoading}
+                    className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50"
+                  >
+                    Annuler
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={mutationLoading}
+                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
+                  >
+                    {editingCategory ? "Modifier" : "Créer"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
 
-        {/* Delete Confirmation Dialog */}
-        <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-          <DialogContent className="sm:max-w-[400px]">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2 text-red-600">
-                <AlertCircle className="h-5 w-5" />
-                Confirmer la suppression
-              </DialogTitle>
-              <DialogDescription>
+        {isDeleteDialogOpen && (
+          <div className="fixed inset-0 bg-black/70 bg-opacity-10 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded w-full max-w-md border border-gray-300 shadow-lg">
+              <h2 className="text-lg font-semibold mb-4 text-red-600">Confirmer la suppression</h2>
+              <p className="mb-6">
                 Êtes-vous sûr de vouloir supprimer la catégorie <strong>"{categoryToDelete?.nom}"</strong> ?
                 <br />
                 <span className="text-red-600 font-medium">Cette action est irréversible.</span>
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter className="gap-2">
-              <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)} disabled={mutationLoading}>
-                Annuler
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={confirmDelete}
-                disabled={mutationLoading}
-                className="bg-red-600 hover:bg-red-700"
-              >
-                {mutationLoading ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Suppression...
-                  </>
-                ) : (
-                  <>
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Supprimer
-                  </>
-                )}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-
-        {/* Details Dialog */}
-        <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
-          <DialogContent className="sm:max-w-[600px]">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2 text-teal-600">
-                <Tags className="h-5 w-5" />
-                Détails de la catégorie
-              </DialogTitle>
-            </DialogHeader>
-            {selectedCategory && (
-              <div className="space-y-6">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium text-gray-500">ID</Label>
-                    <p className="text-lg font-semibold">#{selectedCategory.id}</p>
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium text-gray-500">Nom</Label>
-                    <p className="text-lg font-semibold">{selectedCategory.nom}</p>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-500">Description</Label>
-                  <p className="text-gray-700 bg-gray-50 p-3 rounded-lg">{selectedCategory.description}</p>
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-500">Médicaments associés</Label>
-                  <div className="bg-teal-50 p-4 rounded-lg">
-                    <div className="flex items-center gap-2">
-                      <Package className="h-5 w-5 text-teal-600" />
-                      <span className="text-2xl font-bold text-teal-800">
-                        {selectedCategory.medicaments?.length || 0}
-                      </span>
-                      <span className="text-teal-600">médicaments</span>
-                    </div>
-                  </div>
-                </div>
+              </p>
+              <div className="flex justify-end gap-2">
+                <button
+                  onClick={() => setIsDeleteDialogOpen(false)}
+                  disabled={mutationLoading}
+                  className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50"
+                >
+                  Annuler
+                </button>
+                <button
+                  onClick={confirmDelete}
+                  disabled={mutationLoading}
+                  className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 disabled:opacity-50"
+                >
+                  {mutationLoading ? "Suppression..." : "Supprimer"}
+                </button>
               </div>
-            )}
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsDetailDialogOpen(false)}>
-                Fermer
-              </Button>
-              <Button
-                onClick={() => {
-                  setIsDetailDialogOpen(false)
-                  if (selectedCategory) handleEdit(selectedCategory)
-                }}
-                className="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700"
-              >
-                <Edit className="h-4 w-4 mr-2" />
-                Modifier
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+            </div>
+          </div>
+        )}
       </div>
     </PharmacienSidebar>
   )
