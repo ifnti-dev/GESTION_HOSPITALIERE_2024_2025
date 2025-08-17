@@ -1,3 +1,4 @@
+import { DossierGrossesse, DossierMedical } from "./medical"
 import { Medicament } from "./pharmacie"
 import { Employe, Personne } from "./utilisateur"
 
@@ -9,30 +10,33 @@ export interface BaseEntity {
 }
 
 // Consultation médicale
-export interface Consultation extends BaseEntity {
-  date: string 
-  symptomes: string
-  diagnostic: string
-  personne?: Personne // Relation ManyToOne
-  employe?: Employe // Relation ManyToOne
-  prescriptions?: Prescription[] // Relation OneToMany
+export type Consultation = {
+  id: number;
+  date: string; // ISO string format (YYYY-MM-DD)
+  symptomes: string | null;
+  diagnostic: string | null;
+  temperature: number;  // obligatoire
+  poids: number;        // obligatoire
+  tensionArterielle: string | null;
+  pressionArterielle: string | null;
+
+  prescriptions?: Prescription[] 
+  dossierMedical: DossierMedical
+  employe: Employe ;
 }
 
-export interface CreateConsultation   {
-  date: string 
-  symptomes: string
-  diagnostic: string
-  personne: {
-    id: number
-  }
-  employe: {
-    id: number
-  } 
-  prescriptions?: Prescription[]
-   createdAt?: string
-  updatedAt?: string
+export type CreateConsultationPayload = {
+  date: string; // ISO string format (YYYY-MM-DD)
+  symptomes?: string | null;
+  diagnostic?: string | null;
+  temperature: number;  // obligatoire
+  poids: number;        // obligatoire
+  tensionArterielle?: string | null;
+  pressionArterielle?: string | null;
+  dossierMedical: { id: number }; 
+  employe:{ id: number }; 
+};
 
-}
 export interface Prescription extends BaseEntity {
   date: string | Date;
   instructions: string;
@@ -55,10 +59,8 @@ export interface CreatePrescription {
   consultation: {
     id: number;
   };
-  medicament: {
-    id: number;
-  };
-  medicaments?: MedicamentPrescrit[];
+  
+  medicaments?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -68,35 +70,49 @@ export interface CreatePrescription {
 
 export type ConsultationPrenatale = {
   id: number;
-  patiente: Personne;
   dateConsultation: string; // Format "YYYY-MM-DD"
-  semaineAmenorrhee: number;
-  poids: number;
-  tensionArterielle: string;
+  poidsMere: number;
   hauteurUterine: number | null;
-  bruitsCardiaquesFoetaux: string | null;
-  observations: string | null;
-  prochainRdv: string | null; // Format "YYYY-MM-DD"
-  alerte: string | null;
+  bruitsCoeurFoetal: string | null;
+  oedemes: boolean | null;
+  mouvementsFoetus: string | null;
+  presenceDiabeteGestationnel: boolean | null;
+  presenceHypertensionGestationnelle: boolean | null;
+  resultatsAnalyses: string | null;
+  examensComplementaires: string | null;
+  traitementsEnCours: string | null;
+  observationsGenerales: string | null;
+  decisionMedicale: string | null;
+  dateProchaineConsultation: string | null; // Format "YYYY-MM-DD"
+  derniereDoseVAT: number | null;
+  dateDerniereDoseVAT: string | null; // Format "YYYY-MM-DD"
+  dossierGrossesse: DossierGrossesse;
+  employe: Employe;
 };
 
 
 export type CreateConsultationPrenatalePayload = {
-  patiente:{
-    id: number;
-   };
-  dateConsultation: string; // Format "YYYY-MM-DD"
-  semaineAmenorrhee: number;
-  poids: number;
-  tensionArterielle: string;
+  dateConsultation: string;
+  poidsMere: number;
   hauteurUterine?: number | null;
-  bruitsCardiaquesFoetaux?: string | null;
-  observations?: string | null;
-  prochainRdv?: string | null; // Format "YYYY-MM-DD"
-  alerte?: string | null;
+  bruitsCoeurFoetal?: string | null;
+  oedemes?: boolean | null;
+  mouvementsFoetus?: string | null;
+  presenceDiabeteGestationnel?: boolean | null;
+  presenceHypertensionGestationnelle?: boolean | null;
+  resultatsAnalyses?: string | null;
+  examensComplementaires?: string | null;
+  traitementsEnCours?: string | null;
+  observationsGenerales?: string | null;
+  decisionMedicale?: string | null;
+  dateProchaineConsultation?: string | null;
+  derniereDoseVAT?: number | null;
+  dateDerniereDoseVAT?: string | null;
+  dossierGrossesse: { id: number };
+  employe: { id: number };
 };
 
-export type CreateConsultationPayload = Omit<ConsultationPrenatale, 'id' | 'nomPatiente'>;
+
 
 
 export type UpdateConsultationPayload = Omit<ConsultationPrenatale, 'nomPatiente'>;
@@ -168,4 +184,61 @@ export interface CreateHospitalisation {
     id: number
   }
 }
+
+
+
+// Enum pour les types de prescription
+export enum TypePrescription {
+  MEDICAMENT = "MEDICAMENT",
+  EXAMEN = "EXAMEN"
+}
+
+// Interface principale d'une prescription prénatale (telle que renvoyée par l'API)
+export interface PrescriptionPrenatale {
+  id: number;
+  type: TypePrescription;
+  designation: string;
+  instructions?: string | null;
+  commentaire?: string | null;
+  dateDebut?: string | null;        // Format "YYYY-MM-DD"
+  dateFin?: string | null;          // Format "YYYY-MM-DD"
+
+  // Champs spécifiques aux médicaments
+  posologie?: string | null;
+  quantiteParJour?: number | null;
+  dureeJours?: number | null;
+
+  // Champs spécifiques aux examens
+  datePrevue?: string | null;       // Format "YYYY-MM-DD"
+  lieuRealisation?: string | null;
+
+  // Relation vers la consultation prénatale
+  consultationPrenatale: ConsultationPrenatale;
+}
+
+// Payload pour la création (POST) d'une prescription prénatale
+export interface CreatePrescriptionPrenatalePayload {
+  type: TypePrescription;
+  designation: string;
+  instructions?: string | null;
+  commentaire?: string | null;
+  dateDebut?: string | null;
+  dateFin?: string | null;
+
+  // Champs médicaments
+  posologie?: string | null;
+  quantiteParJour?: number | null;
+  dureeJours?: number | null;
+
+  // Champs examens
+  datePrevue?: string | null;
+  lieuRealisation?: string | null;
+
+  // Uniquement l'ID de la consultation
+  consultationPrenatale: {
+    id: number;
+  };
+}
+
+// Objet de la consultation prénatale (référencée)
 

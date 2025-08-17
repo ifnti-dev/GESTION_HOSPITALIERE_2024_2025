@@ -2,17 +2,17 @@ package com.gestion_hospitaliere.UeEntreprise.service.ConsultationTraitement;
 
 import com.gestion_hospitaliere.UeEntreprise.model.ConsultationTraitement.Consultation;
 import com.gestion_hospitaliere.UeEntreprise.model.ConsultationTraitement.Prescription;
-import com.gestion_hospitaliere.UeEntreprise.model.Medical.Dossier;
 import com.gestion_hospitaliere.UeEntreprise.model.Medical.DossierMedical;
+import com.gestion_hospitaliere.UeEntreprise.model.User.Employe;
 import com.gestion_hospitaliere.UeEntreprise.repository.ConsultationTraitement.ConsultationRepository;
 import com.gestion_hospitaliere.UeEntreprise.repository.Medical.DossierMedicalRepository;
 import com.gestion_hospitaliere.UeEntreprise.repository.User.EmployeRepository;
-import com.gestion_hospitaliere.UeEntreprise.model.User.Employe;
 import com.gestion_hospitaliere.UeEntreprise.service.User.EmployeService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -42,113 +42,109 @@ public class ConsultationService {
 
     @Transactional
     public Consultation saveConsultation(Consultation consultation) {
-        // Gérer l'association du DossierMedical
-        DossierMedical dossierDetails = consultation.getDossierMedical();
-        DossierMedical managedDossier;
-        if (dossierDetails == null) {
-            throw new IllegalArgumentException("Les détails du dossier médical sont requis pour créer une consultation.");
+        // Gestion du dossier médical
+        DossierMedical dossier = consultation.getDossierMedical();
+        if (dossier == null || dossier.getId() == null) {
+            throw new IllegalArgumentException("L'ID du dossier médical est requis pour la consultation.");
         }
 
-        if (dossierDetails.getId() != null) {
-            managedDossier = dossierMedicalRepository.findById(dossierDetails.getId())
-                    .orElseThrow(() -> new IllegalArgumentException("Dossier médical non trouvé avec l'ID : " + dossierDetails.getId()));
-        } else {
-            throw new IllegalArgumentException("L'ID du dossier médical est requis pour associer à une consultation.");
-        }
+        DossierMedical managedDossier = dossierMedicalRepository.findById(dossier.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Dossier médical non trouvé avec l'ID : " + dossier.getId()));
         consultation.setDossierMedical(managedDossier);
 
-        // Gérer l'association de l'Employe (médecin)
-        Employe medecinDetails = consultation.getEmploye();
-        Employe managedMedecin;
-        if (medecinDetails == null) {
-            throw new IllegalArgumentException("Les détails du médecin (employe) sont requis pour créer une consultation.");
+        // Gestion du médecin (employé)
+        Employe employe = consultation.getEmploye();
+        if (employe == null) {
+            throw new IllegalArgumentException("Les informations du médecin sont requises.");
         }
 
-        if (medecinDetails.getId() != null) {
-            managedMedecin = employeRepository.findById(medecinDetails.getId())
-                    .orElseThrow(() -> new IllegalArgumentException("Médecin (Employe) non trouvé avec l'ID : " + medecinDetails.getId()));
-        } else if (medecinDetails.getNumOrdre() != null) {
-            managedMedecin = employeRepository.findByNumOrdre(medecinDetails.getNumOrdre())
+        Employe managedEmploye;
+        if (employe.getId() != null) {
+            managedEmploye = employeRepository.findById(employe.getId())
+                    .orElseThrow(() -> new IllegalArgumentException("Médecin non trouvé avec l'ID : " + employe.getId()));
+        } else if (employe.getNumOrdre() != null) {
+            managedEmploye = employeRepository.findByNumOrdre(employe.getNumOrdre())
                     .orElseGet(() -> {
-                        if (medecinDetails.getPersonne() == null || medecinDetails.getPersonne().getNom() == null) {
-                            throw new IllegalArgumentException("Les détails personnels (nom, prénom, email) du médecin sont requis pour le créer avec son numéro d'ordre.");
+                        if (employe.getPersonne() == null || employe.getPersonne().getNom() == null) {
+                            throw new IllegalArgumentException("Détails personnels requis pour créer un nouveau médecin.");
                         }
-                        return employeService.creerEmploye(medecinDetails);
+                        return employeService.creerEmploye(employe);
                     });
         } else {
-            if (medecinDetails.getPersonne() == null || medecinDetails.getPersonne().getNom() == null) {
-                throw new IllegalArgumentException("Les détails personnels complets du médecin sont requis pour le créer.");
+            if (employe.getPersonne() == null || employe.getPersonne().getNom() == null) {
+                throw new IllegalArgumentException("Détails personnels complets requis pour le médecin.");
             }
-            managedMedecin = employeService.creerEmploye(medecinDetails);
+            managedEmploye = employeService.creerEmploye(employe);
         }
-        consultation.setEmploye(managedMedecin);
+        consultation.setEmploye(managedEmploye);
 
-        // Gérer les prescriptions
+        // Lier prescriptions à la consultation
         if (consultation.getPrescriptions() != null) {
             for (Prescription prescription : consultation.getPrescriptions()) {
                 prescription.setConsultation(consultation);
             }
         }
+
         return consultationRepository.save(consultation);
     }
 
     @Transactional
     public Consultation updateConsultation(Long id, Consultation consultationDetails) {
-        Consultation existingConsultation = consultationRepository.findById(id)
+        Consultation existing = consultationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Consultation non trouvée avec l'id : " + id));
-        existingConsultation.setDate(consultationDetails.getDate());
-        existingConsultation.setSymptomes(consultationDetails.getSymptomes());
 
-        // Mettre à jour l'employé associé si fourni
+        existing.setDate(consultationDetails.getDate());
+        existing.setSymptomes(consultationDetails.getSymptomes());
+        existing.setDiagnostic(consultationDetails.getDiagnostic());
+
+        // Mise à jour du médecin
         if (consultationDetails.getEmploye() != null) {
-            Employe medecinUpdateDetails = consultationDetails.getEmploye();
-            Employe updatedMedecin;
-            if (medecinUpdateDetails.getId() != null) {
-                updatedMedecin = employeRepository.findById(medecinUpdateDetails.getId())
-                        .orElseThrow(() -> new IllegalArgumentException("Médecin (Employe) non trouvé pour mise à jour avec l'ID : " + medecinUpdateDetails.getId()));
-            } else if (medecinUpdateDetails.getNumOrdre() != null) {
-                updatedMedecin = employeRepository.findByNumOrdre(medecinUpdateDetails.getNumOrdre())
-                        .orElseThrow(() -> new IllegalArgumentException("Médecin non trouvé par NumOrdre: " + medecinUpdateDetails.getNumOrdre() + ". La création à la volée lors de l'update n'est pas gérée ici, fournissez un ID ou un numOrdre existant."));
+            Employe employe = consultationDetails.getEmploye();
+            Employe updated;
+            if (employe.getId() != null) {
+                updated = employeRepository.findById(employe.getId())
+                        .orElseThrow(() -> new IllegalArgumentException("Médecin non trouvé avec l'ID : " + employe.getId()));
+            } else if (employe.getNumOrdre() != null) {
+                updated = employeRepository.findByNumOrdre(employe.getNumOrdre())
+                        .orElseThrow(() -> new IllegalArgumentException("Médecin non trouvé avec le numéro d'ordre : " + employe.getNumOrdre()));
             } else {
-                throw new IllegalArgumentException("ID ou Numéro d'Ordre de l'employé requis pour mettre à jour l'association.");
+                throw new IllegalArgumentException("ID ou numéro d'ordre requis pour le médecin.");
             }
-            existingConsultation.setEmploye(updatedMedecin);
+            existing.setEmploye(updated);
         }
 
-        // Mettre à jour le dossier médical associé si fourni
+        // Mise à jour du dossier médical
         if (consultationDetails.getDossierMedical() != null) {
-            DossierMedical dossierUpdateDetails = consultationDetails.getDossierMedical();
-            DossierMedical updatedDossier;
-            if (dossierUpdateDetails.getId() != null) {
-                updatedDossier = dossierMedicalRepository.findById(dossierUpdateDetails.getId())
-                        .orElseThrow(() -> new IllegalArgumentException("Dossier médical non trouvé pour mise à jour avec l'ID : " + dossierUpdateDetails.getId()));
-            } else {
-                throw new IllegalArgumentException("ID du dossier médical requis pour mettre à jour l'association.");
+            DossierMedical dossier = consultationDetails.getDossierMedical();
+            if (dossier.getId() == null) {
+                throw new IllegalArgumentException("ID du dossier requis pour mise à jour.");
             }
-            existingConsultation.setDossierMedical(updatedDossier);
+            DossierMedical updatedDossier = dossierMedicalRepository.findById(dossier.getId())
+                    .orElseThrow(() -> new IllegalArgumentException("Dossier médical non trouvé avec l'ID : " + dossier.getId()));
+            existing.setDossierMedical(updatedDossier);
         }
 
-        // Gérer la mise à jour des prescriptions
+        // Mise à jour des prescriptions
         if (consultationDetails.getPrescriptions() != null) {
-            existingConsultation.getPrescriptions().clear();
-            for (Prescription prescriptionDetail : consultationDetails.getPrescriptions()) {
-                prescriptionDetail.setConsultation(existingConsultation);
-                existingConsultation.getPrescriptions().add(prescriptionDetail);
+            existing.getPrescriptions().clear();
+            for (Prescription pres : consultationDetails.getPrescriptions()) {
+                pres.setConsultation(existing);
+                existing.getPrescriptions().add(pres);
             }
         }
-        return consultationRepository.save(existingConsultation);
+
+        return consultationRepository.save(existing);
     }
 
     @Transactional
     public void deleteConsultation(Long id) {
         if (!consultationRepository.existsById(id)) {
-            throw new RuntimeException("Consultation non trouvée avec l'id : " + id + " pour la suppression.");
+            throw new RuntimeException("Consultation non trouvée pour l'id : " + id);
         }
         consultationRepository.deleteById(id);
     }
 
-    // Méthodes pour utiliser les requêtes personnalisées du repository
-
+    // Recherches personnalisées
     public List<Consultation> getConsultationsByDate(LocalDate date) {
         return consultationRepository.findByDate(date);
     }

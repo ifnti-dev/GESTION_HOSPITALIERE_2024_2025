@@ -23,12 +23,14 @@ public interface PrescriptionRepository extends JpaRepository<Prescription, Long
     List<Prescription> findByConsultationId(Long consultationId);
     
     // Trouver les prescriptions par médicament ID
-    List<Prescription> findByMedicamentId(Long medicamentId);
     
     // Trouver les prescriptions par quantité
     List<Prescription> findByQuantite(Integer quantite);
     
     // Trouver les prescriptions par posologie
     List<Prescription> findByPosologieContaining(String posologie);
+
+    List<Prescription> findByConsultation_Id(Long id);
+
 }
 

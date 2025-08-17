@@ -15,5 +15,5 @@ public interface ConsultationPrenataleRepository extends JpaRepository<Consultat
     List<ConsultationPrenatale> findByDateConsultation(LocalDate date);
 
 
-    List<Consultation> findByDossierGrossesse_Id(Long dossierGrossesseId);
+List<ConsultationPrenatale> findByDossierGrossesse_Id(Long dossierGrossesseId);
 }

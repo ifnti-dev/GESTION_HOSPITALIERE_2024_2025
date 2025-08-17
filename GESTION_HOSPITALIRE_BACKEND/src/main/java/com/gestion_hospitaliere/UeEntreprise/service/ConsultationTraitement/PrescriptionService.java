@@ -1,7 +1,9 @@
 
 package com.gestion_hospitaliere.UeEntreprise.service.ConsultationTraitement;
 
+import com.gestion_hospitaliere.UeEntreprise.model.ConsultationTraitement.Consultation;
 import com.gestion_hospitaliere.UeEntreprise.model.ConsultationTraitement.Prescription;
+import com.gestion_hospitaliere.UeEntreprise.repository.ConsultationTraitement.ConsultationRepository;
 import com.gestion_hospitaliere.UeEntreprise.repository.ConsultationTraitement.PrescriptionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -31,17 +33,23 @@ public class PrescriptionService {
         return prescriptionRepository.findById(id);
     }
 
-    public Prescription savePrescription(Prescription prescription) {
-        if (prescription.getConsultation() == null || prescription.getConsultation().getId() == null) {
-            throw new IllegalArgumentException("Une prescription doit être liée à une consultation.");
-        }
+    private ConsultationRepository consultationRepository; 
 
-        if (prescription.getMedicament() == null || prescription.getMedicament().getId() == null) {
-            throw new IllegalArgumentException("Un médicament est requis pour une prescription.");
-        }
-
-        return prescriptionRepository.save(prescription);
+public Prescription savePrescription(Prescription prescription) {
+    if (prescription.getConsultation() == null || prescription.getConsultation().getId() == null) {
+        throw new IllegalArgumentException("Une prescription doit être liée à une consultation.");
     }
+
+    // Récupérer la consultation existante depuis la base
+    Long consultationId = prescription.getConsultation().getId();
+    Consultation consultation = consultationRepository.findById(consultationId)
+            .orElseThrow(() -> new IllegalArgumentException("Consultation non trouvée avec l'ID : " + consultationId));
+
+    // Attacher la vraie consultation persistée à la prescription
+    prescription.setConsultation(consultation);
+
+    return prescriptionRepository.save(prescription);
+}
 
     public Prescription updatePrescription(Long id, Prescription details) {
         Prescription prescription = prescriptionRepository.findById(id)
@@ -51,9 +59,7 @@ public class PrescriptionService {
         prescription.setDuree(details.getDuree());
         prescription.setPosologie(details.getPosologie());
 
-        if (details.getMedicament() != null) {
-            prescription.setMedicament(details.getMedicament());
-        }
+        
 
         if (details.getConsultation() != null) {
             prescription.setConsultation(details.getConsultation());

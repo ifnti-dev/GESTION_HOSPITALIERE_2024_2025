@@ -1,4 +1,5 @@
 "use client"
+
 import {
   Dialog,
   DialogContent,
@@ -13,170 +14,256 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
-import { useState } from "react"
-import { CreateConsultation, Consultation } from "@/types/consultstionsTraitement"
+import { useState, useEffect } from "react"
 import { addConsultation } from "@/services/consultationTraitement/consultationService"
 import { useToast } from "@/components/ui/use-toast"
+import { cn } from "@/lib/utils"
+import { DossierMedical } from "@/types/medical"
+import { CreateConsultationPayload } from "@/types/consultstionsTraitement"
+
+// Types simplifiés basés sur le modal de prise de constantes
 
 interface AddConsultationModalProps {
   isOpen: boolean
   onClose: () => void
-  onSuccess: (consultation: Consultation) => void
-  patients: Array<{ id: number; prenom: string; nom: string }>
-  medecins: Array<{ id: number; specialite: string; personne?: { prenom: string; nom: string } }>
+  onSubmit: (data: CreateConsultationPayload) => void
+  dossiers: DossierMedical[]
+  selectedDossier: DossierMedical | null
+  setSelectedDossier: (dossier: DossierMedical | null) => void
+  employeid: number
 }
 
- export function AddConsultationModal({
+const FormField = ({
+  id,
+  label,
+  children,
+  required = false,
+  error,
+}: {
+  id: string
+  label: string
+  children: React.ReactNode
+  required?: boolean
+  error?: string
+}) => (
+  <div className="space-y-2">
+    <Label htmlFor={id} className="text-sm font-medium">
+      {label} {required && <span className="text-red-500">*</span>}
+    </Label>
+    {children}
+    {error && <p className="text-sm font-medium text-red-500">{error}</p>}
+  </div>
+)
+
+export function AddConsultationModal({
   isOpen,
   onClose,
-  onSuccess,
-  patients,
-  medecins,
+  onSubmit,
+  dossiers,
+  selectedDossier,
+  setSelectedDossier,
+  employeid
 }: AddConsultationModalProps) {
-  const [newConsultation, setNewConsultation] = useState<CreateConsultation>({
-    date: new Date().toISOString().split('T')[0],
-    symptomes: '',
-    diagnostic: '',
-    employe: { id: 0 },
-    personne: { id: 0 }
-  })
+  const [date, setDate] = useState<string>("")
+  const [symptomes, setSymptomes] = useState<string>("")
+  const [diagnostic, setDiagnostic] = useState<string>("")
+  const [temperature, setTemperature] = useState<string>("")
+  const [poids, setPoids] = useState<string>("")
+  const [tensionArterielle, setTensionArterielle] = useState<string>("")
+  const [pressionArterielle, setPressionArterielle] = useState<string>("")
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const { toast } = useToast()
 
-  const handleSubmit = async () => {
-    setIsSubmitting(true)
-    try {
-      if (!newConsultation.personne.id || !newConsultation.employe.id) {
-        toast({
-          title: "Erreur",
-          description: "Veuillez sélectionner un patient et un employé",
-          variant: "destructive",
-        })
-        return
-      }
-
-      const createdConsultation = await addConsultation(newConsultation)
-      onSuccess(createdConsultation)
-      
-      // Réinitialiser le formulaire
-      setNewConsultation({
-        date: new Date().toISOString().split('T')[0],
-        symptomes: '',
-        diagnostic: '',
-        employe: { id: 0 },
-        personne: { id: 0 }
-      })
-    } catch (err) {
-      toast({
-        title: "Erreur",
-        description: "Une erreur est survenue lors de la création",
-        variant: "destructive",
-      })
-    } finally {
-      setIsSubmitting(false)
+  // Reset du formulaire quand le modal se ferme
+  useEffect(() => {
+    if (!isOpen) {
+      setDate(new Date().toISOString().split('T')[0])
+      setSymptomes("")
+      setDiagnostic("")
+      setTemperature("")
+      setPoids("")
+      setTensionArterielle("")
+      setPressionArterielle("")
+      setSelectedDossier(null)
     }
+  }, [isOpen, setSelectedDossier])
+
+  const handleSubmit = () => {
+    if (!selectedDossier  || !temperature || !poids) return
+    
+    setIsSubmitting(true)
+    
+    const consultationData: CreateConsultationPayload = {
+      date,
+      symptomes: symptomes || null,
+      diagnostic: diagnostic || null,
+      temperature: parseFloat(temperature),
+      poids: parseFloat(poids),
+      tensionArterielle: tensionArterielle || null,
+      pressionArterielle: pressionArterielle || null,
+      dossierMedical: { id: selectedDossier.id },
+      employe: { id: employeid } // Remplacer par l'ID du médecin connecté
+    }
+    
+    onSubmit(consultationData)
+    setIsSubmitting(false)
   }
+
+  if (!isOpen) return null
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Créer une Nouvelle Consultation</DialogTitle>
-          <DialogDescription>Enregistrez une nouvelle consultation médicale</DialogDescription>
+          <DialogTitle className="text-2xl flex items-center gap-3">
+            <Plus className="h-6 w-6 text-green-500" />
+            Créer une Nouvelle Consultation
+          </DialogTitle>
+          <DialogDescription>
+            Enregistrez une nouvelle consultation médicale avec toutes les informations nécessaires.
+          </DialogDescription>
         </DialogHeader>
-        <div className="grid grid-cols-2 gap-4 py-4">
-          <div className="space-y-2">
-            <Label htmlFor="patient">Patient</Label>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
+          {/* Sélection du patient */}
+          <FormField id="patient" label="Patient" required>
             <Select
-              value={newConsultation.personne.id ? newConsultation.personne.id.toString() : ""}
-              onValueChange={(value) =>
-                setNewConsultation({ ...newConsultation, personne: { id: parseInt(value) } })
-              }
+              value={selectedDossier?.id.toString() || ""}
+              onValueChange={(value) => {
+                const dossier = dossiers.find(d => d.id.toString() === value)
+                setSelectedDossier(dossier || null)
+              }}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Sélectionner un patient" />
               </SelectTrigger>
               <SelectContent>
-                {patients.map((patient) => (
-                  <SelectItem key={patient.id} value={patient.id.toString()}>
-                    {patient.prenom} {patient.nom}
-                  </SelectItem>
-                ))}
+                {dossiers.map(dossier => {
+                  const patient = dossier.personne
+                  const nomComplet = patient ? `${patient.prenom} ${patient.nom}` : "Patient inconnu"
+                  return (
+                    <SelectItem key={dossier.id} value={dossier.id.toString()}>
+                      {nomComplet} (Dossier #{dossier.id})
+                    </SelectItem>
+                  )
+                })}
               </SelectContent>
             </Select>
-          </div>
+          </FormField>
 
-          <div className="space-y-2">
-            <Label htmlFor="dateConsultation">Date</Label>
+          
+
+          {/* Date de consultation */}
+          <FormField id="dateConsultation" label="Date de consultation" required>
             <Input 
               id="dateConsultation" 
               type="date" 
-              value={newConsultation.date}
-              onChange={(e) => 
-                setNewConsultation({...newConsultation, date: e.target.value})
-              }
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
             />
-          </div>
+          </FormField>
 
-          <div className="space-y-2 col-span-2">
-            <Label htmlFor="symptomes">Symptômes</Label>
-            <Textarea 
-              id="symptomes" 
-              placeholder="Décrivez les symptômes" 
-              value={newConsultation.symptomes}
-              onChange={(e) => 
-                setNewConsultation({...newConsultation, symptomes: e.target.value})
-              }
+          {/* Température */}
+          <FormField id="temperature" label="Température (°C)" required>
+            <Input 
+              id="temperature" 
+              type="number" 
+              step="0.1"
+              min="30"
+              max="45"
+              placeholder="36.5"
+              value={temperature}
+              onChange={(e) => setTemperature(e.target.value)}
               required
             />
-          </div>
-          
-          <div className="space-y-2 col-span-2">
-            <Label htmlFor="diagnostic">Diagnostic</Label>
-            <Textarea 
-              id="diagnostic" 
-              placeholder="Diagnostic médical" 
-              value={newConsultation.diagnostic ?? ''}
-              onChange={(e) => 
-                setNewConsultation({...newConsultation, diagnostic: e.target.value})
-              }
+          </FormField>
+
+          {/* Poids */}
+          <FormField id="poids" label="Poids (kg)" required>
+            <Input 
+              id="poids" 
+              type="number" 
+              step="0.1"
+              min="0"
+              placeholder="70"
+              value={poids}
+              onChange={(e) => setPoids(e.target.value)}
+              required
             />
+          </FormField>
+
+          {/* Tension artérielle */}
+          <FormField id="tensionArterielle" label="Tension Artérielle (optionnel)">
+            <Input 
+              id="tensionArterielle" 
+              type="text" 
+              placeholder="120/80"
+              value={tensionArterielle}
+              onChange={(e) => setTensionArterielle(e.target.value)}
+            />
+          </FormField>
+
+          {/* Pression artérielle */}
+          <FormField id="pressionArterielle" label="Pression Artérielle (optionnel)">
+            <Input 
+              id="pressionArterielle" 
+              type="text" 
+              placeholder="mmHg"
+              value={pressionArterielle}
+              onChange={(e) => setPressionArterielle(e.target.value)}
+            />
+          </FormField>
+
+          <div className="md:col-span-1"></div> {/* Spacer pour l'alignement */}
+
+          {/* Symptômes */}
+          <div className="md:col-span-2">
+            <FormField id="symptomes" label="Symptômes (optionnel)">
+              <Textarea 
+                id="symptomes" 
+                placeholder="Décrivez les symptômes présentés par le patient..." 
+                value={symptomes}
+                onChange={(e) => setSymptomes(e.target.value)}
+                rows={4}
+              />
+            </FormField>
           </div>
           
-          <div className="space-y-2">
-            <Label htmlFor="employe">Médecin</Label>
-            <Select
-              value={newConsultation.employe.id ? newConsultation.employe.id.toString() : ""}
-              onValueChange={(value) =>
-                setNewConsultation({ ...newConsultation, employe: { id: parseInt(value) } })
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Sélectionner un médecin" />
-              </SelectTrigger>
-              <SelectContent>
-                {medecins.map((medecin) => (
-                  <SelectItem key={medecin.id} value={medecin.id.toString()}>
-                    {medecin.personne?.prenom} {medecin.personne?.nom} ({medecin.specialite})
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          {/* Diagnostic */}
+          <div className="md:col-span-2">
+            <FormField id="diagnostic" label="Diagnostic (optionnel)">
+              <Textarea 
+                id="diagnostic" 
+                placeholder="Diagnostic médical et observations..." 
+                value={diagnostic}
+                onChange={(e) => setDiagnostic(e.target.value)}
+                rows={4}
+              />
+            </FormField>
           </div>
         </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
+
+        <DialogFooter className="gap-2">
+          <Button 
+            variant="outline" 
+            onClick={onClose}
+            disabled={isSubmitting}
+          >
             Annuler
           </Button>
           <Button 
-            className="bg-gradient-to-r from-cyan-600 to-blue-600"
             onClick={handleSubmit}
-            disabled={isSubmitting}
+            disabled={!selectedDossier  || !temperature || !poids || isSubmitting}
+            className="bg-green-600 hover:bg-green-700"
           >
-            {isSubmitting ? "Création..." : (
+            {isSubmitting ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                Enregistrement...
+              </>
+            ) : (
               <>
                 <Plus className="h-4 w-4 mr-2" />
-                Créer Consultation
+                Enregistrer
               </>
             )}
           </Button>

@@ -34,7 +34,6 @@ public class Consultation {
     
     @OneToMany(mappedBy = "consultation", cascade = CascadeType.ALL)
 	private List<Prescription> prescriptions = new ArrayList<>();
-	@JsonIgnore
 
     
     

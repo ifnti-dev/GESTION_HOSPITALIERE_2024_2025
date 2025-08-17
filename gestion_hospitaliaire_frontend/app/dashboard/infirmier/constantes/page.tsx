@@ -1,3 +1,4 @@
+'use client';
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -19,20 +20,37 @@ import {
   TrendingDown,
   Minus,
 } from "lucide-react"
+import { useState, useEffect } from "react"
+import { DossierMedical } from "@/types/medical"
+import { Consultation, CreateConsultationPayload } from "@/types/consultstionsTraitement"
+import { PriseConstantesModal } from "@/components/modals/medical/prise-constantes"
+import { dossierMedicalService } from "@/services/medical/dossier-medical.service"
+import { addConsultation, getConsultations, updateConsultation } from "@/services/consultationTraitement/consultationService"
+import { EditConstanteModal } from "@/components/modals/medical/edit-constante"
 
 export default function InfirmierConstantesPage() {
+  const [dossiers, setDossiers] = useState<DossierMedical[]>([])
+  const [constantes, setConstantes] = useState<Consultation[]>([])
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [selectedDossier, setSelectedDossier] = useState<DossierMedical | null>(null)
+  const [editingConstante, setEditingConstante] = useState<Consultation | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  // Stats calculées
   const stats = [
     {
       title: "Constantes Prises",
-      value: "24",
-      change: "+8 aujourd'hui",
+      value: constantes.length.toString(),
+      change: "Aujourd'hui",
       icon: <Thermometer className="h-5 w-5" />,
       color: "text-green-600",
       bgColor: "bg-green-50",
     },
     {
       title: "À Prendre",
-      value: "12",
+      value: dossiers.length > 0 ? "12" : "0",
       change: "Programmées",
       icon: <Clock className="h-5 w-5" />,
       color: "text-orange-600",
@@ -40,7 +58,10 @@ export default function InfirmierConstantesPage() {
     },
     {
       title: "Alertes",
-      value: "3",
+      value: constantes.filter(c => 
+        c.temperature > 38 || 
+        (c.tensionArterielle && parseFloat(c.tensionArterielle.split('/')[0]) > 140)
+      ).length.toString(),
       change: "Valeurs anormales",
       icon: <AlertTriangle className="h-5 w-5" />,
       color: "text-red-600",
@@ -48,7 +69,7 @@ export default function InfirmierConstantesPage() {
     },
     {
       title: "Patients Surveillés",
-      value: "18",
+      value: dossiers.length.toString(),
       change: "Actifs",
       icon: <Activity className="h-5 w-5" />,
       color: "text-blue-600",
@@ -56,92 +77,91 @@ export default function InfirmierConstantesPage() {
     },
   ]
 
-  const constantesRecentes = [
-    {
-      id: "C001",
-      patient: "Marie Dubois",
-      chambre: "Ch. 201",
-      heure: "13:30",
-      temperature: "37.2°C",
-      tension: "120/80",
-      pouls: "72",
-      saturation: "98%",
-      frequenceResp: "16",
-      glycemie: "1.2g/L",
-      poids: "65kg",
-      taille: "165cm",
-      alerte: false,
-      infirmier: "Marie D.",
-      tendance: "stable",
-    },
-    {
-      id: "C002",
-      patient: "Jean Martin",
-      chambre: "Ch. 203",
-      heure: "13:15",
-      temperature: "38.5°C",
-      tension: "140/95",
-      pouls: "88",
-      saturation: "95%",
-      frequenceResp: "20",
-      glycemie: "1.8g/L",
-      poids: "78kg",
-      taille: "175cm",
-      alerte: true,
-      infirmier: "Marie D.",
-      tendance: "hausse",
-    },
-    {
-      id: "C003",
-      patient: "Sophie Laurent",
-      chambre: "Ch. 205",
-      heure: "12:45",
-      temperature: "36.8°C",
-      tension: "110/70",
-      pouls: "68",
-      saturation: "99%",
-      frequenceResp: "14",
-      glycemie: "1.0g/L",
-      poids: "58kg",
-      taille: "160cm",
-      alerte: false,
-      infirmier: "Marie D.",
-      tendance: "baisse",
-    },
-  ]
+  // Charger les données
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true)
+      setError(null)
+      
+      try {
+        // Charger les dossiers médicaux
+        const dossiersData = await dossierMedicalService.getAllDossiers()
+        setDossiers(dossiersData)
+        
+        // Charger les consultations (constantes)
+        const constantesData = await getConsultations()
+        setConstantes(constantesData)
+      } catch (err) {
+        setError("Erreur lors du chargement des données")
+        console.error(err)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    
+    fetchData()
+  }, [])
 
-  const constantesProgrammees = [
-    {
-      patient: "Pierre Moreau",
-      chambre: "Ch. 207",
-      heure: "14:00",
-      type: "Complètes",
-      frequence: "Toutes les 4h",
-      derniere: "10:00",
-      priorite: "urgent",
-    },
-    {
-      patient: "Claire Petit",
-      chambre: "Ch. 209",
-      heure: "14:30",
-      type: "Tension + Pouls",
-      frequence: "Toutes les 6h",
-      derniere: "08:30",
-      priorite: "normale",
-    },
-    {
-      patient: "Marc Durand",
-      chambre: "Ch. 211",
-      heure: "15:00",
-      type: "Température",
-      frequence: "Toutes les 2h",
-      derniere: "13:00",
-      priorite: "normale",
-    },
-  ]
+  // Traiter la création de nouvelles constantes
+  const handleCreateConstantes = async (data: {
+    temperature: number
+    poids: number
+    tensionArterielle?: string
+    pressionArterielle?: string
+  }) => {
+    if (!selectedDossier) return
+    
+    const payload: CreateConsultationPayload = {
+      date: new Date().toISOString(),
+      temperature: data.temperature,
+      poids: data.poids,
+      tensionArterielle: data.tensionArterielle || null,
+      pressionArterielle: data.pressionArterielle || null,
+      symptomes: null,
+      diagnostic: null,
+      dossierMedical: { id: selectedDossier.id },
+      employe: { id: 1 } // À remplacer par l'ID de l'infirmier connecté
+    }
+    
+    try {
+      const newConsultation = await addConsultation(payload)
+      setConstantes(prev => [newConsultation, ...prev])
+      setIsCreateModalOpen(false)
+    } catch (error) {
+      console.error("Erreur création constantes:", error)
+    }
+  }
 
-  const getAlerteBadge = (alerte: boolean) => {
-    return alerte ? "bg-red-100 text-red-800 border-red-200" : "bg-green-100 text-green-800 border-green-200"
+  // Traiter la mise à jour des constantes
+  const handleUpdateConstante = async (updatedData: Consultation) => {
+    try {
+      await updateConsultation(updatedData)
+      
+      setConstantes(prev => 
+        prev.map(c => c.id === updatedData.id ? updatedData : c)
+      )
+      
+      setIsEditModalOpen(false)
+      setEditingConstante(null)
+    } catch (error) {
+      console.error("Erreur mise à jour constante:", error)
+    }
+  }
+
+  // Ouvrir le modal d'édition
+  const handleOpenEditModal = (constante: Consultation) => {
+    setEditingConstante(constante)
+    setIsEditModalOpen(true)
+  }
+
+  const getAlerteBadge = (constante: Consultation) => {
+    const isAlerte = constante.temperature > 38 || 
+                     (constante.tensionArterielle && 
+                      parseFloat(constante.tensionArterielle.split('/')[0]) > 140)
+    
+    return isAlerte ? 
+      "bg-red-100 text-red-800 border-red-200" : 
+      "bg-green-100 text-green-800 border-green-200"
   }
 
   const getTendanceIcon = (tendance: string) => {
@@ -159,9 +179,58 @@ export default function InfirmierConstantesPage() {
     return priorite === "urgent" ? "border-red-200 bg-red-50" : "border-gray-200 bg-white hover:bg-gray-50"
   }
 
+  if (isLoading) {
+    return (
+      <DashboardLayout >
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <Activity className="h-12 w-12 animate-spin text-red-500 mx-auto mb-4" />
+            <p className="text-gray-600">Chargement des données...</p>
+          </div>
+        </div>
+      </DashboardLayout>
+    )
+  }
+
+  if (error) {
+    return (
+      <DashboardLayout >
+        <div className="text-center p-8">
+          <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+          <p className="text-red-500 text-lg font-medium">{error}</p>
+          <Button onClick={() => window.location.reload()} className="mt-4" variant="outline">
+            Réessayer
+          </Button>
+        </div>
+      </DashboardLayout>
+    )
+  }
+
   return (
-    <DashboardLayout userRole="Infirmier">
+    <DashboardLayout >
       <div className="space-y-6">
+        {/* Modal de prise de constantes */}
+        <PriseConstantesModal
+          isOpen={isCreateModalOpen}
+          onClose={() => setIsCreateModalOpen(false)}
+          onSubmit={handleCreateConstantes}
+          dossiers={dossiers}
+          selectedDossier={selectedDossier}
+          setSelectedDossier={setSelectedDossier}
+        />
+
+        {/* Modal d'édition des constantes */}
+        <EditConstanteModal
+          isOpen={isEditModalOpen}
+          onClose={() => {
+            setIsEditModalOpen(false)
+            setEditingConstante(null)
+          }}
+          onSubmit={handleUpdateConstante}
+          constante={editingConstante}
+          dossier={editingConstante?.dossierMedical}
+        />
+
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
@@ -171,9 +240,12 @@ export default function InfirmierConstantesPage() {
           <div className="flex items-center gap-3">
             <Badge variant="outline" className="text-orange-700 border-orange-200">
               <Clock className="w-3 h-3 mr-2" />
-              12 à prendre
+              {dossiers.length > 0 ? "12 à prendre" : "0 à prendre"}
             </Badge>
-            <Button className="bg-red-600 hover:bg-red-700">
+            <Button 
+              className="bg-red-600 hover:bg-red-700"
+              onClick={() => setIsCreateModalOpen(true)}
+            >
               <Plus className="h-4 w-4 mr-2" />
               Prendre Constantes
             </Button>
@@ -260,119 +332,129 @@ export default function InfirmierConstantesPage() {
                 <CardDescription>Dernières constantes enregistrées</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-gray-200">
-                        <th className="text-left p-4 font-semibold text-gray-700 bg-gradient-to-r from-red-50 to-pink-50">
-                          Patient
-                        </th>
-                        <th className="text-left p-4 font-semibold text-gray-700 bg-gradient-to-r from-red-50 to-pink-50">
-                          Heure
-                        </th>
-                        <th className="text-left p-4 font-semibold text-gray-700 bg-gradient-to-r from-red-50 to-pink-50">
-                          Température
-                        </th>
-                        <th className="text-left p-4 font-semibold text-gray-700 bg-gradient-to-r from-red-50 to-pink-50">
-                          Tension
-                        </th>
-                        <th className="text-left p-4 font-semibold text-gray-700 bg-gradient-to-r from-red-50 to-pink-50">
-                          Pouls
-                        </th>
-                        <th className="text-left p-4 font-semibold text-gray-700 bg-gradient-to-r from-red-50 to-pink-50">
-                          Saturation
-                        </th>
-                        <th className="text-left p-4 font-semibold text-gray-700 bg-gradient-to-r from-red-50 to-pink-50">
-                          Tendance
-                        </th>
-                        <th className="text-left p-4 font-semibold text-gray-700 bg-gradient-to-r from-red-50 to-pink-50">
-                          Actions
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {constantesRecentes.map((constante, index) => (
-                        <tr
-                          key={index}
-                          className={`border-b border-gray-100 hover:bg-gray-50 transition-colors ${
-                            index % 2 === 0 ? "bg-white" : "bg-gray-50/50"
-                          }`}
-                        >
-                          <td className="p-4">
-                            <div>
-                              <p className="font-medium text-gray-900">{constante.patient}</p>
-                              <p className="text-sm text-gray-500">{constante.chambre}</p>
-                            </div>
-                          </td>
-                          <td className="p-4">
-                            <Badge variant="outline" className="text-xs">
-                              <Clock className="h-3 w-3 mr-1" />
-                              {constante.heure}
-                            </Badge>
-                          </td>
-                          <td className="p-4">
-                            <span
-                              className={`font-medium ${
-                                Number.parseFloat(constante.temperature) > 37.5 ? "text-red-600" : "text-gray-900"
-                              }`}
-                            >
-                              {constante.temperature}
-                            </span>
-                          </td>
-                          <td className="p-4">
-                            <span
-                              className={`font-medium ${
-                                constante.tension.includes("140") || constante.tension.includes("95")
-                                  ? "text-red-600"
-                                  : "text-gray-900"
-                              }`}
-                            >
-                              {constante.tension}
-                            </span>
-                          </td>
-                          <td className="p-4">
-                            <span className="font-medium text-gray-900">{constante.pouls}</span>
-                          </td>
-                          <td className="p-4">
-                            <span
-                              className={`font-medium ${
-                                Number.parseInt(constante.saturation) < 96 ? "text-red-600" : "text-gray-900"
-                              }`}
-                            >
-                              {constante.saturation}
-                            </span>
-                          </td>
-                          <td className="p-4">
-                            <div className="flex items-center gap-2">
-                              {getTendanceIcon(constante.tendance)}
-                              <Badge className={`text-xs border ${getAlerteBadge(constante.alerte)}`}>
-                                {constante.alerte ? "Alerte" : "Normal"}
-                              </Badge>
-                            </div>
-                          </td>
-                          <td className="p-4">
-                            <div className="flex gap-2">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="text-green-600 border-green-200 hover:bg-green-50"
-                              >
-                                <Eye className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="text-blue-600 border-blue-200 hover:bg-blue-50"
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </td>
+                {constantes.length === 0 ? (
+                  <div className="text-center py-12">
+                    <Thermometer className="h-16 w-16 mx-auto mb-4 text-gray-400" />
+                    <p className="text-xl font-medium">Aucune constante enregistrée</p>
+                    <p className="text-sm mt-2">Commencez par prendre des constantes</p>
+                    <Button 
+                      className="mt-4 bg-red-600 hover:bg-red-700"
+                      onClick={() => setIsCreateModalOpen(true)}
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Prendre des constantes
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-gray-200">
+                          <th className="text-left p-4 font-semibold text-gray-700 bg-gradient-to-r from-red-50 to-pink-50">
+                            Patient
+                          </th>
+                          <th className="text-left p-4 font-semibold text-gray-700 bg-gradient-to-r from-red-50 to-pink-50">
+                            Heure
+                          </th>
+                          <th className="text-left p-4 font-semibold text-gray-700 bg-gradient-to-r from-red-50 to-pink-50">
+                            Température
+                          </th>
+                          <th className="text-left p-4 font-semibold text-gray-700 bg-gradient-to-r from-red-50 to-pink-50">
+                            Tension
+                          </th>
+                          <th className="text-left p-4 font-semibold text-gray-700 bg-gradient-to-r from-red-50 to-pink-50">
+                            Poids
+                          </th>
+                          <th className="text-left p-4 font-semibold text-gray-700 bg-gradient-to-r from-red-50 to-pink-50">
+                            Tendance
+                          </th>
+                          <th className="text-left p-4 font-semibold text-gray-700 bg-gradient-to-r from-red-50 to-pink-50">
+                            Actions
+                          </th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                      </thead>
+                      <tbody>
+                        {constantes.map((constante, index) => {
+                          const dossier = dossiers.find(d => d.id === constante.dossierMedical?.id)
+                          const patient = dossier?.personne
+                          const nomComplet = patient ? `${patient.prenom} ${patient.nom}` : "Patient inconnu"
+                          
+                          return (
+                            <tr
+                              key={index}
+                              className={`border-b border-gray-100 hover:bg-gray-50 transition-colors ${
+                                index % 2 === 0 ? "bg-white" : "bg-gray-50/50"
+                              }`}
+                            >
+                              <td className="p-4">
+                                <div>
+                                  <p className="font-medium text-gray-900">{nomComplet}</p>
+                                  <p className="text-sm text-gray-500">Ch. {dossier?.id || "N/A"}</p>
+                                </div>
+                              </td>
+                              <td className="p-4">
+                                <Badge variant="outline" className="text-xs">
+                                  <Clock className="h-3 w-3 mr-1" />
+                                  {new Date(constante.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                </Badge>
+                              </td>
+                              <td className="p-4">
+                                <span
+                                  className={`font-medium ${
+                                    constante.temperature > 37.5 ? "text-red-600" : "text-gray-900"
+                                  }`}
+                                >
+                                  {constante.temperature}°C
+                                </span>
+                              </td>
+                              <td className="p-4">
+                                <span
+                                  className={`font-medium ${
+                                    constante.tensionArterielle?.includes("140") ? "text-red-600" : "text-gray-900"
+                                  }`}
+                                >
+                                  {constante.tensionArterielle || "N/A"}
+                                </span>
+                              </td>
+                              <td className="p-4">
+                                <span className="font-medium text-gray-900">
+                                  {constante.poids} kg
+                                </span>
+                              </td>
+                              <td className="p-4">
+                                <div className="flex items-center gap-2">
+                                  {getTendanceIcon("stable")}
+                                  <Badge className={`text-xs border ${getAlerteBadge(constante)}`}>
+                                    {constante.temperature > 38 ? "Alerte" : "Normal"}
+                                  </Badge>
+                                </div>
+                              </td>
+                              <td className="p-4">
+                                <div className="flex gap-2">
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="text-green-600 border-green-200 hover:bg-green-50"
+                                  >
+                                    <Eye className="h-4 w-4" />
+                                  </Button>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                                    onClick={() => handleOpenEditModal(constante)}
+                                  >
+                                    <Edit className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </td>
+                            </tr>
+                          )
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -387,56 +469,70 @@ export default function InfirmierConstantesPage() {
                 <CardDescription>Constantes à prendre selon le planning</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {constantesProgrammees.map((constante, index) => (
-                    <div
-                      key={index}
-                      className={`p-4 rounded-lg border transition-all duration-200 ${getPrioriteColor(constante.priorite)}`}
-                    >
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <h3 className="font-semibold text-gray-900">{constante.patient}</h3>
-                            <Badge variant="outline" className="text-xs">
-                              {constante.chambre}
-                            </Badge>
-                            {constante.priorite === "urgent" && (
-                              <Badge variant="destructive" className="text-xs">
-                                <AlertTriangle className="h-3 w-3 mr-1" />
-                                Urgent
-                              </Badge>
-                            )}
+                {dossiers.length === 0 ? (
+                  <div className="text-center py-12">
+                    <Clock className="h-16 w-16 mx-auto mb-4 text-gray-400" />
+                    <p className="text-xl font-medium">Aucun patient à surveiller</p>
+                    <p className="text-sm mt-2">Aucun dossier médical trouvé</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {dossiers.slice(0, 3).map((dossier, index) => {
+                      const patient = dossier.personne
+                      const nomComplet = patient ? `${patient.prenom} ${patient.nom}` : "Patient inconnu"
+                      
+                      return (
+                        <div
+                          key={index}
+                          className={`p-4 rounded-lg border transition-all duration-200 ${getPrioriteColor("normale")}`}
+                        >
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-3 mb-2">
+                                <h3 className="font-semibold text-gray-900">{nomComplet}</h3>
+                                <Badge variant="outline" className="text-xs">
+                                  Ch. {dossier.id}
+                                </Badge>
+                              </div>
+                              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-sm text-gray-600">
+                                <div className="flex items-center gap-2">
+                                  <Clock className="h-4 w-4 text-orange-500" />
+                                  <span>Prévue: 14:00</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Thermometer className="h-4 w-4 text-red-500" />
+                                  <span>Complètes</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Activity className="h-4 w-4 text-blue-500" />
+                                  <span>Dernière: 10:00</span>
+                                </div>
+                              </div>
+                              <p className="text-xs text-gray-500 mt-1">Fréquence: Toutes les 4h</p>
+                            </div>
+                            <div className="flex gap-2">
+                              <Button variant="outline" size="sm">
+                                <Eye className="h-4 w-4 mr-2" />
+                                Historique
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                className="bg-red-600 hover:bg-red-700"
+                                onClick={() => {
+                                  setSelectedDossier(dossier)
+                                  setIsCreateModalOpen(true)
+                                }}
+                              >
+                                <Thermometer className="h-4 w-4 mr-2" />
+                                Prendre
+                              </Button>
+                            </div>
                           </div>
-                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-sm text-gray-600">
-                            <div className="flex items-center gap-2">
-                              <Clock className="h-4 w-4 text-orange-500" />
-                              <span>Prévue: {constante.heure}</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <Thermometer className="h-4 w-4 text-red-500" />
-                              <span>{constante.type}</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <Activity className="h-4 w-4 text-blue-500" />
-                              <span>Dernière: {constante.derniere}</span>
-                            </div>
-                          </div>
-                          <p className="text-xs text-gray-500 mt-1">Fréquence: {constante.frequence}</p>
                         </div>
-                        <div className="flex gap-2">
-                          <Button variant="outline" size="sm">
-                            <Eye className="h-4 w-4 mr-2" />
-                            Historique
-                          </Button>
-                          <Button size="sm" className="bg-red-600 hover:bg-red-700">
-                            <Thermometer className="h-4 w-4 mr-2" />
-                            Prendre
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                      )
+                    })}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>

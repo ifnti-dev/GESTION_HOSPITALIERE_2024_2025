@@ -1,5 +1,5 @@
 import { apiClient } from "@/services/api";
-import { Consultation,CreateConsultation } from "@/types/consultstionsTraitement";
+import { Consultation,CreateConsultationPayload } from "@/types/consultstionsTraitement";
 import { API_ENDPOINTS } from "@/config/api";
 
 export async function getConsultations(): Promise<Consultation[]> {
@@ -13,7 +13,7 @@ export async function getConsultations(): Promise<Consultation[]> {
 }
 
 export async function addConsultation(
-  newConsultation: Omit<CreateConsultation, 'id' | 'createdAt' | 'updatedAt'>
+  newConsultation: Omit<CreateConsultationPayload, 'id' | 'createdAt' | 'updatedAt'>
 ): Promise<Consultation> {
   try {
     // Construction propre du payload sans les objets nested
@@ -21,8 +21,12 @@ export async function addConsultation(
       date: new Date(newConsultation.date).toISOString(),
       symptomes: newConsultation.symptomes,
       diagnostic: newConsultation.diagnostic,
-      personne: {
-        id: newConsultation.personne?.id
+      temperature: newConsultation.temperature,
+      poids: newConsultation.poids,
+      tensionArterielle: newConsultation.tensionArterielle,
+      pressionArterielle: newConsultation.pressionArterielle,
+      dossierMedical: {
+        id: newConsultation.dossierMedical.id
       },
       employe: {
         id: newConsultation.employe?.id

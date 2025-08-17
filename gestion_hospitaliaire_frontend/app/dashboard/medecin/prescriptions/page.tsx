@@ -110,7 +110,7 @@ export default function MedecinPrescriptionsPage() {
 
   if (isLoading) {
     return (
-      <DashboardLayout userRole="Médecin">
+      <DashboardLayout >
         <div className="flex justify-center items-center h-64">
           <div>Chargement en cours...</div>
         </div>
@@ -120,7 +120,7 @@ export default function MedecinPrescriptionsPage() {
 
   if (error) {
     return (
-      <DashboardLayout userRole="Médecin">
+      <DashboardLayout >
         <div className="flex justify-center items-center h-64">
           <div className="text-red-500">{error}</div>
         </div>
@@ -129,7 +129,7 @@ export default function MedecinPrescriptionsPage() {
   }
 
   return (
-    <DashboardLayout userRole="Médecin">
+    <DashboardLayout >
       <div className="space-y-6">
         {/* Cartes de statistiques */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">

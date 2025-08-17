@@ -4,8 +4,11 @@ package com.gestion_hospitaliere.UeEntreprise.controller.ConsultationTraitement;
 import com.gestion_hospitaliere.UeEntreprise.model.ConsultationTraitement.Consultation;
 import com.gestion_hospitaliere.UeEntreprise.service.ConsultationTraitement.ConsultationService;
 
+import jakarta.validation.Valid;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
@@ -35,31 +38,28 @@ public class ConsultationController {
                            .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // // Créer une nouvelle consultation
-//    @PostMapping
-// public ResponseEntity<?> createConsultation(@RequestBody Consultation consultation) {
-//     try {
-//         Consultation savedConsultation = consultationService.saveConsultation(consultation);
-//         return ResponseEntity.status(HttpStatus.CREATED).body(savedConsultation);
-//     } catch (IllegalArgumentException e) {
-//         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404 avec message lisible
-//     } catch (Exception e) {
-//         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur interne : " + e.getMessage());
-//     }
-// }
+    // Créer une nouvelle consultation
+  @PostMapping
+public ResponseEntity<?> createConsultation(@Valid @RequestBody Consultation consultation, BindingResult result) {
+    if (result.hasErrors()) {
+        return ResponseEntity.badRequest().body("Erreur de validation");
+    }
+    Consultation saved = consultationService.saveConsultation(consultation);
+    return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+}
 
 
 
-//     // Mettre à jour une consultation existante
-//     @PutMapping("/{id}")
-//     public ResponseEntity<Consultation> updateConsultation(@PathVariable Long id, @RequestBody Consultation consultationDetails) {
-//         try {
-//             Consultation updatedConsultation = consultationService.updateConsultation(id, consultationDetails);
-//             return ResponseEntity.ok(updatedConsultation);
-//         } catch (RuntimeException e) {
-//             return ResponseEntity.notFound().build();
-//         }
-//     }
+    // Mettre à jour une consultation existante
+    @PutMapping("/{id}")
+    public ResponseEntity<Consultation> updateConsultation(@PathVariable Long id, @RequestBody Consultation consultationDetails) {
+        try {
+            Consultation updatedConsultation = consultationService.updateConsultation(id, consultationDetails);
+            return ResponseEntity.ok(updatedConsultation);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 
     // Supprimer une consultation
     @DeleteMapping("/{id}")

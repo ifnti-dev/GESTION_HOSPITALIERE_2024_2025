@@ -29,6 +29,7 @@ import {
   Eye,
   Clipboard,
   Stethoscope,
+  FileText,
 } from "lucide-react"
 import Link from "next/link"
 import { TopBar } from "../top-bar"
@@ -65,55 +66,64 @@ export function InfirmierSidebar({ children }: InfirmierSidebarProps) {
       title: "Mes Patients",
       icon: <Users className="h-5 w-5" />,
       href: "/dashboard/infirmier/patients",
-      badge: "18",
       gradient: "from-emerald-500 to-green-500",
     },
     {
       title: "Constantes Vitales",
       icon: <Thermometer className="h-5 w-5" />,
       href: "/dashboard/infirmier/constantes",
-      badge: "8",
       gradient: "from-red-500 to-pink-500",
     },
-    {
-      title: "Administrations",
-      icon: <Syringe className="h-5 w-5" />,
-      href: "/dashboard/infirmier/administrations",
-      badge: "12",
-      gradient: "from-orange-500 to-red-500",
+
+     {
+      title: "Dossiers Médicaux",
+      icon: <FileText className="h-5 w-5" />,
+      href: "/dashboard/infirmier/dossiersmedical",
+      
+      gradient: "from-emerald-500 to-green-500",
     },
-    {
-      title: "Soins Infirmiers",
-      icon: <Heart className="h-5 w-5" />,
-      href: "/dashboard/infirmier/soins",
-      badge: "6",
-      gradient: "from-teal-500 to-emerald-500",
-    },
-    {
-      title: "Gestion des Lits",
-      icon: <Bed className="h-5 w-5" />,
-      href: "/dashboard/infirmier/lits",
-      gradient: "from-purple-500 to-indigo-500",
-    },
-    {
-      title: "Hospitalisations",
-      icon: <Stethoscope className="h-5 w-5" />,
-      href: "/dashboard/infirmier/hospitalisations",
-      gradient: "from-blue-500 to-cyan-500",
-    },
-    {
-      title: "Transmissions",
-      icon: <MessageSquare className="h-5 w-5" />,
-      href: "/dashboard/infirmier/transmissions",
-      badge: "3",
-      gradient: "from-cyan-500 to-blue-500",
-    },
-    {
-      title: "Observations",
-      icon: <Eye className="h-5 w-5" />,
-      href: "/dashboard/infirmier/observations",
-      gradient: "from-green-500 to-emerald-500",
-    },
+    
+    
+
+    // {
+    //   title: "Administrations",
+    //   icon: <Syringe className="h-5 w-5" />,
+    //   href: "/dashboard/infirmier/administrations",
+    //   badge: "12",
+    //   gradient: "from-orange-500 to-red-500",
+    // },
+    // {
+    //   title: "Soins Infirmiers",
+    //   icon: <Heart className="h-5 w-5" />,
+    //   href: "/dashboard/infirmier/soins",
+    //   badge: "6",
+    //   gradient: "from-teal-500 to-emerald-500",
+    // },
+    // {
+    //   title: "Gestion des Lits",
+    //   icon: <Bed className="h-5 w-5" />,
+    //   href: "/dashboard/infirmier/lits",
+    //   gradient: "from-purple-500 to-indigo-500",
+    // },
+    // {
+    //   title: "Hospitalisations",
+    //   icon: <Stethoscope className="h-5 w-5" />,
+    //   href: "/dashboard/infirmier/hospitalisations",
+    //   gradient: "from-blue-500 to-cyan-500",
+    // },
+    // {
+    //   title: "Transmissions",
+    //   icon: <MessageSquare className="h-5 w-5" />,
+    //   href: "/dashboard/infirmier/transmissions",
+    //   badge: "3",
+    //   gradient: "from-cyan-500 to-blue-500",
+    // },
+    // {
+    //   title: "Observations",
+    //   icon: <Eye className="h-5 w-5" />,
+    //   href: "/dashboard/infirmier/observations",
+    //   gradient: "from-green-500 to-emerald-500",
+    // },
     // {
     //   title: "Planning Soins",
     //   icon: <Calendar className="h-5 w-5" />,
@@ -210,7 +220,7 @@ export function InfirmierSidebar({ children }: InfirmierSidebarProps) {
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-emerald-100 bg-gradient-to-r from-emerald-50/50 to-teal-50/50">
+        {/* <div className="p-6 border-t border-emerald-100 bg-gradient-to-r from-emerald-50/50 to-teal-50/50">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -254,7 +264,7 @@ export function InfirmierSidebar({ children }: InfirmierSidebarProps) {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        </div>
+        </div> */}
       </div>
 
       {/* Mobile Overlay */}
@@ -268,13 +278,15 @@ export function InfirmierSidebar({ children }: InfirmierSidebarProps) {
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* TopBar */}
-        <TopBar
+        {/* <TopBar
           userRole="Infirmier"
           userName="Marie Dubois"
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}
           isMobile={isMobile}
-        />
+        /> */}
+        <TopBar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} isMobile={isMobile} />
+        
 
         {/* Page Content */}
         <main className="flex-1 overflow-auto p-6 bg-gray-50">{children}</main>

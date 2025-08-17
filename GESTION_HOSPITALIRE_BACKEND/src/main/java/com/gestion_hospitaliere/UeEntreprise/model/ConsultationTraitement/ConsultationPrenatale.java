@@ -5,74 +5,66 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.gestion_hospitaliere.UeEntreprise.model.Medical.DossierGrossesse;
 import com.gestion_hospitaliere.UeEntreprise.model.User.Employe;
 
 @Entity
 @Table(name = "consultations_prenatales")
 public class ConsultationPrenatale {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToMany(mappedBy = "consultationPrenatale", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Prescription> prescriptions = new ArrayList<>();
+    // Suivi clinique (dynamique)
+    private LocalDate dateConsultation;
+    private Double poidsMere;
+    private Integer hauteurUterine;
+    private String bruitsCoeurFoetal;
+    private Boolean oedemes;
+    private String mouvementsFoetus;
+    
+    // Pathologies gestationnelles (dynamiques)
+    private Boolean presenceDiabeteGestationnel;
+    private Boolean presenceHypertensionGestationnelle;
+    
+    // Examens (dynamiques)
+    private String resultatsAnalyses;
+    private String examensComplementaires;
+    
+    // Prise en charge (dynamique)
+    private String traitementsEnCours;      // Déplacé de Dossier
+    private String observationsGenerales;   // Déplacé de DossierGrossesse
+    private String decisionMedicale;
+    private LocalDate dateProchaineConsultation;
+    
+    // Vaccination (dynamique)
+    private Integer derniereDoseVAT;
+    private LocalDate dateDerniereDoseVAT;
 
+    // Relation
     @ManyToOne
-    @JoinColumn(name = "dossier_id")
+    @JoinColumn(name = "dossier_grossesse_id")
     private DossierGrossesse dossierGrossesse;
+
+    @OneToMany(mappedBy = "consultationPrenatale", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<PrescriptionPrenatal> prescriptionsPrenatale = new ArrayList<>();
+
+    public List<PrescriptionPrenatal> getPrescriptionsPrenatale() {
+        return prescriptionsPrenatale;
+    }
+
+    public void setPrescriptionsPrenatale(List<PrescriptionPrenatal> prescriptionsPrenatale) {
+        this.prescriptionsPrenatale = prescriptionsPrenatale;
+    }
 
     @ManyToOne
     @JoinColumn(name = "employe_id", nullable = false)
     private Employe employe;
 
-    @Column(nullable = false)
-    private LocalDate dateConsultation;
 
-    @Column(nullable = false)
-    private Integer semaineAmenorrhee;
-
-    @Column(nullable = false)
-    private Double poids;
-
-    @Column(nullable = false)
-    private String tensionArterielle;
-
-    private Integer hauteurUterine;
-    private String bruitsCardiaquesFoetaux;
-
-    @Column(columnDefinition = "TEXT")
-    private String observations;
-
-    private LocalDate prochainRdv;
-    private String alerte;
-
-    // === Getters & Setters ===
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public List<Prescription> getPrescriptions() {
-        return prescriptions;
-    }
-
-    public void setPrescriptions(List<Prescription> prescriptions) {
-        this.prescriptions = prescriptions;
-    }
-
-    public DossierGrossesse getDossierGrossesse() {
-        return dossierGrossesse;
-    }
-
-    public void setDossierGrossesse(DossierGrossesse dossierGrossesse) {
-        this.dossierGrossesse = dossierGrossesse;
-    }
+    
 
     public Employe getEmploye() {
         return employe;
@@ -80,6 +72,14 @@ public class ConsultationPrenatale {
 
     public void setEmploye(Employe employe) {
         this.employe = employe;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public LocalDate getDateConsultation() {
@@ -90,28 +90,12 @@ public class ConsultationPrenatale {
         this.dateConsultation = dateConsultation;
     }
 
-    public Integer getSemaineAmenorrhee() {
-        return semaineAmenorrhee;
+    public Double getPoidsMere() {
+        return poidsMere;
     }
 
-    public void setSemaineAmenorrhee(Integer semaineAmenorrhee) {
-        this.semaineAmenorrhee = semaineAmenorrhee;
-    }
-
-    public Double getPoids() {
-        return poids;
-    }
-
-    public void setPoids(Double poids) {
-        this.poids = poids;
-    }
-
-    public String getTensionArterielle() {
-        return tensionArterielle;
-    }
-
-    public void setTensionArterielle(String tensionArterielle) {
-        this.tensionArterielle = tensionArterielle;
+    public void setPoidsMere(Double poidsMere) {
+        this.poidsMere = poidsMere;
     }
 
     public Integer getHauteurUterine() {
@@ -122,35 +106,117 @@ public class ConsultationPrenatale {
         this.hauteurUterine = hauteurUterine;
     }
 
-    public String getBruitsCardiaquesFoetaux() {
-        return bruitsCardiaquesFoetaux;
+    public String getBruitsCoeurFoetal() {
+        return bruitsCoeurFoetal;
     }
 
-    public void setBruitsCardiaquesFoetaux(String bruitsCardiaquesFoetaux) {
-        this.bruitsCardiaquesFoetaux = bruitsCardiaquesFoetaux;
+    public void setBruitsCoeurFoetal(String bruitsCoeurFoetal) {
+        this.bruitsCoeurFoetal = bruitsCoeurFoetal;
     }
 
-    public String getObservations() {
-        return observations;
+    public Boolean getOedemes() {
+        return oedemes;
     }
 
-    public void setObservations(String observations) {
-        this.observations = observations;
+    public void setOedemes(Boolean oedemes) {
+        this.oedemes = oedemes;
     }
 
-    public LocalDate getProchainRdv() {
-        return prochainRdv;
+    public String getMouvementsFoetus() {
+        return mouvementsFoetus;
     }
 
-    public void setProchainRdv(LocalDate prochainRdv) {
-        this.prochainRdv = prochainRdv;
+    public void setMouvementsFoetus(String mouvementsFoetus) {
+        this.mouvementsFoetus = mouvementsFoetus;
     }
 
-    public String getAlerte() {
-        return alerte;
+    public Boolean getPresenceDiabeteGestationnel() {
+        return presenceDiabeteGestationnel;
     }
 
-    public void setAlerte(String alerte) {
-        this.alerte = alerte;
+    public void setPresenceDiabeteGestationnel(Boolean presenceDiabeteGestationnel) {
+        this.presenceDiabeteGestationnel = presenceDiabeteGestationnel;
     }
+
+    public Boolean getPresenceHypertensionGestationnelle() {
+        return presenceHypertensionGestationnelle;
+    }
+
+    public void setPresenceHypertensionGestationnelle(Boolean presenceHypertensionGestationnelle) {
+        this.presenceHypertensionGestationnelle = presenceHypertensionGestationnelle;
+    }
+
+    public String getResultatsAnalyses() {
+        return resultatsAnalyses;
+    }
+
+    public void setResultatsAnalyses(String resultatsAnalyses) {
+        this.resultatsAnalyses = resultatsAnalyses;
+    }
+
+    public String getExamensComplementaires() {
+        return examensComplementaires;
+    }
+
+    public void setExamensComplementaires(String examensComplementaires) {
+        this.examensComplementaires = examensComplementaires;
+    }
+
+    public String getTraitementsEnCours() {
+        return traitementsEnCours;
+    }
+
+    public void setTraitementsEnCours(String traitementsEnCours) {
+        this.traitementsEnCours = traitementsEnCours;
+    }
+
+    public String getObservationsGenerales() {
+        return observationsGenerales;
+    }
+
+    public void setObservationsGenerales(String observationsGenerales) {
+        this.observationsGenerales = observationsGenerales;
+    }
+
+    public String getDecisionMedicale() {
+        return decisionMedicale;
+    }
+
+    public void setDecisionMedicale(String decisionMedicale) {
+        this.decisionMedicale = decisionMedicale;
+    }
+
+    public LocalDate getDateProchaineConsultation() {
+        return dateProchaineConsultation;
+    }
+
+    public void setDateProchaineConsultation(LocalDate dateProchaineConsultation) {
+        this.dateProchaineConsultation = dateProchaineConsultation;
+    }
+
+    public Integer getDerniereDoseVAT() {
+        return derniereDoseVAT;
+    }
+
+    public void setDerniereDoseVAT(Integer derniereDoseVAT) {
+        this.derniereDoseVAT = derniereDoseVAT;
+    }
+
+    public LocalDate getDateDerniereDoseVAT() {
+        return dateDerniereDoseVAT;
+    }
+
+    public void setDateDerniereDoseVAT(LocalDate dateDerniereDoseVAT) {
+        this.dateDerniereDoseVAT = dateDerniereDoseVAT;
+    }
+
+    public DossierGrossesse getDossierGrossesse() {
+        return dossierGrossesse;
+    }
+
+    public void setDossierGrossesse(DossierGrossesse dossierGrossesse) {
+        this.dossierGrossesse = dossierGrossesse;
+    }
+
+    // ... (getters/setters)
 }

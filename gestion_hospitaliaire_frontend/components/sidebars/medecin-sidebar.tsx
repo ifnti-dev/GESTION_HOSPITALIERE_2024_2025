@@ -64,36 +64,29 @@ export function MedecinSidebar({ children }: MedecinSidebarProps) {
       title: "Mes Patients",
       icon: <Users className="h-5 w-5" />,
       href: "/dashboard/medecin/patients",
-      badge: "23",
+      
       gradient: "from-blue-500 to-indigo-500",
     },
     {
       title: "Dossiers Médicaux",
       icon: <FileText className="h-5 w-5" />,
-      gradient: "from-indigo-500 to-blue-500",
-      subItems: [
-        {
-          title: "Dossiers Médicaux",
-          href: "/dashboard/medecin/dossiers/medical",
-        },
-        {
-          title: "Dossiers Grossesse",
-          href: "/dashboard/medecin/dossiers/grossesse",
-        },
-      ],
+      href: "/dashboard/medecin/dossiers/medical",
+      
+      gradient: "from-blue-500 to-indigo-500",
     },
+    
     {
       title: "Consultations",
       icon: <Stethoscope className="h-5 w-5" />,
       href: "/dashboard/medecin/consultations",
-      badge: "12",
+      
       gradient: "from-cyan-500 to-blue-500",
     },
     {
       title: "Prescriptions",
       icon: <Pill className="h-5 w-5" />,
       href: "/dashboard/medecin/prescriptions",
-      badge: "5",
+     
       gradient: "from-blue-600 to-cyan-600",
     },
      {
@@ -244,51 +237,7 @@ export function MedecinSidebar({ children }: MedecinSidebarProps) {
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-blue-100 bg-gradient-to-r from-blue-50/50 to-cyan-50/50 flex-shrink-0">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                className="w-full p-4 h-auto hover:bg-blue-100/50 rounded-xl transition-all duration-300 group"
-              >
-                <div className="flex items-center space-x-4">
-                  <div className="relative">
-                    <Avatar className="h-12 w-12 ring-4 ring-blue-200 shadow-lg">
-                      <AvatarImage src="/images/user.png" />
-                      <AvatarFallback className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold text-lg">
-                        MD
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white shadow-sm"></div>
-                  </div>
-                  <div className="flex-1 text-left">
-                    <p className="text-sm font-bold text-gray-900 group-hover:text-blue-700 transition-colors">
-                      Dr. Jean Dupont
-                    </p>
-                    <p className="text-xs text-blue-600 font-medium">Médecin Généraliste</p>
-                  </div>
-                </div>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 shadow-xl border-blue-100">
-              <DropdownMenuLabel>Mon Compte</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="hover:bg-blue-50">
-                <User className="mr-2 h-4 w-4" />
-                Profil
-              </DropdownMenuItem>
-              <DropdownMenuItem className="hover:bg-blue-50">
-                <Settings className="mr-2 h-4 w-4" />
-                Paramètres
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-red-600 hover:bg-red-50">
-                <LogOut className="mr-2 h-4 w-4" />
-                Déconnexion
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+        
       </div>
 
       {/* Mobile Overlay */}
@@ -317,4 +266,4 @@ export function MedecinSidebar({ children }: MedecinSidebarProps) {
       </div>
     </div>
   )
-}
+}11111111111111111111111111111111111111111111111111
