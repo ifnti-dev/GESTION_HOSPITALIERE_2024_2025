@@ -1,0 +1,9 @@
+**/.project
+**/.classpath
+**/.settings
+**/.git
+**/target
+Dockerfile
+docker-compose.yml
+*.iml
+*.log
