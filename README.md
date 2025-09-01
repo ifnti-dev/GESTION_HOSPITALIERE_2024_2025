@@ -14,3 +14,17 @@ Ce projet est une application complète de gestion hospitalière avec un backend
 3. Exécutez la commande : 
    ```bash
    docker compose up --build
+
+## Architecture du projet
+projet-root/
+├── gestion_hospitaliaire_frontend/
+│   ├── Dockerfile
+│   ├── .dockerignore
+│   └── ... (le reste de votre projet Next.js)
+├── GESTION_HOSPITALIRE_BACKEND/
+│   ├── Dockerfile
+│   ├── .dockerignore
+│   └── ... (le reste de votre projet Spring Boot)
+├── docker-compose.yml
+├── .env
+└── README.md
