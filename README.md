@@ -13,4 +13,4 @@ Ce projet est une application complète de gestion hospitalière avec un backend
 2. Placez-vous à la racine du projet
 3. Exécutez la commande : 
    ```bash
-   docker-compose up --build
+   docker compose up --build
