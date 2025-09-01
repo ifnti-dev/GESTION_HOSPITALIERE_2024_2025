@@ -52,7 +52,10 @@ public class DatabaseSeeder implements CommandLineRunner {
         // Création des données de test
         final String adminEmail = "admin@admin.com";
         final String adminPassword = "admin123";
+        final String pharmacienEmail = "pharmacie@gmail.com";
+        final String pharmacienPassword = "pharmacien123";
         String encodedPassword = passwordEncoder.encode(adminPassword);
+        String encodedPharmacienPassword = passwordEncoder.encode(pharmacienPassword);
 
 
        // Insertion des permissions
@@ -204,6 +207,17 @@ public class DatabaseSeeder implements CommandLineRunner {
             admin.setSituationMatrimoniale("célibataire");
             personneRepository.save(admin);
 
+            Personne pharmacien = new Personne();
+            pharmacien.setNom("DIOP");
+            pharmacien.setPrenom("Aissatou");
+            pharmacien.setEmail(pharmacienEmail);
+            pharmacien.setPassword(encodedPharmacienPassword);
+            pharmacien.setSexe("F");
+            pharmacien.setTelephone("12345678");
+            pharmacien.setDateNaissance(LocalDate.of(1995, 5, 15));
+            pharmacien.setSituationMatrimoniale("mariée");
+            personneRepository.save(pharmacien);
+
             Employe adminEmploye = new Employe();
             adminEmploye.setPersonne(admin);
             adminEmploye.setHoraire("9h-17h");
@@ -212,6 +226,15 @@ public class DatabaseSeeder implements CommandLineRunner {
             adminEmploye.setDateAffectation(LocalDate.now());
             adminEmploye.setRoles(new HashSet<>(List.of(roleRepository.findByNom("DIRECTEUR").orElseThrow(() -> new RuntimeException("Role ADMIN not found")))));
             employeRepository.save(adminEmploye);
+
+            Employe pharmacienEmploye = new Employe();
+            pharmacienEmploye.setPersonne(pharmacien);
+            pharmacienEmploye.setHoraire("8h-16h");
+            pharmacienEmploye.setSpecialite("Pharmacie");
+            pharmacienEmploye.setNumOrdre("PHARM123456");
+            pharmacienEmploye.setDateAffectation(LocalDate.now());
+            pharmacienEmploye.setRoles(new HashSet<>(List.of(roleRepository.findByNom("PHARMACIEN").orElseThrow(() -> new RuntimeException("Role PHARMACIEN not found")))));
+            employeRepository.save(pharmacienEmploye);
         }
     }
 }

@@ -29,32 +29,32 @@ public class PermissionService {
     // Créer une permission
     @Transactional
     public Permission creerPermission(@Valid Permission permission) {
-        log.info("Création d'une nouvelle permission: {}", permission.getNom());
+//        log.info("Création d'une nouvelle permission: {}", permission.getNom());
         return permissionRepository.save(permission);
     }
 
     // Récupérer toutes les permissions
     public List<Permission> obtenirToutesLesPermissions() {
-        log.info("Récupération de toutes les permissions");
+//        log.info("Récupération de toutes les permissions");
         return permissionRepository.findAll();
     }
 
     // Récupérer une permission par ID
     public Optional<Permission> obtenirPermissionParId(Long id) {
-        log.info("Récupération de la permission avec ID: {}", id);
+//        log.info("Récupération de la permission avec ID: {}", id);
         return permissionRepository.findById(id);
     }
 
     // Récupérer une permission par nom
     public Optional<Permission> obtenirPermissionParNom(String nom) {
-        log.info("Récupération de la permission par nom: {}", nom);
+//        log.info("Récupération de la permission par nom: {}", nom);
         return permissionRepository.findPermissionByNom(nom);
     }
 
     // Mettre à jour une permission
     @Transactional
     public Permission mettreAJourPermission(Long id, @Valid Permission permissionDetails) {
-        log.info("Mise à jour de la permission avec ID: {}", id);
+//        log.info("Mise à jour de la permission avec ID: {}", id);
         return permissionRepository.findById(id).map(permission -> {
             if (permissionDetails.getNom() == null || permissionDetails.getNom().isEmpty()) {
                 throw new IllegalArgumentException("Le nom de la permission est obligatoire");
@@ -68,7 +68,7 @@ public class PermissionService {
     // Supprimer une permission
     @Transactional
     public void supprimerPermission(Long id) {
-        log.info("Suppression de la permission avec ID: {}", id);
+//        log.info("Suppression de la permission avec ID: {}", id);
         permissionRepository.deleteById(id);
     }
 }

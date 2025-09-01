@@ -103,7 +103,7 @@ public class PersonneService {
             throw new PersonneNotFoundException(id);
         }
         personneRepository.deleteById(id);
-        log.info("Personne {} supprimée", id);
+//        log.info("Personne {} supprimée", id);
     }
 
     // Trouver les personnes qui sont des patients
