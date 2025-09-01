@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useState, useEffect } from "react"
-import { Pill, Package, Package2, ShoppingCart, Activity, Truck, Tags, Bell, BarChart3, BookOpen } from "lucide-react"
+// import { Pill, Package, Package2, ShoppingCart, Activity, Truck, Tags, Bell, BarChart3, BookOpen } from "lucide-react"
 import Link from "next/link"
 import { TopBar } from "../top-bar"
 
@@ -30,54 +30,54 @@ export function PharmacienSidebar({ children }: PharmacienSidebarProps) {
   const menuItems = [
     {
       title: "Tableau de Bord",
-      icon: <Activity className="h-5 w-5" />,
+      // icon: <Activity className="h-5 w-5" />,
       href: "/dashboard/pharmacien",
     },
     {
       title: "Catégories",
-      icon: <Tags className="h-5 w-5" />,
+      // icon: <Tags className="h-5 w-5" />,
       href: "/dashboard/pharmacien/categories",
     },
     {
       title: "Médicaments",
-      icon: <Pill className="h-5 w-5" />,
+      // icon: <Pill className="h-5 w-5" />,
       href: "/dashboard/pharmacien/medicaments",
     },
     {
       title: "Références",
-      icon: <BookOpen className="h-5 w-5" />,
+      // icon: <BookOpen className="h-5 w-5" />,
       href: "/dashboard/pharmacien/references",
     },
     {
       title: "Produits Finaux",
-      icon: <Package2 className="h-5 w-5" />,
+      // icon: <Package2 className="h-5 w-5" />,
       href: "/dashboard/pharmacien/produits",
     },
     {
       title: "Stock & Inventaire",
-      icon: <Package className="h-5 w-5" />,
+      // icon: <Package className="h-5 w-5" />,
       href: "/dashboard/pharmacien/stock",
     },
     {
       title: "Approvisionnements",
-      icon: <Truck className="h-5 w-5" />,
+      // icon: <Truck className="h-5 w-5" />,
       href: "/dashboard/pharmacien/approvisionnements",
     },
     {
       title: "Commandes",
-      icon: <ShoppingCart className="h-5 w-5" />,
+      // icon: <ShoppingCart className="h-5 w-5" />,
       href: "/dashboard/pharmacien/commandes",
     },
     {
       title: "Rapports",
-      icon: <BarChart3 className="h-5 w-5" />,
+      // icon: <BarChart3 className="h-5 w-5" />,
       href: "/dashboard/pharmacien/rapports",
     },
-    {
-      title: "Notifications",
-      icon: <Bell className="h-5 w-5" />,
-      href: "/dashboard/pharmacien/notifications",
-    },
+    // {
+    //   title: "Notifications",
+    //   icon: <Bell className="h-5 w-5" />,
+    //   href: "/dashboard/pharmacien/notifications",
+    // },
   ]
 
   const closeSidebar = () => {
@@ -101,7 +101,7 @@ export function PharmacienSidebar({ children }: PharmacienSidebarProps) {
         <div className="p-6 bg-gray-100 border-b border-gray-200 flex-shrink-0">
           <div className="flex items-center space-x-4">
             <div className="bg-gray-200 p-3 rounded">
-              <Pill className="h-6 w-6 text-gray-600" />
+              {/* <Pill className="h-6 w-6 text-gray-600" /> */}
             </div>
             <div>
               <h2 className="text-xl font-semibold text-gray-800">Pharmacien</h2>
@@ -124,7 +124,7 @@ export function PharmacienSidebar({ children }: PharmacienSidebarProps) {
                     onClick={closeSidebar}
                     className="flex items-center space-x-3 p-3 rounded hover:bg-gray-100 text-gray-700 hover:text-gray-900"
                   >
-                    <div className="text-gray-500">{item.icon}</div>
+                    {/* <div className="text-gray-500">{item.icon}</div> */}
                     <span className="font-medium">{item.title}</span>
                   </Link>
                 ))}
