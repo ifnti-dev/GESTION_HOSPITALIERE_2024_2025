@@ -7,6 +7,36 @@ Ce projet est une application complète de gestion hospitalière avec un backend
 - Docker
 - Docker Compose
 
+
+## consulter la db
+
+# Se connecter au conteneur de la base de données
+docker compose exec db psql -U nom_utilisateur -d hospital_db
+
+# Une fois connecté, vous pouvez exécuter des commandes SQL
+# Lister toutes les tables
+\dt
+
+# Voir le contenu d'une table spécifique
+SELECT * FROM nom_de_la_table;
+
+# Voir les utilisateurs créés
+SELECT * FROM pg_user;
+
+# Quitter psql
+\q
+
+## en cas d'erreur de connection
+
+descendez le volume et remontez un db fraiche 
+
+docker-compose down --volumes
+
+docker-compose up --build
+
+
+
+
 ## Installation et lancement
 
 1. Clonez le projet
