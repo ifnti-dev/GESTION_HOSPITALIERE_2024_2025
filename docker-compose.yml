@@ -23,7 +23,6 @@ services:
   backend:
     build:
       context: ./GESTION_HOSPITALIRE_BACKEND
-      # Utiliser le réseau host pour éviter les problèmes DNS
       network: host
     restart: always
     ports:
@@ -68,7 +67,6 @@ services:
 volumes:
   postgres_data:
 
-# Réseau pour la communication entre les services
 networks:
   app-network:
     driver: bridge
