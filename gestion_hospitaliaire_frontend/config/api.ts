@@ -240,7 +240,7 @@ export const API_ENDPOINTS = {
       EMPLOYES: "/api/employe/stats",
       EMPLOYE_COUNT: (id: number) => `/api/roles/${id}/employes/count`,
       ROLES: "/api/roles/stats",
-      EMPLOYES_PAR_ROLE: "/api/employe/stats/roles", // ✅ Ajouté ici
+      EMPLOYES_PAR_ROLE: "/api/employe/stats/roles",
     },
   },
 

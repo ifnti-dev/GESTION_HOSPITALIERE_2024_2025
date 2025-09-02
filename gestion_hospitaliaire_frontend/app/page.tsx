@@ -224,13 +224,8 @@ export default function HomePage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
-              { title: "Médecin Généraliste", desc: "Consultations, prescriptions, dossiers médicaux", color: "blue" },
-              { title: "Infirmier", desc: "Soins, constantes vitales, suivi patients", color: "green" },
-              { title: "Sage-femme", desc: "Grossesses, accouchements, soins postnataux", color: "pink" },
               { title: "Pharmacien", desc: "Gestion stocks, délivrance médicaments", color: "purple" },
-              { title: "Caissier", desc: "Facturation, encaissements, prises en charge", color: "orange" },
-              { title: "Directeur", desc: "Supervision, statistiques, gestion globale", color: "red" },
-            ].map((module, index) => (
+                 ].map((module, index) => (
               <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300">
                 <CardHeader>
                   <CardTitle className="text-lg font-semibold text-gray-900">{module.title}</CardTitle>
