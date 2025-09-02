@@ -18,13 +18,13 @@ public class HosptalisationControlller {
     @Autowired
     private HospitalisationService hospitalisationService;
 
-    // ✅ Lister toutes les hospitalisations
+    // Lister toutes les hospitalisations
     @GetMapping
     public List<Hospitalisation> getAllHospitalisations() {
         return hospitalisationService.findAll();
     }
 
-    // ✅ Récupérer une hospitalisation par ID
+    //  Récupérer une hospitalisation par ID
     @GetMapping("/{id}")
     public ResponseEntity<Hospitalisation> getHospitalisationById(@PathVariable Long id) {
         return hospitalisationService.findById(id)
