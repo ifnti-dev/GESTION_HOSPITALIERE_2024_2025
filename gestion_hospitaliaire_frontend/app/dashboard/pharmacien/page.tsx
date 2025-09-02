@@ -1,20 +1,12 @@
 "use client"
 
 import { PharmacienSidebar } from "@/components/sidebars/pharmacien-sidebar"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Progress } from "@/components/ui/progress"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { useDashboardStats } from "@/hooks/pharmacie/useDashboardStats"
 import { formatPrice, formatPercentage } from "@/utils/formatters"
 import {
-  Pill,
   Package,
   AlertTriangle,
-  TrendingUp,
   ShoppingCart,
-  Activity,
   Bell,
   DollarSign,
   RefreshCw,
@@ -22,33 +14,17 @@ import {
   AlertCircle,
   CheckCircle,
   BarChart3,
-  PieChartIcon as RechartsPieChart,
   Users,
-  Target,
-  Zap,
   ArrowUpRight,
   ArrowDownRight,
+  Search,
 } from "lucide-react"
 import Link from "next/link"
-import {
-  Line,
-  AreaChart,
-  Area,
-  BarChart,
-  Bar,
-  Pie,
-  Cell,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  ResponsiveContainer,
-  Legend,
-} from "recharts"
-
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8", "#82CA9D"]
+import { useState } from "react"
 
 export default function PharmacienDashboard() {
   const { stats, loading, error, refreshStats } = useDashboardStats()
+  const [searchTerm, setSearchTerm] = useState("")
 
   if (loading) {
     return (
@@ -63,11 +39,6 @@ export default function PharmacienDashboard() {
               <div key={i} className="h-32 bg-gray-200 rounded-lg animate-pulse"></div>
             ))}
           </div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="h-80 bg-gray-200 rounded-lg animate-pulse"></div>
-            ))}
-          </div>
         </div>
       </PharmacienSidebar>
     )
@@ -80,10 +51,13 @@ export default function PharmacienDashboard() {
           <div className="text-center">
             <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
             <p className="text-red-600 mb-4">{error}</p>
-            <Button onClick={refreshStats} variant="outline">
-              <RefreshCw className="h-4 w-4 mr-2" />
+            <button
+              onClick={refreshStats}
+              className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 flex items-center gap-2"
+            >
+              <RefreshCw className="h-4 w-4" />
               Réessayer
-            </Button>
+            </button>
           </div>
         </div>
       </PharmacienSidebar>
@@ -92,28 +66,26 @@ export default function PharmacienDashboard() {
 
   if (!stats) return null
 
-  const chartConfig = {
-    ventes: {
-      label: "Ventes",
-      color: "hsl(var(--chart-1))",
-    },
-    commandes: {
-      label: "Commandes",
-      color: "hsl(var(--chart-2))",
-    },
-    stock: {
-      label: "Stock",
-      color: "hsl(var(--chart-3))",
-    },
-    entrees: {
-      label: "Entrées",
-      color: "hsl(var(--chart-4))",
-    },
-    sorties: {
-      label: "Sorties",
-      color: "hsl(var(--chart-5))",
-    },
-  }
+  const allStats = [
+    { name: "Ventes Aujourd'hui", value: formatPrice(stats.ventesAujourdhui), type: "ventes" },
+    { name: "Valeur Stock Total", value: formatPrice(stats.valeurTotalStock), type: "stock" },
+    { name: "Produits Actifs", value: stats.totalMedicaments.toLocaleString(), type: "produits" },
+    { name: "Alertes Actives", value: stats.alertesStock.toString(), type: "alertes" },
+    { name: "Commandes Aujourd'hui", value: stats.commandesAujourdhui.toString(), type: "commandes" },
+    { name: "Total Lots", value: stats.totalLots.toString(), type: "lots" },
+    { name: "Nombre Fournisseurs", value: stats.nombreFournisseurs.toString(), type: "fournisseurs" },
+    { name: "Lots Expirés", value: stats.lotsExpires.toString(), type: "expiration" },
+    { name: "Lots Expirant Bientôt", value: stats.lotsExpirantBientot.toString(), type: "expiration" },
+    { name: "Taux Rotation Stock", value: formatPercentage(stats.tauxRotationStock), type: "performance" },
+    { name: "Marge Globale", value: formatPercentage(stats.margeGlobale), type: "performance" },
+    { name: "Notifications Non Lues", value: stats.notificationsNonLues.toString(), type: "notifications" },
+  ]
+
+  const filteredStats = allStats.filter(
+    (stat) =>
+      stat.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      stat.type.toLowerCase().includes(searchTerm.toLowerCase()),
+  )
 
   return (
     <PharmacienSidebar>
@@ -122,7 +94,7 @@ export default function PharmacienDashboard() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-              <div className="p-3 bg-gray-100 border rounded-lg">
+              <div className="p-3 bg-gray-100 rounded-lg">
                 <BarChart3 className="h-8 w-8 text-gray-700" />
               </div>
               Dashboard Pharmacie
@@ -130,494 +102,263 @@ export default function PharmacienDashboard() {
             <p className="text-gray-600 mt-2">Tableau de bord analytique et opérationnel</p>
           </div>
           <div className="flex items-center gap-2">
-            <Button onClick={refreshStats} variant="outline" size="sm">
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Actualiser
-            </Button>
+            <button
+              onClick={refreshStats}
+              className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 flex items-center gap-2"
+            >
+
+            </button>
             {stats.notificationsNonLues > 0 && (
               <Link href="/dashboard/pharmacien/notifications">
-                <Button variant="outline" size="sm" className="relative bg-transparent">
-                  <Bell className="h-4 w-4 mr-2" />
+                <button className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 flex items-center gap-2 relative">
+                  <Bell className="h-4 w-4" />
                   Notifications
-                  <Badge className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-1.5 py-0.5">
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">
                     {stats.notificationsNonLues}
-                  </Badge>
-                </Button>
+                  </span>
+                </button>
               </Link>
             )}
           </div>
         </div>
 
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Rechercher une statistique..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+        </div>
+
         {/* Alertes importantes */}
         {(stats.alertesImportantes.length > 0 || stats.lotsExpires > 0) && (
-          <Card className="border-red-200 bg-red-50">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-red-800 flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5" />
-                Alertes Critiques
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                {stats.lotsExpires > 0 && (
-                  <div className="flex items-center justify-between p-3 bg-red-100 rounded-lg">
-                    <div>
-                      <span className="text-red-800 font-medium">{stats.lotsExpires} lot(s) expirés</span>
-                      <p className="text-red-600 text-xs">Action immédiate requise</p>
-                    </div>
-                    <Link href="/dashboard/pharmacien/stock">
-                      <Button size="sm" variant="outline" className="text-red-700 border-red-300 bg-transparent">
-                        Voir
-                      </Button>
-                    </Link>
+          <div className="bg-red-50 p-4 rounded-lg">
+            <h3 className="text-red-800 font-medium flex items-center gap-2 mb-3">
+              <AlertTriangle className="h-5 w-5" />
+              Alertes Critiques
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              {stats.lotsExpires > 0 && (
+                <div className="flex items-center justify-between p-3 bg-red-100 rounded-lg">
+                  <div>
+                    <span className="text-red-800 font-medium">{stats.lotsExpires} lot(s) expirés</span>
+                    <p className="text-red-600 text-xs">Action immédiate requise</p>
                   </div>
-                )}
-                {stats.alertesStock > 10 && (
-                  <div className="flex items-center justify-between p-3 bg-orange-100 rounded-lg">
-                    <div>
-                      <span className="text-orange-800 font-medium">{stats.alertesStock} stocks critiques</span>
-                      <p className="text-orange-600 text-xs">Réapprovisionnement nécessaire</p>
-                    </div>
-                    <Link href="/dashboard/pharmacien/stock">
-                      <Button size="sm" variant="outline" className="text-orange-700 border-orange-300 bg-transparent">
-                        Gérer
-                      </Button>
-                    </Link>
-                  </div>
-                )}
-                {stats.lotsExpirantBientot > 5 && (
-                  <div className="flex items-center justify-between p-3 bg-yellow-100 rounded-lg">
-                    <div>
-                      <span className="text-yellow-800 font-medium">
-                        {stats.lotsExpirantBientot} lots expirent bientôt
-                      </span>
-                      <p className="text-yellow-600 text-xs">Surveillance requise</p>
-                    </div>
-                    <Link href="/dashboard/pharmacien/stock">
-                      <Button size="sm" variant="outline" className="text-yellow-700 border-yellow-300 bg-transparent">
-                        Planifier
-                      </Button>
-                    </Link>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* KPIs principaux */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card className="border">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-700 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <DollarSign className="h-4 w-4" />
-                  Ventes Aujourd'hui
-                </div>
-                {stats.ventesEvolution >= 0 ? (
-                  <ArrowUpRight className="h-4 w-4 text-green-600" />
-                ) : (
-                  <ArrowDownRight className="h-4 w-4 text-red-600" />
-                )}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-gray-900">{formatPrice(stats.ventesAujourdhui)}</div>
-              <div className="flex items-center mt-1">
-                <span className={`text-xs ${stats.ventesEvolution >= 0 ? "text-green-600" : "text-red-600"}`}>
-                  {stats.ventesEvolution >= 0 ? "+" : ""}
-                  {stats.ventesEvolution.toFixed(1)}% vs hier
-                </span>
-              </div>
-              <p className="text-xs text-gray-600 mt-1">{stats.commandesAujourdhui} commandes</p>
-            </CardContent>
-          </Card>
-
-          <Card className="border">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                <Package className="h-4 w-4" />
-                Valeur Stock Total
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-gray-900">{formatPrice(stats.valeurTotalStock)}</div>
-              <div className="flex items-center mt-1">
-                <Target className="h-3 w-3 text-gray-600 mr-1" />
-                <span className="text-xs text-gray-600">Rotation: {stats.tauxRotationStock}%</span>
-              </div>
-              <p className="text-xs text-gray-600 mt-1">{stats.totalLots} lots actifs</p>
-            </CardContent>
-          </Card>
-
-          <Card className="border">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                <Pill className="h-4 w-4" />
-                Produits Actifs
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-gray-900">{stats.totalMedicaments.toLocaleString()}</div>
-              <div className="flex items-center mt-1">
-                <Users className="h-3 w-3 text-gray-600 mr-1" />
-                <span className="text-xs text-gray-600">{stats.nombreFournisseurs} fournisseurs</span>
-              </div>
-              <p className="text-xs text-gray-600 mt-1">Marge: {stats.margeGlobale}%</p>
-            </CardContent>
-          </Card>
-
-          <Card className="border">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                <AlertTriangle className="h-4 w-4" />
-                Alertes Actives
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-gray-900">{stats.alertesStock}</div>
-              <div className="flex items-center mt-1">
-                <Zap className="h-3 w-3 text-gray-600 mr-1" />
-                <span className="text-xs text-gray-600">{stats.lotsExpirantBientot} expirent bientôt</span>
-              </div>
-              <p className="text-xs text-gray-600 mt-1">{stats.lotsExpires} lots expirés</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Graphiques principaux */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Évolution des ventes */}
-          <Card className="border">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-gray-600" />
-                Évolution des Ventes (7 jours)
-              </CardTitle>
-              <CardDescription>Ventes quotidiennes et nombre de commandes</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ChartContainer config={chartConfig} className="h-[300px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={stats.ventesParJour}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
-                    <YAxis />
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                    <Area
-                      type="monotone"
-                      dataKey="ventes"
-                      stroke="hsl(var(--chart-1))"
-                      fill="hsl(var(--chart-1))"
-                      fillOpacity={0.3}
-                      name="Ventes (FCFA)"
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="commandes"
-                      stroke="hsl(var(--chart-2))"
-                      strokeWidth={2}
-                      name="Commandes"
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </ChartContainer>
-            </CardContent>
-          </Card>
-
-          {/* Répartition du stock par catégorie */}
-          <Card className="border">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <RechartsPieChart className="h-5 w-5 text-gray-600" />
-                Stock par Catégorie
-              </CardTitle>
-              <CardDescription>Répartition de la valeur du stock</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ChartContainer config={chartConfig} className="h-[300px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <RechartsPieChart>
-                    <Pie
-                      data={stats.stockParCategorie}
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="valeur"
-                      label={({ categorie, percent }) => `${categorie} (${(percent * 100).toFixed(0)}%)`}
-                    >
-                      {stats.stockParCategorie.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <ChartTooltip
-                      content={({ active, payload }) => {
-                        if (active && payload && payload.length) {
-                          const data = payload[0].payload
-                          return (
-                            <div className="bg-white p-3 border rounded shadow">
-                              <p className="font-medium">{data.categorie}</p>
-                              <p className="text-sm">Valeur: {formatPrice(data.valeur)}</p>
-                              <p className="text-sm">Stock: {data.stock} unités</p>
-                            </div>
-                          )
-                        }
-                        return null
-                      }}
-                    />
-                  </RechartsPieChart>
-                </ResponsiveContainer>
-              </ChartContainer>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Graphiques secondaires */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Top produits */}
-          <Card className="border">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="h-5 w-5 text-gray-600" />
-                Top Produits
-              </CardTitle>
-              <CardDescription>Produits les plus performants</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ChartContainer config={chartConfig} className="h-[300px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={stats.topProduits} layout="horizontal">
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis type="number" />
-                    <YAxis dataKey="nom" type="category" width={100} />
-                    <ChartTooltip
-                      content={({ active, payload }) => {
-                        if (active && payload && payload.length) {
-                          const data = payload[0].payload
-                          return (
-                            <div className="bg-white p-3 border rounded shadow">
-                              <p className="font-medium">{data.nom}</p>
-                              <p className="text-sm">CA: {formatPrice(data.chiffreAffaires)}</p>
-                              <p className="text-sm">Quantité: {data.quantiteVendue}</p>
-                            </div>
-                          )
-                        }
-                        return null
-                      }}
-                    />
-                    <Bar dataKey="chiffreAffaires" fill="hsl(var(--chart-3))" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </ChartContainer>
-            </CardContent>
-          </Card>
-
-          {/* Alertes par type */}
-          <Card className="border">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <AlertCircle className="h-5 w-5 text-gray-600" />
-                Alertes par Type
-              </CardTitle>
-              <CardDescription>Distribution des alertes actives</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {stats.alertesParType.map((alerte, index) => (
-                  <div key={index} className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-4 h-4 rounded-full" style={{ backgroundColor: alerte.color }} />
-                      <span className="text-sm font-medium">{alerte.type}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Progress
-                        value={(alerte.count / Math.max(...stats.alertesParType.map((a) => a.count))) * 100}
-                        className="w-20 h-2"
-                      />
-                      <Badge variant="outline">{alerte.count}</Badge>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Évolution du stock */}
-        <Card className="border">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Activity className="h-5 w-5 text-gray-600" />
-              Évolution du Stock (6 mois)
-            </CardTitle>
-            <CardDescription>Mouvements d'entrées et sorties de stock</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer config={chartConfig} className="h-[400px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={stats.evolutionStock}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="mois" />
-                  <YAxis />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Legend />
-                  <Area
-                    type="monotone"
-                    dataKey="entrees"
-                    stackId="1"
-                    stroke="hsl(var(--chart-4))"
-                    fill="hsl(var(--chart-4))"
-                    name="Entrées"
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="sorties"
-                    stackId="2"
-                    stroke="hsl(var(--chart-5))"
-                    fill="hsl(var(--chart-5))"
-                    name="Sorties"
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="stock"
-                    stroke="hsl(var(--chart-1))"
-                    strokeWidth={3}
-                    name="Stock Total"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </ChartContainer>
-          </CardContent>
-        </Card>
-
-        {/* Activité récente et actions rapides */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Produits à stock faible */}
-          <Card className="border">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Package className="h-5 w-5 text-gray-600" />
-                Stock Critique
-              </CardTitle>
-              <CardDescription>Produits nécessitant un réapprovisionnement</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3 max-h-80 overflow-y-auto">
-                {stats.produitsStockFaible.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500">
-                    <CheckCircle className="h-12 w-12 mx-auto mb-2 text-green-500" />
-                    <p>Aucun produit en stock critique</p>
-                  </div>
-                ) : (
-                  stats.produitsStockFaible.map((produit, index) => (
-                    <div
-                      key={index}
-                      className={`flex items-center justify-between p-3 rounded-lg ${
-                        produit.statut === "rupture"
-                          ? "bg-red-50 border border-red-200"
-                          : produit.statut === "critique"
-                            ? "bg-orange-50 border border-orange-200"
-                            : "bg-yellow-50 border border-yellow-200"
-                      }`}
-                    >
-                      <div className="flex-1">
-                        <p className="font-medium text-gray-900 text-sm">{produit.nom}</p>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className="text-xs text-gray-600">
-                            Stock: {produit.stock} / Min: {produit.minimum}
-                          </span>
-                          {produit.stock > 0 && (
-                            <Progress value={(produit.stock / produit.minimum) * 100} className="w-16 h-2" />
-                          )}
-                        </div>
-                      </div>
-                      <Badge
-                        className={
-                          produit.statut === "rupture"
-                            ? "bg-red-100 text-red-800 hover:bg-red-100"
-                            : produit.statut === "critique"
-                              ? "bg-orange-100 text-orange-800 hover:bg-orange-100"
-                              : "bg-yellow-100 text-yellow-800 hover:bg-yellow-100"
-                        }
-                      >
-                        {produit.statut === "rupture"
-                          ? "Rupture"
-                          : produit.statut === "critique"
-                            ? "Critique"
-                            : "Faible"}
-                      </Badge>
-                    </div>
-                  ))
-                )}
-              </div>
-              {stats.produitsStockFaible.length > 0 && (
-                <div className="mt-4 pt-4 border-t">
                   <Link href="/dashboard/pharmacien/stock">
-                    <Button variant="outline" className="w-full bg-transparent">
-                      <Eye className="h-4 w-4 mr-2" />
-                      Gérer les stocks
-                    </Button>
+                    <button className="px-3 py-1 text-sm border border-red-300 rounded-md text-red-700 hover:bg-red-50">
+                      Voir
+                    </button>
                   </Link>
                 </div>
               )}
-            </CardContent>
-          </Card>
+              {stats.alertesStock > 10 && (
+                <div className="flex items-center justify-between p-3 bg-orange-100 rounded-lg">
+                  <div>
+                    <span className="text-orange-800 font-medium">{stats.alertesStock} stocks critiques</span>
+                    <p className="text-orange-600 text-xs">Réapprovisionnement nécessaire</p>
+                  </div>
+                  <Link href="/dashboard/pharmacien/stock">
+                    <button className="px-3 py-1 text-sm border border-orange-300 rounded-md text-orange-700 hover:bg-orange-50">
+                      Gérer
+                    </button>
+                  </Link>
+                </div>
+              )}
+              {stats.lotsExpirantBientot > 5 && (
+                <div className="flex items-center justify-between p-3 bg-yellow-100 rounded-lg">
+                  <div>
+                    <span className="text-yellow-800 font-medium">
+                      {stats.lotsExpirantBientot} lots expirent bientôt
+                    </span>
+                    <p className="text-yellow-600 text-xs">Surveillance requise</p>
+                  </div>
+                  <Link href="/dashboard/pharmacien/stock">
+                    <button className="px-3 py-1 text-sm border border-yellow-300 rounded-md text-yellow-700 hover:bg-yellow-50">
+                      Planifier
+                    </button>
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
-          {/* Actions rapides */}
-          <Card className="border">
-            <CardHeader>
-              <CardTitle>Actions Rapides</CardTitle>
-              <CardDescription>Accès rapide aux fonctionnalités principales</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 gap-4">
-                <Link href="/dashboard/pharmacien/stock">
-                  <Button variant="outline" className="w-full h-20 flex-col bg-transparent">
-                    <Package className="h-6 w-6 mb-2 text-gray-600" />
-                    <span className="text-sm">Gérer Stock</span>
-                  </Button>
-                </Link>
-                <Link href="/dashboard/pharmacien/commandes">
-                  <Button variant="outline" className="w-full h-20 flex-col bg-transparent">
-                    <ShoppingCart className="h-6 w-6 mb-2 text-gray-600" />
-                    <span className="text-sm">Commandes</span>
-                  </Button>
-                </Link>
-                <Link href="/dashboard/pharmacien/rapports">
-                  <Button variant="outline" className="w-full h-20 flex-col bg-transparent">
-                    <BarChart3 className="h-6 w-6 mb-2 text-gray-600" />
-                    <span className="text-sm">Rapports</span>
-                  </Button>
-                </Link>
-                <Link href="/dashboard/pharmacien/notifications">
-                  <Button variant="outline" className="w-full h-20 flex-col relative bg-transparent">
-                    <Bell className="h-6 w-6 mb-2 text-gray-600" />
-                    <span className="text-sm">Notifications</span>
-                    {stats.notificationsNonLues > 0 && (
-                      <Badge className="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1.5 py-0.5">
-                        {stats.notificationsNonLues}
-                      </Badge>
-                    )}
-                  </Button>
-                </Link>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {filteredStats.slice(0, 12).map((stat, index) => (
+            <div key={index} className="bg-white p-4 rounded-lg shadow-sm">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-sm font-medium text-gray-700">{stat.name}</h3>
+                {stat.type === "ventes" && stats.ventesEvolution >= 0 ? (
+                  <ArrowUpRight className="h-4 w-4 text-green-600" />
+                ) : stat.type === "ventes" ? (
+                  <ArrowDownRight className="h-4 w-4 text-red-600" />
+                ) : null}
               </div>
+              <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
+              {stat.type === "ventes" && (
+                <div className="flex items-center mt-1">
+                  <span className={`text-xs ${stats.ventesEvolution >= 0 ? "text-green-600" : "text-red-600"}`}>
+                    {stats.ventesEvolution >= 0 ? "+" : ""}
+                    {stats.ventesEvolution.toFixed(1)}% vs hier
+                  </span>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
 
-              {/* Métriques supplémentaires */}
-              <div className="mt-6 pt-4 border-t">
-                <div className="grid grid-cols-2 gap-4 text-center">
-                  <div className="p-3 bg-gray-50 border rounded-lg">
-                    <div className="text-lg font-bold text-gray-800">{formatPercentage(stats.tauxRotationStock)}</div>
-                    <div className="text-xs text-gray-600">Taux de rotation</div>
-                  </div>
-                  <div className="p-3 bg-gray-50 border rounded-lg">
-                    <div className="text-lg font-bold text-gray-800">{formatPercentage(stats.margeGlobale)}</div>
-                    <div className="text-xs text-gray-600">Marge globale</div>
-                  </div>
+        <div className="bg-white p-6 rounded-lg shadow-sm">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Statistiques Détaillées</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="p-4 bg-gray-50 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <DollarSign className="h-5 w-5 text-gray-600" />
+                <span className="font-medium text-gray-700">Performance Financière</span>
+              </div>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span>Ventes du mois:</span>
+                  <span className="font-medium">{formatPrice(stats.ventesAujourdhui * 30)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Marge moyenne:</span>
+                  <span className="font-medium">{formatPercentage(stats.margeGlobale)}</span>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+
+            <div className="p-4 bg-gray-50 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <Package className="h-5 w-5 text-gray-600" />
+                <span className="font-medium text-gray-700">Gestion Stock</span>
+              </div>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span>Rotation stock:</span>
+                  <span className="font-medium">{formatPercentage(stats.tauxRotationStock)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Valeur moyenne/lot:</span>
+                  <span className="font-medium">{formatPrice(stats.valeurTotalStock / stats.totalLots)}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-4 bg-gray-50 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <Users className="h-5 w-5 text-gray-600" />
+                <span className="font-medium text-gray-700">Activité</span>
+              </div>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span>Commandes/jour:</span>
+                  <span className="font-medium">{stats.commandesAujourdhui}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Fournisseurs actifs:</span>
+                  <span className="font-medium">{stats.nombreFournisseurs}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Produits à stock faible */}
+        <div className="bg-white p-6 rounded-lg shadow-sm">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <Package className="h-5 w-5 text-gray-600" />
+            Stock Critique
+          </h3>
+          <div className="space-y-3 max-h-80 overflow-y-auto">
+            {stats.produitsStockFaible.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                <CheckCircle className="h-12 w-12 mx-auto mb-2 text-green-500" />
+                <p>Aucun produit en stock critique</p>
+              </div>
+            ) : (
+              stats.produitsStockFaible.map((produit, index) => (
+                <div
+                  key={index}
+                  className={`flex items-center justify-between p-3 rounded-lg ${
+                    produit.statut === "rupture"
+                      ? "bg-red-50"
+                      : produit.statut === "critique"
+                        ? "bg-orange-50"
+                        : "bg-yellow-50"
+                  }`}
+                >
+                  <div className="flex-1">
+                    <p className="font-medium text-gray-900 text-sm">{produit.nom}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-xs text-gray-600">
+                        Stock: {produit.stock} / Min: {produit.minimum}
+                      </span>
+                    </div>
+                  </div>
+                  <span
+                    className={`px-2 py-1 text-xs rounded-full ${
+                      produit.statut === "rupture"
+                        ? "bg-red-100 text-red-800"
+                        : produit.statut === "critique"
+                          ? "bg-orange-100 text-orange-800"
+                          : "bg-yellow-100 text-yellow-800"
+                    }`}
+                  >
+                    {produit.statut === "rupture" ? "Rupture" : produit.statut === "critique" ? "Critique" : "Faible"}
+                  </span>
+                </div>
+              ))
+            )}
+          </div>
+          {stats.produitsStockFaible.length > 0 && (
+            <div className="mt-4 pt-4 border-t">
+              <Link href="/dashboard/pharmacien/stock">
+                <button className="w-full px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 flex items-center justify-center gap-2">
+                  <Eye className="h-4 w-4" />
+                  Gérer les stocks
+                </button>
+              </Link>
+            </div>
+          )}
+        </div>
+
+        {/* Actions rapides */}
+        <div className="bg-white p-6 rounded-lg shadow-sm">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Actions Rapides</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <Link href="/dashboard/pharmacien/stock">
+              <button className="w-full h-20 flex flex-col items-center justify-center gap-2 border border-gray-300 rounded-md hover:bg-gray-50">
+                <Package className="h-6 w-6 text-gray-600" />
+                <span className="text-sm">Gérer Stock</span>
+              </button>
+            </Link>
+            <Link href="/dashboard/pharmacien/commandes">
+              <button className="w-full h-20 flex flex-col items-center justify-center gap-2 border border-gray-300 rounded-md hover:bg-gray-50">
+                <ShoppingCart className="h-6 w-6 text-gray-600" />
+                <span className="text-sm">Commandes</span>
+              </button>
+            </Link>
+            <Link href="/dashboard/pharmacien/rapports">
+              <button className="w-full h-20 flex flex-col items-center justify-center gap-2 border border-gray-300 rounded-md hover:bg-gray-50">
+                <BarChart3 className="h-6 w-6 text-gray-600" />
+                <span className="text-sm">Rapports</span>
+              </button>
+            </Link>
+            <Link href="/dashboard/pharmacien/notifications">
+              <button className="w-full h-20 flex flex-col items-center justify-center gap-2 border border-gray-300 rounded-md hover:bg-gray-50 relative">
+                <Bell className="h-6 w-6 text-gray-600" />
+                <span className="text-sm">Notifications</span>
+                {stats.notificationsNonLues > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">
+                    {stats.notificationsNonLues}
+                  </span>
+                )}
+              </button>
+            </Link>
+          </div>
         </div>
       </div>
     </PharmacienSidebar>

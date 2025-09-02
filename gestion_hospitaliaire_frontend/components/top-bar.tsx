@@ -81,7 +81,7 @@ export function TopBar({ sidebarOpen, setSidebarOpen, isMobile }: TopBarProps) {
   }
 
   return (
-    <header className="w-full border-b bg-white">
+    <header className="w-full border-b bg-white-900">
       <div className="px-6 py-4">
         <div className="flex items-center justify-between">
           {/* Left Section */}
@@ -126,7 +126,7 @@ export function TopBar({ sidebarOpen, setSidebarOpen, isMobile }: TopBarProps) {
                     {userInfo.email && <p className="text-xs text-gray-500">{userInfo.email}</p>}
                   </div>
                 </DropdownMenuLabel>
-                <DropdownMenuSeparator />
+                {/* <DropdownMenuSeparator />
                 <DropdownMenuItem>
                   <User className="mr-2 h-4 w-4" />
                   Mon Profil
@@ -135,7 +135,7 @@ export function TopBar({ sidebarOpen, setSidebarOpen, isMobile }: TopBarProps) {
                   <Settings className="mr-2 h-4 w-4" />
                   Paramètres
                 </DropdownMenuItem>
-                <DropdownMenuSeparator />
+                <DropdownMenuSeparator /> */}
                 <DropdownMenuItem className="text-red-600" onClick={handleLogout}>
                   <LogOut className="mr-2 h-4 w-4" />
                   Déconnexion

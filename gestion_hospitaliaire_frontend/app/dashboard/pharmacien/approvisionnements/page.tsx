@@ -263,7 +263,7 @@ export default function ApprovisionnementPage() {
       resetForm()
 
       // Afficher un message de succès
-      alert("Approvisionnement sauvegardé avec succès!")
+      // alert("Approvisionnement sauvegardé avec succès!")
     } catch (error) {
       console.error("Erreur lors de la sauvegarde:", error)
       alert(`Erreur lors de la sauvegarde: ${error instanceof Error ? error.message : "Erreur inconnue"}`)
@@ -288,7 +288,7 @@ export default function ApprovisionnementPage() {
       alert("Approvisionnement supprimé avec succès!")
     } catch (error) {
       console.error("Erreur lors de la suppression:", error)
-      alert(`Erreur lors de la suppression: ${error instanceof Error ? error.message : "Erreur inconnue"}`)
+      // alert(`Erreur lors de la suppression: ${error instanceof Error ? error.message : "Erreur inconnue"}`)
     }
   }
 
@@ -298,6 +298,20 @@ export default function ApprovisionnementPage() {
 
   // Calcul du total du formulaire
   const totalFormulaire = formLignes.reduce((sum, ligne) => sum + ligne.quantite * ligne.prixUnitaireVente, 0)
+
+  const canGoToLignes = () => {
+    return fournisseur.trim() !== ""
+  }
+
+  const canGoToResume = () => {
+    return (
+      canGoToLignes() &&
+      formLignes.length > 0 &&
+      formLignes.some(
+        (ligne) => ligne.medicamentReferenceId && ligne.quantite > 0 && ligne.dateReception && ligne.dateExpiration,
+      )
+    )
+  }
 
   if (approLoading) {
     return (
@@ -414,7 +428,7 @@ export default function ApprovisionnementPage() {
                             }}
                             className="p-1 hover:bg-blue-100 rounded"
                           >
-                            <Edit className="h-4 w-4 text-blue-600" />
+                            {/* <Edit className="h-4 w-4 text-blue-600" /> */}
                           </button>
                           <button
                             onClick={(e) => {
@@ -564,13 +578,27 @@ export default function ApprovisionnementPage() {
                     </button>
                     <button
                       onClick={() => setActiveTab("lignes")}
-                      className={`px-4 py-2 rounded ${activeTab === "lignes" ? "bg-blue-500 text-white" : "bg-gray-200"}`}
+                      disabled={!canGoToLignes()}
+                      className={`px-4 py-2 rounded ${
+                        activeTab === "lignes"
+                          ? "bg-blue-500 text-white"
+                          : canGoToLignes()
+                            ? "bg-gray-200 hover:bg-gray-300"
+                            : "bg-gray-100 text-gray-400 cursor-not-allowed opacity-50"
+                      }`}
                     >
                       Lignes ({formLignes.length})
                     </button>
                     <button
                       onClick={() => setActiveTab("resume")}
-                      className={`px-4 py-2 rounded ${activeTab === "resume" ? "bg-blue-500 text-white" : "bg-gray-200"}`}
+                      disabled={!canGoToResume()}
+                      className={`px-4 py-2 rounded ${
+                        activeTab === "resume"
+                          ? "bg-blue-500 text-white"
+                          : canGoToResume()
+                            ? "bg-gray-200 hover:bg-gray-300"
+                            : "bg-gray-100 text-gray-400 cursor-not-allowed opacity-50"
+                      }`}
                     >
                       Résumé
                     </button>
@@ -588,6 +616,9 @@ export default function ApprovisionnementPage() {
                           className="w-full px-3 py-2 bg-gray-50 rounded"
                           required
                         />
+                        {!fournisseur.trim() && (
+                          <p className="text-red-500 text-xs mt-1">Le fournisseur est obligatoire</p>
+                        )}
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Date d'Approvisionnement</label>
@@ -602,12 +633,22 @@ export default function ApprovisionnementPage() {
                       <div className="flex justify-end">
                         <button
                           onClick={() => setActiveTab("lignes")}
-                          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center gap-2"
+                          disabled={!canGoToLignes()}
+                          className={`px-4 py-2 rounded flex items-center gap-2 ${
+                            canGoToLignes()
+                              ? "bg-blue-500 hover:bg-blue-600 text-white"
+                              : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                          }`}
                         >
                           Suivant: Ajouter des lignes
                           <ChevronRight className="h-4 w-4" />
                         </button>
                       </div>
+                      {!canGoToLignes() && (
+                        <p className="text-red-500 text-sm text-center">
+                          Veuillez remplir le fournisseur pour continuer
+                        </p>
+                      )}
                     </div>
                   )}
 
@@ -624,20 +665,23 @@ export default function ApprovisionnementPage() {
                         </button>
                       </div>
 
-                      {formLignes.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center h-64 text-gray-500">
-                          <Package className="h-12 w-12 mb-4 opacity-50" />
-                          <p className="text-lg font-medium">Aucune ligne ajoutée</p>
-                          <p className="text-sm mb-4">Cliquez sur "Ajouter Ligne" pour commencer</p>
-                          <button
-                            onClick={addFormLigne}
-                            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center gap-2"
-                          >
-                            <Plus className="h-4 w-4" />
-                            Première Ligne
-                          </button>
+                      {formLignes.length === 0 && (
+                        <div className="bg-yellow-50 border border-yellow-200 rounded p-3">
+                          <p className="text-yellow-800 text-sm">
+                            Ajoutez au moins une ligne complète pour accéder au résumé
+                          </p>
                         </div>
-                      ) : (
+                      )}
+
+                      {formLignes.length > 0 && !canGoToResume() && (
+                        <div className="bg-yellow-50 border border-yellow-200 rounded p-3">
+                          <p className="text-yellow-800 text-sm">
+                            Complétez au moins une ligne (médicament, quantité et dates) pour accéder au résumé
+                          </p>
+                        </div>
+                      )}
+
+                      {formLignes.length > 0 && (
                         <div className="h-96 overflow-auto">
                           <table className="w-full">
                             <thead className="bg-gray-100 sticky top-0">
